@@ -49,7 +49,7 @@
 
     /* Suporte a Impressão Limpa */
     @media print {
-      header, #barra-filtros, #kpis-container, .no-print { display: none !important; }
+      header, #barra-filtros, #kpis-container, #secao-analytics, .no-print { display: none !important; }
       body { background: white !important; color: black !important; font-size: 11pt; }
       #lista-pedidos, #view-tabela { display: block !important; }
       .card-pedido { break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
@@ -89,7 +89,7 @@
         <div class="flex items-center gap-2 shrink-0">
           
           <!-- Seletor de Modo de Visualização (Cards / Tabela / Kanban) -->
-          <div class="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
+          <div class="hidden lg:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
             <button id="btn-view-cards" onclick="alternarVisualizacao('cards')" title="Visualização em Grade de Cards" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
               <span>Cards</span>
@@ -112,6 +112,26 @@
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span class="hidden sm:inline">Novo Pedido</span>
+          </button>
+
+          <!-- Botão Som de Notificação Realtime -->
+          <button 
+            id="btn-som"
+            onclick="alternarSom()"
+            title="Alternar Som de Notificação"
+            class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
+          >
+            <svg id="icon-som-on" class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <svg id="icon-som-off" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
+          </button>
+
+          <!-- Botão Tela Cheia (Modo TV / Painel) -->
+          <button 
+            onclick="alternarTelaCheia()"
+            title="Modo Tela Cheia (Modo TV/Painel)"
+            class="hidden sm:block p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
+          >
+            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
           </button>
 
           <!-- Botão Recarregar -->
@@ -209,6 +229,27 @@
 
     </section>
 
+    <!-- PAINEL DE ANALYTICS / DISTRIBUIÇÃO POR SETOR (EXPANSÍVEL) -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden transition-colors">
+      <button 
+        onclick="alternarAnalytics()" 
+        class="w-full px-5 py-3.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
+      >
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>Distribuição de Pedidos e Faturamento por Setor</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="label-toggle-analytics" class="text-[11px] font-medium text-slate-400">Expandir</span>
+          <svg id="seta-analytics" class="w-4 h-4 text-slate-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </button>
+
+      <div id="corpo-analytics" class="hidden px-5 pb-5 pt-1 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+        <!-- Populado dinamicamente com barras de progresso -->
+      </div>
+    </section>
+
     <!-- BARRA DE FILTROS, BUSCA E CONTROLES -->
     <section id="barra-filtros" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs p-4 sm:p-5 space-y-4 transition-colors">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
@@ -261,6 +302,15 @@
           </select>
         </div>
 
+      </div>
+
+      <!-- Filtros Rápidos de Faixa de Valor (Chips) -->
+      <div class="flex flex-wrap items-center gap-2 pt-1">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Faixa:</span>
+        <button onclick="filtrarFaixaValor('todos')" id="btn-faixa-todos" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todos</button>
+        <button onclick="filtrarFaixaValor('ate100')" id="btn-faixa-ate100" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Até R$ 100</button>
+        <button onclick="filtrarFaixaValor('100a200')" id="btn-faixa-100a200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">R$ 100 a R$ 200</button>
+        <button onclick="filtrarFaixaValor('acima200')" id="btn-faixa-acima200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Acima de R$ 200</button>
       </div>
 
       <!-- Rodapé dos Filtros com Contador e Ações -->
@@ -348,9 +398,9 @@
               <th class="px-4 py-3.5">Serviço</th>
               <th class="px-4 py-3.5">Setor</th>
               <th class="px-4 py-3.5">Data / Horário</th>
-              <th class="px-4 py-3.5">Status</th>
+              <th class="px-4 py-3.5">Status (Alterar)</th>
               <th class="px-4 py-3.5 text-right">Valor</th>
-              <th class="px-4 py-3.5 text-center">Contato</th>
+              <th class="px-4 py-3.5 text-center">WhatsApp</th>
               <th class="px-4 py-3.5 text-center">Ações</th>
             </tr>
           </thead>
@@ -487,25 +537,36 @@
 
       </div>
 
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <button onclick="copiarResumoPedido()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          Copiar Resumo
-        </button>
-        <button onclick="fecharModalDetalhes()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
-          Fechar
-        </button>
+      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button onclick="copiarResumoPedido()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Copiar Resumo
+          </button>
+          <button onclick="imprimirComprovanteIndividual()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            Comprovante
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="abrirModalEdicao()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer">
+            Editar
+          </button>
+          <button onclick="fecharModalDetalhes()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+            Fechar
+          </button>
+        </div>
       </div>
 
     </div>
   </div>
 
-  <!-- MODAL: NOVO PEDIDO -->
+  <!-- MODAL: NOVO / EDITAR PEDIDO -->
   <div id="modal-novo" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
       
       <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <h2 id="modal-form-titulo" class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           </span>
@@ -516,7 +577,8 @@
         </button>
       </div>
 
-      <form id="form-novo-pedido" onsubmit="salvarNovoPedido(event)" class="p-6 space-y-4">
+      <form id="form-novo-pedido" onsubmit="salvarPedido(event)" class="p-6 space-y-4">
+        <input type="hidden" id="pedido-id-edicao" value="" />
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -536,13 +598,15 @@
             <datalist id="setores-sugestoes"></datalist>
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Status Inicial</label>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Status</label>
             <select id="novo-status" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white">
               <option value="Pendente">Pendente</option>
               <option value="Agendado">Agendado</option>
               <option value="Confirmado">Confirmado</option>
               <option value="Em andamento">Em andamento</option>
+              <option value="Em produção">Em produção</option>
               <option value="Concluído">Concluído</option>
+              <option value="Cancelado">Cancelado</option>
             </select>
           </div>
         </div>
@@ -570,13 +634,18 @@
 
         <div id="novo-pedido-erro" class="hidden text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 p-3 rounded-xl border border-rose-200 dark:border-rose-800"></div>
 
-        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
-          <button type="button" onclick="fecharModalNovoPedido()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
-            Cancelar
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <button type="button" id="btn-excluir-pedido" onclick="excluirPedidoAtual()" class="hidden text-xs font-bold text-rose-600 hover:text-rose-800 transition cursor-pointer">
+            Excluir Pedido
           </button>
-          <button type="submit" id="btn-salvar-pedido" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5">
-            <span>Salvar Pedido</span>
-          </button>
+          <div class="flex items-center gap-2 ml-auto">
+            <button type="button" onclick="fecharModalNovoPedido()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
+              Cancelar
+            </button>
+            <button type="submit" id="btn-salvar-pedido" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5">
+              <span>Salvar Pedido</span>
+            </button>
+          </div>
         </div>
 
       </form>
@@ -596,6 +665,8 @@
     let pedidoSelecionado = null;
     let modoVisualizacao = localStorage.getItem('modo_visualizacao') || 'cards';
     let filtroKPIAtivo = null;
+    let filtroFaixaValorAtiva = 'todos';
+    let somAtivado = localStorage.getItem('som_notificacao') !== 'false';
 
     // INICIALIZAÇÃO DE TEMA (DARK / LIGHT)
     function iniciarTema() {
@@ -612,6 +683,57 @@
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('tema', isDark ? 'dark' : 'light');
       mostrarToast(isDark ? 'Modo Escuro ativado 🌙' : 'Modo Claro ativado ☀️');
+    }
+
+    // CONTROLE DE SOM WEB AUDIO
+    function alternarSom() {
+      somAtivado = !somAtivado;
+      localStorage.setItem('som_notificacao', somAtivado);
+      document.getElementById('icon-som-on').classList.toggle('hidden', !somAtivado);
+      document.getElementById('icon-som-off').classList.toggle('hidden', somAtivado);
+      mostrarToast(somAtivado ? 'Alertas sonoros ativados 🔔' : 'Alertas sonoros desativados 🔕');
+      if (somAtivado) tocarChime();
+    }
+
+    function tocarChime() {
+      if (!somAtivado) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota D5
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // Nota A5
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+      } catch (e) {}
+    }
+
+    // TELA CHEIA (MODO KIOSK/TV)
+    function alternarTelaCheia() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        mostrarToast('Modo Tela Cheia ativado ⛶');
+      } else {
+        document.exitFullscreen().catch(() => {});
+        mostrarToast('Modo Tela Cheia desativado');
+      }
+    }
+
+    // EXPANDIR / RECOLHER PAINEL ANALYTICS
+    function alternarAnalytics() {
+      const corpo = document.getElementById('corpo-analytics');
+      const seta = document.getElementById('seta-analytics');
+      const label = document.getElementById('label-toggle-analytics');
+      const oculto = corpo.classList.toggle('hidden');
+      seta.classList.toggle('rotate-180', !oculto);
+      label.textContent = oculto ? 'Expandir' : 'Recolher';
     }
 
     // HELPER: NORMALIZAÇÃO DE TEXTO PARA BUSCA ROBUSTA
@@ -689,6 +811,7 @@
         dadosOriginais = data || [];
         preencherFiltrosDinamicos(dadosOriginais);
         atualizarKPIs(dadosOriginais);
+        renderizarAnalyticsSetores(dadosOriginais);
         filtrarEOrdenar();
       } catch (err) {
         console.error('Erro Supabase:', err);
@@ -707,10 +830,13 @@
           .channel('public:pedidos')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
             console.log('Realtime Event:', payload);
+            tocarChime();
             if (payload.eventType === 'INSERT') {
               mostrarToast(`Novo pedido recebido: ${getCampo(payload.new, 'cliente', 'nome') || 'Cliente'}`);
             } else if (payload.eventType === 'UPDATE') {
               mostrarToast(`Pedido atualizado: ${getCampo(payload.new, 'cliente', 'nome') || 'Cliente'}`);
+            } else if (payload.eventType === 'DELETE') {
+              mostrarToast(`Pedido removido`);
             }
             carregarPedidos();
           })
@@ -750,6 +876,48 @@
       document.getElementById('kpi-taxa-sucesso').textContent = `${taxaConclusao}% de conclusão`;
     }
 
+    // ANALYTICS / BARRAS DE DISTRIBUIÇÃO POR SETOR
+    function renderizarAnalyticsSetores(pedidos) {
+      const container = document.getElementById('corpo-analytics');
+      if (!container) return;
+
+      const faturamentoSetor = {};
+      const pedidosSetor = {};
+      let totalGeral = 0;
+
+      pedidos.forEach(p => {
+        const setor = getCampo(p, 'setor', 'categoria', 'departamento') || 'Geral';
+        const valor = extrairNumero(getCampo(p, 'valor', 'preco'));
+        faturamentoSetor[setor] = (faturamentoSetor[setor] || 0) + valor;
+        pedidosSetor[setor] = (pedidosSetor[setor] || 0) + 1;
+        totalGeral += valor;
+      });
+
+      const setores = Object.keys(faturamentoSetor).sort((a, b) => faturamentoSetor[b] - faturamentoSetor[a]);
+
+      container.innerHTML = setores.map(s => {
+        const valor = faturamentoSetor[s];
+        const qtd = pedidosSetor[s];
+        const pct = totalGeral > 0 ? Math.round((valor / totalGeral) * 100) : 0;
+
+        return `
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
+            <div class="flex items-center justify-between font-bold">
+              <span class="text-slate-800 dark:text-slate-200">${s}</span>
+              <span class="text-indigo-600 dark:text-indigo-400 font-extrabold">${formatarMoeda(valor)}</span>
+            </div>
+            <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+              <span>${qtd} ${qtd === 1 ? 'pedido' : 'pedidos'}</span>
+              <span>${pct}% do total</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     // POPULAR FILTROS DINÂMICOS COM CONTAGEM
     function preencherFiltrosDinamicos(pedidos) {
       const statusSelect = document.getElementById('filtro-status');
@@ -779,10 +947,25 @@
           <option value="${s}" ${s === setorAtual ? 'selected' : ''}>${s} (${contagemSetor[s]})</option>
         `).join('');
 
-      // Sugestões para o modal de novo pedido
       if (datalistSetores) {
         datalistSetores.innerHTML = Object.keys(contagemSetor).map(s => `<option value="${s}">`).join('');
       }
+    }
+
+    // FILTRO DE FAIXA DE VALOR (CHIPS)
+    function filtrarFaixaValor(faixa) {
+      filtroFaixaValorAtiva = faixa;
+      ['todos', 'ate100', '100a200', 'acima200'].forEach(f => {
+        const btn = document.getElementById(`btn-faixa-${f}`);
+        if (btn) {
+          if (f === faixa) {
+            btn.className = 'px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer';
+          } else {
+            btn.className = 'px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer';
+          }
+        }
+      });
+      filtrarEOrdenar();
     }
 
     // FILTRAGEM E ORDENAÇÃO
@@ -796,10 +979,9 @@
       const tagFiltroAtivo = document.getElementById('filtro-ativo-tag');
 
       btnLimparBusca.classList.toggle('hidden', !busca);
-      const temFiltro = Boolean(busca || statusFiltro || setorFiltro || filtroKPIAtivo);
+      const temFiltro = Boolean(busca || statusFiltro || setorFiltro || filtroKPIAtivo || filtroFaixaValorAtiva !== 'todos');
       btnLimpar.classList.toggle('hidden', !temFiltro);
 
-      // Feedback de filtro rápido ativo
       if (filtroKPIAtivo) {
         tagFiltroAtivo.textContent = `Filtro: ${filtroKPIAtivo === 'abertos' ? 'Em Aberto' : 'Finalizados'}`;
         tagFiltroAtivo.classList.remove('hidden');
@@ -815,12 +997,13 @@
         const status = getCampo(p, 'status', 'situacao', 'situação') || '';
         const statusNorm = removerAcentos(status);
         const setor = getCampo(p, 'setor', 'categoria', 'departamento', 'area', 'área') || '';
+        const valor = extrairNumero(getCampo(p, 'valor', 'preco', 'preço', 'total'));
 
         const bateBusca = !busca || cliente.includes(busca) || servico.includes(busca) || telefone.includes(busca) || obs.includes(busca);
         const bateStatus = !statusFiltro || status === statusFiltro;
         const bateSetor = !setorFiltro || setor === setorFiltro;
 
-        // Regra do filtro de KPI
+        // Filtro rápido de KPI
         let bateKPI = true;
         if (filtroKPIAtivo === 'abertos') {
           bateKPI = !statusNorm.includes('conclu') && !statusNorm.includes('finaliz') && !statusNorm.includes('pago') && !statusNorm.includes('entreg');
@@ -828,7 +1011,13 @@
           bateKPI = statusNorm.includes('conclu') || statusNorm.includes('finaliz') || statusNorm.includes('pago') || statusNorm.includes('entreg');
         }
 
-        return bateBusca && bateStatus && bateSetor && bateKPI;
+        // Filtro de faixa de valor
+        let bateValor = true;
+        if (filtroFaixaValorAtiva === 'ate100') bateValor = valor <= 100;
+        else if (filtroFaixaValorAtiva === '100a200') bateValor = valor > 100 && valor <= 200;
+        else if (filtroFaixaValorAtiva === 'acima200') bateValor = valor > 200;
+
+        return bateBusca && bateStatus && bateSetor && bateKPI && bateValor;
       });
 
       // Ordenação
@@ -852,6 +1041,33 @@
       renderizar(filtrados);
     }
 
+    // ATUALIZAÇÃO RÁPIDA DE STATUS INLINE (SUPABASE UPDATE)
+    async function atualizarStatusRapido(id, novoStatus) {
+      const pedido = dadosOriginais.find(p => p.id === id);
+      if (!pedido) return;
+
+      const statusAntigo = pedido.status;
+      pedido.status = novoStatus; // Atualização otimista
+      atualizarKPIs(dadosOriginais);
+      renderizarAnalyticsSetores(dadosOriginais);
+      filtrarEOrdenar();
+
+      try {
+        const { error } = await supabaseClient
+          .from('pedidos')
+          .update({ status: novoStatus })
+          .eq('id', id);
+
+        if (error) throw error;
+        mostrarToast(`Status alterado para "${novoStatus}"! ✅`);
+      } catch (err) {
+        console.error('Erro ao atualizar status:', err);
+        pedido.status = statusAntigo; // Reverte se falhar
+        filtrarEOrdenar();
+        mostrarToast('Erro ao atualizar status no banco de dados.');
+      }
+    }
+
     // CONTROLE DE VISUALIZAÇÕES (CARDS / TABELA / KANBAN)
     function alternarVisualizacao(modo) {
       modoVisualizacao = modo;
@@ -862,11 +1078,11 @@
       const btnKanban = document.getElementById('btn-view-kanban');
 
       [btnCards, btnTabela, btnKanban].forEach(btn => {
-        btn.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+        if (btn) btn.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
       });
 
       const btnAtivo = modo === 'tabela' ? btnTabela : (modo === 'kanban' ? btnKanban : btnCards);
-      btnAtivo.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold';
+      if (btnAtivo) btnAtivo.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold';
 
       filtrarEOrdenar();
     }
@@ -938,7 +1154,7 @@
       const vazioBox = document.getElementById('estado-vazio');
 
       const somaTotal = pedidos.reduce((acc, p) => acc + extrairNumero(getCampo(p, 'valor', 'preco', 'total')), 0);
-      contador.textContent = `Mostrando ${pedidos.length} de ${dadosOriginais.length} pedidos • Total: ${formatarMoeda(somaTotal)}`;
+      contador.textContent = `Mostrando ${pedidos.length} de ${dadosOriginais.length} pedidos • Total filtrado: ${formatarMoeda(somaTotal)}`;
 
       if (pedidos.length === 0) {
         containerCards.classList.add('hidden');
@@ -992,9 +1208,21 @@
                 <span class="inline-flex items-center text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-100 dark:border-indigo-800/80 px-2.5 py-1 rounded-lg">
                   ${setor}
                 </span>
-                <span class="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border ${badgeStatus(status)}">
-                  ${status}
-                </span>
+
+                <!-- Seletor Rápido de Status no Card -->
+                <select 
+                  onchange="atualizarStatusRapido(${id}, this.value)" 
+                  class="text-xs font-semibold px-2.5 py-1 rounded-full border ${badgeStatus(status)} cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+                  title="Clique para alterar status rapidamente"
+                >
+                  <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                  <option value="Agendado" ${status === 'Agendado' ? 'selected' : ''}>Agendado</option>
+                  <option value="Confirmado" ${status === 'Confirmado' ? 'selected' : ''}>Confirmado</option>
+                  <option value="Em andamento" ${status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+                  <option value="Em produção" ${status === 'Em produção' ? 'selected' : ''}>Em produção</option>
+                  <option value="Concluído" ${status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                  <option value="Cancelado" ${status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                </select>
               </div>
 
               <h2 onclick="abrirModalDetalhes(${id})" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors cursor-pointer">
@@ -1083,9 +1311,18 @@
               ${formatarData(data)}
             </td>
             <td class="px-4 py-3 whitespace-nowrap">
-              <span class="inline-flex text-xs font-semibold px-2.5 py-0.5 rounded-full border ${badgeStatus(status)}">
-                ${status}
-              </span>
+              <select 
+                onchange="atualizarStatusRapido(${id}, this.value)" 
+                class="text-xs font-semibold px-2.5 py-1 rounded-full border ${badgeStatus(status)} cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500 transition"
+              >
+                <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                <option value="Agendado" ${status === 'Agendado' ? 'selected' : ''}>Agendado</option>
+                <option value="Confirmado" ${status === 'Confirmado' ? 'selected' : ''}>Confirmado</option>
+                <option value="Em andamento" ${status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+                <option value="Em produção" ${status === 'Em produção' ? 'selected' : ''}>Em produção</option>
+                <option value="Concluído" ${status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                <option value="Cancelado" ${status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+              </select>
             </td>
             <td class="px-4 py-3 text-right font-extrabold text-slate-900 dark:text-white whitespace-nowrap">
               ${formatarMoeda(valor)}
@@ -1200,7 +1437,6 @@
         boxObs.classList.add('hidden');
       }
 
-      // Links WhatsApp formatados
       const numLimpo = String(telefone || '').replace(/\D/g, '');
       const ddi = numLimpo.startsWith('55') ? numLimpo : `55${numLimpo}`;
       const btnConf = document.getElementById('modal-btn-whats-confirmar');
@@ -1240,24 +1476,119 @@
       });
     }
 
-    // MODAL NOVO PEDIDO
+    // IMPRIMIR COMPROVANTE INDIVIDUAL
+    function imprimirComprovanteIndividual() {
+      if (!pedidoSelecionado) return;
+      const cliente = getCampo(pedidoSelecionado, 'cliente', 'nome');
+      const servico = getCampo(pedidoSelecionado, 'servico', 'serviço');
+      const valor = formatarMoeda(getCampo(pedidoSelecionado, 'valor', 'preco'));
+      const data = formatarData(getCampo(pedidoSelecionado, 'data_pedido', 'data'));
+      const setor = getCampo(pedidoSelecionado, 'setor');
+      const status = getCampo(pedidoSelecionado, 'status');
+      const obs = getCampo(pedidoSelecionado, 'observacoes') || 'Nenhuma';
+
+      const win = window.open('', '_blank', 'width=450,height=600');
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Comprovante - Pedido #${pedidoSelecionado.id || ''}</title>
+          <style>
+            body { font-family: monospace, sans-serif; padding: 20px; font-size: 12px; line-height: 1.4; color: #111; }
+            .header { text-align: center; border-bottom: 1px dashed #999; padding-bottom: 10px; margin-bottom: 12px; }
+            .linha { display: flex; justify-content: space-between; margin-bottom: 5px; }
+            .total { font-size: 16px; font-weight: bold; border-top: 1px dashed #999; padding-top: 8px; margin-top: 10px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 10px; color: #666; border-top: 1px solid #eee; padding-top: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h2 style="margin:0;">COMPROVANTE DE PEDIDO</h2>
+            <p style="margin:4px 0 0 0;">Central de Atendimento Operacional</p>
+          </div>
+          <div class="linha"><span>Pedido:</span><span>#${pedidoSelecionado.id || ''}</span></div>
+          <div class="linha"><span>Cliente:</span><span>${cliente}</span></div>
+          <div class="linha"><span>Setor:</span><span>${setor}</span></div>
+          <div class="linha"><span>Data/Horário:</span><span>${data}</span></div>
+          <div class="linha"><span>Status:</span><span>${status}</span></div>
+          <div style="margin: 10px 0; border-top: 1px solid #eee; padding-top: 5px;">
+            <strong>Serviço / Itens:</strong>
+            <p style="margin: 3px 0;">${servico}</p>
+          </div>
+          <div style="margin-bottom: 10px;">
+            <strong>Observações:</strong>
+            <p style="margin: 3px 0; font-style: italic;">${obs}</p>
+          </div>
+          <div class="linha total">
+            <span>VALOR TOTAL:</span>
+            <span>${valor}</span>
+          </div>
+          <div class="footer">
+            <p>Obrigado pela preferência!</p>
+            <p>Emitido em: ${new Date().toLocaleString('pt-BR')}</p>
+          </div>
+          <script>window.onload = function() { window.print(); }<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
+    // MODAL NOVO / EDITAR PEDIDO
     function abrirModalNovoPedido() {
       document.getElementById('form-novo-pedido').reset();
+      document.getElementById('pedido-id-edicao').value = '';
+      document.getElementById('modal-form-titulo').innerHTML = `
+        <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        </span>
+        Cadastrar Novo Pedido
+      `;
+      document.getElementById('btn-salvar-pedido').textContent = 'Salvar Pedido';
+      document.getElementById('btn-excluir-pedido').classList.add('hidden');
       document.getElementById('novo-pedido-erro').classList.add('hidden');
       document.getElementById('modal-novo').classList.remove('hidden');
       document.getElementById('novo-cliente').focus();
+    }
+
+    function abrirModalEdicao() {
+      if (!pedidoSelecionado) return;
+      const p = pedidoSelecionado;
+      fecharModalDetalhes();
+
+      document.getElementById('pedido-id-edicao').value = p.id || '';
+      document.getElementById('novo-cliente').value = getCampo(p, 'cliente', 'nome') || '';
+      document.getElementById('novo-telefone').value = getCampo(p, 'telefone', 'contato') || '';
+      document.getElementById('novo-setor').value = getCampo(p, 'setor', 'categoria') || '';
+      document.getElementById('novo-status').value = getCampo(p, 'status') || 'Pendente';
+      document.getElementById('novo-servico').value = getCampo(p, 'servico', 'serviço') || '';
+      document.getElementById('novo-valor').value = extrairNumero(getCampo(p, 'valor', 'preco')) || '';
+      document.getElementById('novo-data').value = getCampo(p, 'data_pedido', 'data') || '';
+      document.getElementById('novo-obs').value = getCampo(p, 'observacoes', 'obs') || '';
+
+      document.getElementById('modal-form-titulo').innerHTML = `
+        <span class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        </span>
+        Editar Pedido #${p.id}
+      `;
+      document.getElementById('btn-salvar-pedido').textContent = 'Atualizar Pedido';
+      document.getElementById('btn-excluir-pedido').classList.remove('hidden');
+      document.getElementById('novo-pedido-erro').classList.add('hidden');
+      document.getElementById('modal-novo').classList.remove('hidden');
     }
 
     function fecharModalNovoPedido() {
       document.getElementById('modal-novo').classList.add('hidden');
     }
 
-    async function salvarNovoPedido(e) {
+    async function salvarPedido(e) {
       e.preventDefault();
       const erroEl = document.getElementById('novo-pedido-erro');
       const btnSalvar = document.getElementById('btn-salvar-pedido');
       erroEl.classList.add('hidden');
 
+      const idEdicao = document.getElementById('pedido-id-edicao').value;
       const cliente = document.getElementById('novo-cliente').value.trim();
       const telefone = document.getElementById('novo-telefone').value.trim();
       const setor = document.getElementById('novo-setor').value.trim() || 'Geral';
@@ -1270,33 +1601,57 @@
       btnSalvar.disabled = true;
       btnSalvar.textContent = 'Salvando...';
 
-      try {
-        const { data, error } = await supabaseClient
-          .from('pedidos')
-          .insert([{
-            cliente,
-            telefone,
-            setor,
-            status,
-            servico,
-            valor,
-            data_pedido,
-            observacoes
-          }])
-          .select();
+      const payload = { cliente, telefone, setor, status, servico, valor, data_pedido, observacoes };
 
-        if (error) throw error;
+      try {
+        if (idEdicao) {
+          // UPDATE
+          const { error } = await supabaseClient
+            .from('pedidos')
+            .update(payload)
+            .eq('id', idEdicao);
+
+          if (error) throw error;
+          mostrarToast('Pedido atualizado com sucesso! ✨');
+        } else {
+          // INSERT
+          const { error } = await supabaseClient
+            .from('pedidos')
+            .insert([payload]);
+
+          if (error) throw error;
+          mostrarToast('Pedido cadastrado com sucesso! 🎉');
+        }
 
         fecharModalNovoPedido();
-        mostrarToast('Pedido cadastrado com sucesso! 🎉');
         await carregarPedidos();
       } catch (err) {
         console.error('Erro ao salvar:', err);
-        erroEl.textContent = `Erro ao salvar no Supabase: ${err.message || 'Verifique as políticas de RLS no banco'}`;
+        erroEl.textContent = `Erro no Supabase: ${err.message || 'Verifique as permissões de gravação RLS'}`;
         erroEl.classList.remove('hidden');
       } finally {
         btnSalvar.disabled = false;
-        btnSalvar.textContent = 'Salvar Pedido';
+        btnSalvar.textContent = idEdicao ? 'Atualizar Pedido' : 'Salvar Pedido';
+      }
+    }
+
+    async function excluirPedidoAtual() {
+      const idEdicao = document.getElementById('pedido-id-edicao').value;
+      if (!idEdicao) return;
+      if (!confirm(`Deseja realmente excluir o Pedido #${idEdicao}? Esta ação não pode ser desfeita.`)) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from('pedidos')
+          .delete()
+          .eq('id', idEdicao);
+
+        if (error) throw error;
+        fecharModalNovoPedido();
+        mostrarToast('Pedido excluído com sucesso.');
+        await carregarPedidos();
+      } catch (err) {
+        alert(`Erro ao excluir: ${err.message || 'Verifique as permissões no banco'}`);
       }
     }
 
@@ -1364,6 +1719,8 @@
       document.getElementById('filtro-setor').value = '';
       document.getElementById('filtro-ordem').value = 'data-desc';
       filtroKPIAtivo = null;
+      filtroFaixaValorAtiva = 'todos';
+      filtrarFaixaValor('todos');
       filtrarPorKPI('todos');
       mostrarToast('Filtros limpos');
     }
