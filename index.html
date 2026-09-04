@@ -574,6 +574,10 @@
         <button onclick="exportarSelecionadosCSV()" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Exportar Selecionados para CSV">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </button>
+        <button onclick="excluirSelecionadosLote()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center gap-1" title="Excluir pedidos selecionados">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span>Excluir</span>
+        </button>
         <button onclick="desmarcarTodosLote()" class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Desmarcar todos">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
@@ -709,11 +713,16 @@
           </button>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="excluirPedido(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition cursor-pointer flex items-center gap-1" title="Excluir este pedido permanentemente">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Excluir
+          </button>
           <button onclick="duplicarPedidoAtual()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition cursor-pointer flex items-center gap-1" title="Duplicar este pedido para um novo cadastro">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
             Duplicar
           </button>
-          <button onclick="abrirModalEdicao()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer">
+          <button onclick="abrirModalEdicao(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
             Editar
           </button>
           <button onclick="fecharModalDetalhes()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
@@ -799,8 +808,9 @@
         <div id="novo-pedido-erro" class="hidden text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 p-3 rounded-xl border border-rose-200 dark:border-rose-800"></div>
 
         <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <button type="button" id="btn-excluir-pedido" onclick="excluirPedidoAtual()" class="hidden text-xs font-bold text-rose-600 hover:text-rose-800 transition cursor-pointer">
-            Excluir Pedido
+          <button type="button" id="btn-excluir-pedido" onclick="excluirPedidoAtual()" class="hidden px-3.5 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 rounded-xl transition cursor-pointer flex items-center gap-1.5" title="Excluir este pedido permanentemente">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <span>Excluir Pedido</span>
           </button>
           <div class="flex items-center gap-2 ml-auto">
             <button type="button" onclick="fecharModalNovoPedido()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
@@ -1068,10 +1078,18 @@
       }
     }, 1000);
 
-    // AUTO-REFRESH A CADA 45 SEGUNDOS
+    // AUTO-SINCRONIZAÇÃO INTELIGENTE EM SEGUNDO PLANO (A CADA 3.5 SEGUNDOS COM SMART DIFF)
     setInterval(() => {
-      carregarPedidos(true);
-    }, 45000);
+      if (document.visibilityState === 'visible') {
+        carregarPedidos(true);
+      }
+    }, 3500);
+
+    // RE-SINCRONIZAR IMEDIATAMENTE AO RETORNAR PARA A ABA
+    window.addEventListener('focus', () => carregarPedidos(true));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') carregarPedidos(true);
+    });
 
     // HELPER: NORMALIZAÇÃO DE TEXTO
     function removerAcentos(str) {
@@ -1164,12 +1182,24 @@
 
         if (error) throw error;
 
-        dadosOriginais = data || [];
-        segundosDesdeSync = 0;
-        preencherFiltrosDinamicos(dadosOriginais);
-        atualizarKPIs(dadosOriginais);
-        renderizarAnalyticsSetores(dadosOriginais);
-        filtrarEOrdenar();
+        const novosDados = data || [];
+        const mudou = JSON.stringify(novosDados) !== JSON.stringify(dadosOriginais);
+
+        if (!emSegundoPlano || mudou) {
+          dadosOriginais = novosDados;
+          segundosDesdeSync = 0;
+          preencherFiltrosDinamicos(dadosOriginais);
+          atualizarKPIs(dadosOriginais);
+          renderizarAnalyticsSetores(dadosOriginais);
+          filtrarEOrdenar();
+          if (emSegundoPlano && mudou) {
+            console.log('⚡ Sincronização em tempo real: novos dados renderizados.');
+          }
+        } else {
+          segundosDesdeSync = 0;
+          const el = document.getElementById('label-ultima-sync');
+          if (el) el.textContent = 'Sincronizado agora';
+        }
       } catch (err) {
         console.error('Erro Supabase:', err);
         if (!emSegundoPlano) {
@@ -1185,26 +1215,33 @@
     // SINCRONIZAÇÃO EM TEMPO REAL (SUPABASE REALTIME)
     function iniciarRealtime() {
       try {
-        supabaseClient
-          .channel('public:pedidos')
+        const canal = supabaseClient
+          .channel('pedidos-realtime-channel')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
-            console.log('Realtime Event:', payload);
+            console.log('⚡ Supabase Realtime Evento:', payload);
             tocarChime();
             if (payload.eventType === 'INSERT') {
               const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
-              mostrarToast(`Novo pedido recebido: ${cli}`);
+              mostrarToast(`Novo pedido recebido: ${cli} ✨`);
               registrarAtividade('Novo Pedido', `Pedido recebido para ${cli}`);
             } else if (payload.eventType === 'UPDATE') {
               const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
-              mostrarToast(`Pedido atualizado: ${cli}`);
+              mostrarToast(`Pedido atualizado: ${cli} 🔄`);
               registrarAtividade('Atualização', `Pedido #${payload.new.id} de ${cli} atualizado`);
             } else if (payload.eventType === 'DELETE') {
-              mostrarToast(`Pedido #${payload.old.id} removido`);
-              registrarAtividade('Exclusão', `Pedido #${payload.old.id} excluído`);
+              mostrarToast(`Pedido #${payload.old?.id || ''} removido 🗑️`);
+              registrarAtividade('Exclusão', `Pedido #${payload.old?.id || ''} excluído`);
             }
             carregarPedidos(true);
           })
-          .subscribe();
+          .subscribe(status => {
+            console.log('Status Realtime:', status);
+            const badge = document.getElementById('badge-realtime');
+            if (badge && status === 'SUBSCRIBED') {
+              badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ao Vivo';
+              badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0';
+            }
+          });
       } catch (e) {
         console.warn('Realtime subscription not active:', e);
       }
@@ -1662,9 +1699,17 @@
             </div>
 
             <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <button onclick="abrirModalDetalhes(${id})" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 cursor-pointer">
-                Ver detalhes &rarr;
-              </button>
+              <div class="flex items-center gap-1">
+                <button onclick="abrirModalDetalhes(${id})" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 py-1 px-1.5 rounded hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition cursor-pointer" title="Ver detalhes completos">
+                  Detalhes
+                </button>
+                <button onclick="abrirModalEdicao(${id})" class="p-1.5 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Editar pedido">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="excluirPedido(${id}, event)" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer" title="Excluir pedido">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
               <div class="text-right">
                 <span class="text-[10px] uppercase font-bold text-slate-400 block">Total</span>
                 <span class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -1744,9 +1789,17 @@
               ` : '<span class="text-slate-300 dark:text-slate-600">-</span>'}
             </td>
             <td class="px-4 py-3 text-center whitespace-nowrap">
-              <button onclick="abrirModalDetalhes(${id})" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
-                Detalhes
-              </button>
+              <div class="inline-flex items-center gap-1">
+                <button onclick="abrirModalDetalhes(${id})" class="p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 rounded-lg transition cursor-pointer" title="Ver detalhes completos">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+                <button onclick="abrirModalEdicao(${id})" class="p-1.5 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Editar pedido">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="excluirPedido(${id}, event)" class="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition cursor-pointer" title="Excluir pedido">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -1802,7 +1855,14 @@
               <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-tight">${cliente}</h4>
               <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">${servico}</p>
               <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs">
-                <span class="text-[10px] text-slate-400 font-semibold">Valor</span>
+                <div class="flex items-center gap-1">
+                  <button onclick="event.stopPropagation(); abrirModalEdicao(${id})" class="p-1 text-slate-400 hover:text-amber-500 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer" title="Editar pedido">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+                  <button onclick="excluirPedido(${id}, event)" class="p-1 text-slate-400 hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer" title="Excluir pedido">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
                 <span class="font-extrabold text-slate-900 dark:text-white">${formatarMoeda(valor)}</span>
               </div>
             </div>
@@ -1868,7 +1928,15 @@
                       <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${servico}</p>
                     </div>
                     <div class="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
-                      <span class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Ver detalhes</span>
+                      <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Ver detalhes</span>
+                        <button onclick="event.stopPropagation(); abrirModalEdicao(${id})" class="p-1 text-slate-400 hover:text-amber-500 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer" title="Editar pedido">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </button>
+                        <button onclick="excluirPedido(${id}, event)" class="p-1 text-slate-400 hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer" title="Excluir pedido">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                      </div>
                       <span class="font-extrabold text-slate-900 dark:text-white text-sm">${formatarMoeda(valor)}</span>
                     </div>
                   </div>
@@ -2349,9 +2417,17 @@
                     <p class="text-xs text-slate-600 dark:text-slate-300">${servico}</p>
 
                     <div class="mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
-                      <button onclick="abrirModalDetalhes(${id})" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline cursor-pointer">
-                        Ver Detalhes do Pedido &rarr;
-                      </button>
+                      <div class="flex items-center gap-2">
+                        <button onclick="abrirModalDetalhes(${id})" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline cursor-pointer">
+                          Detalhes &rarr;
+                        </button>
+                        <button onclick="event.stopPropagation(); abrirModalEdicao(${id})" class="p-1 text-slate-400 hover:text-amber-500 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer" title="Editar pedido">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        </button>
+                        <button onclick="excluirPedido(${id}, event)" class="p-1 text-slate-400 hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer" title="Excluir pedido">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                      </div>
                       ${whatsUrl ? `
                         <a href="${whatsUrl}" target="_blank" rel="noopener" class="text-emerald-600 font-semibold flex items-center gap-1 hover:underline">
                           WhatsApp
@@ -2482,9 +2558,15 @@
       document.getElementById('novo-cliente').focus();
     }
 
-    function abrirModalEdicao() {
-      if (!pedidoSelecionado) return;
-      const p = pedidoSelecionado;
+    function abrirModalEdicao(id = null) {
+      let p = null;
+      if (id !== null && id !== undefined) {
+        p = dadosOriginais.find(item => Number(item.id) === Number(id));
+      } else if (pedidoSelecionado) {
+        p = pedidoSelecionado;
+      }
+      if (!p) return;
+      pedidoSelecionado = p;
       fecharModalDetalhes();
 
       document.getElementById('pedido-id-edicao').value = p.id || '';
@@ -2503,10 +2585,11 @@
         </span>
         Editar Pedido #${p.id}
       `;
-      document.getElementById('btn-salvar-pedido').textContent = 'Atualizar Pedido';
+      document.getElementById('btn-salvar-pedido').textContent = 'Salvar Alterações';
       document.getElementById('btn-excluir-pedido').classList.remove('hidden');
       document.getElementById('novo-pedido-erro').classList.add('hidden');
       document.getElementById('modal-novo').classList.remove('hidden');
+      setTimeout(() => document.getElementById('novo-cliente').focus(), 50);
     }
 
     function fecharModalNovoPedido() {
@@ -2566,24 +2649,88 @@
       }
     }
 
-    async function excluirPedidoAtual() {
-      const idEdicao = document.getElementById('pedido-id-edicao').value;
-      if (!idEdicao) return;
-      if (!confirm(`Deseja realmente excluir o Pedido #${idEdicao}? Esta ação não pode ser desfeita.`)) return;
+    // EXCLUIR PEDIDO (AÇÃO DIRETA: CARDS, TABELA, DETALHES, KANBAN, SETORES OU AGENDA)
+    async function excluirPedido(id, event = null) {
+      if (event && event.stopPropagation) event.stopPropagation();
+      const numId = Number(id);
+      if (!numId) return;
+
+      const pedido = dadosOriginais.find(p => Number(p.id) === numId);
+      const nomeCliente = pedido ? (getCampo(pedido, 'cliente', 'nome') || 'Cliente') : '';
+      const confirmMsg = nomeCliente
+        ? `Tem certeza que deseja excluir o Pedido #${numId} (${nomeCliente})?\nEsta ação não poderá ser desfeita.`
+        : `Tem certeza que deseja excluir o Pedido #${numId}?\nEsta ação não poderá ser desfeita.`;
+
+      if (!confirm(confirmMsg)) return;
+
+      // Remoção otimista imediata da interface
+      dadosOriginais = dadosOriginais.filter(p => Number(p.id) !== numId);
+      pedidosSelecionados.delete(numId);
+      fecharModalDetalhes();
+      fecharModalNovoPedido();
+      atualizarBarraAcoesLote();
+      atualizarKPIs(dadosOriginais);
+      renderizarAnalyticsSetores(dadosOriginais);
+      filtrarEOrdenar();
+      mostrarToast(`Excluindo Pedido #${numId}...`);
 
       try {
         const { error } = await supabaseClient
           .from('pedidos')
           .delete()
-          .eq('id', idEdicao);
+          .eq('id', numId);
 
         if (error) throw error;
-        fecharModalNovoPedido();
-        mostrarToast('Pedido excluído com sucesso.');
-        registrarAtividade('Pedido Excluído', `Pedido #${idEdicao} foi deletado`);
-        await carregarPedidos();
+
+        mostrarToast(`Pedido #${numId} excluído com sucesso! 🗑️`);
+        registrarAtividade('Exclusão', `Pedido #${numId} (${nomeCliente}) foi excluído`);
+        await carregarPedidos(true);
       } catch (err) {
-        alert(`Erro ao excluir: ${err.message || 'Verifique as permissões no banco'}`);
+        console.error('Erro ao excluir pedido:', err);
+        mostrarToast(`Erro ao excluir: ${err.message || 'Falha de conexão'}`);
+        await carregarPedidos(false);
+      }
+    }
+
+    async function excluirPedidoAtual() {
+      const idEdicao = document.getElementById('pedido-id-edicao').value;
+      if (idEdicao) {
+        await excluirPedido(idEdicao);
+      }
+    }
+
+    // EXCLUIR MÚLTIPLOS PEDIDOS SELECIONADOS EM LOTE
+    async function excluirSelecionadosLote() {
+      if (pedidosSelecionados.size === 0) return;
+      const ids = Array.from(pedidosSelecionados).map(Number);
+      const total = ids.length;
+
+      if (!confirm(`Tem certeza que deseja excluir os ${total} pedidos selecionados?\nEsta ação não poderá ser desfeita.`)) return;
+
+      // Remoção otimista imediata da interface
+      dadosOriginais = dadosOriginais.filter(p => !pedidosSelecionados.has(Number(p.id)));
+      pedidosSelecionados.clear();
+      atualizarBarraAcoesLote();
+      atualizarKPIs(dadosOriginais);
+      renderizarAnalyticsSetores(dadosOriginais);
+      filtrarEOrdenar();
+      mostrarToast(`Excluindo ${total} pedidos em lote...`);
+
+      try {
+        const { error } = await supabaseClient
+          .from('pedidos')
+          .delete()
+          .in('id', ids);
+
+        if (error) throw error;
+
+        mostrarToast(`${total} pedidos excluídos com sucesso! 🗑️`);
+        registrarAtividade('Exclusão em Lote', `${total} pedidos excluídos`);
+        await carregarPedidos(true);
+      } catch (err) {
+        console.error('Erro ao excluir em lote:', err);
+        mostrarToast(`Erro ao excluir em lote: ${err.message || 'Falha ao processar'}`);
+        await carregarPedidos(false);
       }
     }
 
