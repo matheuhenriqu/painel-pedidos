@@ -47,6 +47,10 @@
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+    /* Ocultar Barra de Rolagem em Containers Horizontais com Toque Suave */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+
     /* Suporte a Impressão Limpa */
     @media print {
       header, #barra-filtros, #kpis-container, #secao-analytics, .no-print { display: none !important; }
@@ -63,6 +67,21 @@
     }
     .shake-animation {
       animation: authShake 0.4s ease-in-out;
+    }
+
+    /* Otimizações Responsivas Mobile */
+    @media (max-width: 640px) {
+      .modal-mobile-bottomsheet {
+        align-items: flex-end !important;
+        padding: 0 !important;
+      }
+      .modal-mobile-bottomsheet > div {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        max-height: 92vh !important;
+        width: 100% !important;
+        padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+      }
     }
   </style>
 </head>
@@ -688,9 +707,9 @@
         </div>
 
         <!-- Controles da Direita -->
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
           
-          <!-- Seletor de Modo de Visualização (Cards / Tabela / Kanban / Setores / Agenda) -->
+          <!-- Seletor de Modo de Visualização Desktop (Cards / Tabela / Kanban / Setores / Agenda) -->
           <div class="hidden lg:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
             <button id="btn-view-cards" onclick="alternarVisualizacao('cards')" title="Visualização em Grade de Cards" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
@@ -736,7 +755,7 @@
           <!-- Botão Novo Pedido -->
           <button 
             onclick="abrirModalNovoPedido()"
-            class="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl shadow-xs shadow-indigo-600/20 transition cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl shadow-xs shadow-indigo-600/20 transition cursor-pointer"
             title="Adicionar novo pedido"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -803,9 +822,9 @@
           <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
 
           <!-- Perfil do Usuário & Logout -->
-          <div id="usuario-perfil-container" class="flex items-center gap-2 pl-1">
-            <div class="flex items-center gap-2 max-w-[180px] sm:max-w-[220px]" title="Usuário conectado">
-              <div id="avatar-usuario" class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-indigo-500/20">
+          <div id="usuario-perfil-container" class="flex items-center gap-1.5 sm:gap-2 pl-0.5 sm:pl-1">
+            <div class="flex items-center gap-2 max-w-[140px] sm:max-w-[220px]" title="Usuário conectado">
+              <div id="avatar-usuario" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-indigo-500/20">
                 US
               </div>
               <div class="hidden md:block truncate text-left leading-tight">
@@ -821,7 +840,7 @@
             <button 
               onclick="fazerLogout()"
               title="Sair da Conta (Logout)"
-              class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl transition active:scale-95 cursor-pointer ml-1"
+              class="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl transition active:scale-95 cursor-pointer"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
               <span class="hidden sm:inline">Sair</span>
@@ -832,48 +851,74 @@
 
       </div>
     </div>
+
+    <!-- BARRA DE NAVEGAÇÃO MÓVEL (SELETOR DE MODOS VISÍVEL EM TELAS < LG) -->
+    <div class="lg:hidden border-t border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 py-2 overflow-x-auto no-scrollbar transition-colors">
+      <div class="flex items-center gap-1.5 whitespace-nowrap min-w-max">
+        <button id="btn-view-cards-mob" onclick="alternarVisualizacao('cards')" title="Cards" class="px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-slate-800 shadow-2xs cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          <span>Cards</span>
+        </button>
+        <button id="btn-view-tabela-mob" onclick="alternarVisualizacao('tabela')" title="Tabela" class="px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <span>Tabela</span>
+        </button>
+        <button id="btn-view-kanban-mob" onclick="alternarVisualizacao('kanban')" title="Kanban" class="px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+          <span>Kanban</span>
+        </button>
+        <button id="btn-view-setores-mob" onclick="alternarVisualizacao('setores')" title="Setores" class="px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          <span>Setores</span>
+        </button>
+        <button id="btn-view-agenda-mob" onclick="alternarVisualizacao('agenda')" title="Agenda" class="px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Agenda</span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <!-- CONTEÚDO PRINCIPAL -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5 sm:space-y-6">
 
     <!-- CARDS DE RESUMO OPERACIONAL (KPIs Clicáveis) -->
-    <section id="kpis-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <section id="kpis-container" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
       
       <!-- KPI Total -->
       <div 
         id="card-kpi-total"
         onclick="filtrarPorKPI('todos')"
-        class="group bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition cursor-pointer relative overflow-hidden"
+        class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-xs font-bold uppercase tracking-wider">Total de Pedidos</p>
+          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Total de Pedidos</p>
           <svg class="w-4 h-4 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         </div>
-        <p id="kpi-total" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
-        <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Clique para ver todos</p>
+        <p id="kpi-total" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
+        <p class="text-[10px] sm:text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 sm:mt-1 truncate">Clique para ver todos</p>
       </div>
 
       <!-- KPI Faturamento & Meta Diária -->
       <div 
         onclick="editarMetaDiaria()"
-        class="group bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition cursor-pointer relative overflow-hidden"
+        class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
         title="Clique para ajustar a Meta Diária de Vendas"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-xs font-bold uppercase tracking-wider">Faturamento Total</p>
+          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Faturamento Total</p>
           <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <p id="kpi-faturamento" class="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">R$ 0,00</p>
+        <p id="kpi-faturamento" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate">R$ 0,00</p>
         
         <!-- Barra de Progresso da Meta Diária -->
-        <div class="mt-2 space-y-1">
+        <div class="mt-1.5 sm:mt-2 space-y-1">
           <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div id="barra-progresso-meta" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
-          <div class="flex items-center justify-between text-[10px] text-slate-400">
-            <span id="label-meta-faturamento">Meta: R$ 2.000</span>
-            <span id="pct-meta-faturamento" class="font-bold text-indigo-600 dark:text-indigo-400">0%</span>
+          <div class="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400">
+            <span id="label-meta-faturamento" class="truncate">Meta: R$ 2.000</span>
+            <span id="pct-meta-faturamento" class="font-bold text-indigo-600 dark:text-indigo-400 shrink-0">0%</span>
           </div>
         </div>
       </div>
@@ -882,28 +927,28 @@
       <div 
         id="card-kpi-abertos"
         onclick="filtrarPorKPI('abertos')"
-        class="group bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700 transition cursor-pointer relative overflow-hidden"
+        class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-xs font-bold uppercase tracking-wider">Em Aberto / Prod.</p>
+          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Em Aberto / Prod.</p>
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
         </div>
-        <p id="kpi-abertos" class="text-2xl sm:text-3xl font-extrabold text-amber-500 dark:text-amber-400 mt-1">0</p>
-        <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Aguardando ou em execução</p>
+        <p id="kpi-abertos" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-amber-500 dark:text-amber-400 mt-1">0</p>
+        <p class="text-[10px] sm:text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 sm:mt-1 truncate">Aguardando/execução</p>
       </div>
 
       <!-- KPI Finalizados -->
       <div 
         id="card-kpi-concluidos"
         onclick="filtrarPorKPI('concluidos')"
-        class="group bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition cursor-pointer relative overflow-hidden"
+        class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-xs font-bold uppercase tracking-wider">Finalizados</p>
+          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Finalizados</p>
           <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <p id="kpi-concluidos" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</p>
-        <p id="kpi-taxa-sucesso" class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400/80 mt-1">0% de conclusão</p>
+        <p id="kpi-concluidos" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</p>
+        <p id="kpi-taxa-sucesso" class="text-[10px] sm:text-[11px] font-medium text-emerald-600 dark:text-emerald-400/80 mt-0.5 sm:mt-1 truncate">0% conclusão</p>
       </div>
 
     </section>
@@ -983,40 +1028,40 @@
 
       </div>
 
-      <!-- Filtros Rápidos de Período e Faixa de Valor (Chips) -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+      <!-- Filtros Rápidos de Período e Faixa de Valor (Chips Deslizáveis) -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
         <!-- Chips Período -->
-        <div class="flex flex-wrap items-center gap-1.5">
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Período:</span>
-          <button onclick="filtrarPeriodo('todos')" id="btn-periodo-todos" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todos</button>
-          <button onclick="filtrarPeriodo('hoje')" id="btn-periodo-hoje" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Hoje</button>
-          <button onclick="filtrarPeriodo('ontem')" id="btn-periodo-ontem" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Ontem</button>
-          <button onclick="filtrarPeriodo('semana')" id="btn-periodo-semana" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Últimos 7 Dias</button>
-          <button onclick="filtrarPeriodo('mes')" id="btn-periodo-mes" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Este Mês</button>
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 whitespace-nowrap">
+          <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">Período:</span>
+          <button onclick="filtrarPeriodo('todos')" id="btn-periodo-todos" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todos</button>
+          <button onclick="filtrarPeriodo('hoje')" id="btn-periodo-hoje" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Hoje</button>
+          <button onclick="filtrarPeriodo('ontem')" id="btn-periodo-ontem" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Ontem</button>
+          <button onclick="filtrarPeriodo('semana')" id="btn-periodo-semana" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">7 Dias</button>
+          <button onclick="filtrarPeriodo('mes')" id="btn-periodo-mes" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Este Mês</button>
         </div>
 
         <!-- Chips Faixa de Valor -->
-        <div class="flex flex-wrap items-center gap-1.5">
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Faixa:</span>
-          <button onclick="filtrarFaixaValor('todos')" id="btn-faixa-todos" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todas</button>
-          <button onclick="filtrarFaixaValor('ate100')" id="btn-faixa-ate100" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Até R$ 100</button>
-          <button onclick="filtrarFaixaValor('100a200')" id="btn-faixa-100a200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">R$ 100 - 200</button>
-          <button onclick="filtrarFaixaValor('acima200')" id="btn-faixa-acima200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">&gt; R$ 200</button>
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 whitespace-nowrap">
+          <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">Faixa:</span>
+          <button onclick="filtrarFaixaValor('todos')" id="btn-faixa-todos" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todas</button>
+          <button onclick="filtrarFaixaValor('ate100')" id="btn-faixa-ate100" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Até R$ 100</button>
+          <button onclick="filtrarFaixaValor('100a200')" id="btn-faixa-100a200" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">R$ 100-200</button>
+          <button onclick="filtrarFaixaValor('acima200')" id="btn-faixa-acima200" class="shrink-0 px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">&gt; R$ 200</button>
         </div>
       </div>
 
       <!-- Rodapé dos Filtros com Contador e Ações -->
-      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
-        <div class="flex items-center gap-2">
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
+        <div class="flex items-center gap-2 flex-wrap">
           <span id="contador-resultado">Carregando registros...</span>
           <span id="filtro-ativo-tag" class="hidden px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800 text-[11px] font-semibold"></span>
         </div>
 
-        <div class="flex items-center gap-2 flex-wrap">
+        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
           <!-- Botão Selecionar Todos -->
           <button 
             onclick="selecionarTodosFiltrados()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
             title="Selecionar ou desmarcar todos os pedidos da listagem"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -1026,7 +1071,7 @@
           <!-- Botão Importar CSV -->
           <button 
             onclick="abrirModalImportarCSV()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
             title="Importar pedidos em massa via arquivo CSV / Excel"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
@@ -1036,7 +1081,7 @@
           <!-- Botão Exportar CSV -->
           <button 
             onclick="exportarCSV()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
             title="Exportar dados filtrados para planilha Excel/CSV"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -1046,7 +1091,7 @@
           <!-- Botão Imprimir / Relatório -->
           <button 
             onclick="window.print()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
             title="Imprimir relatório da listagem atual"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
@@ -1054,7 +1099,7 @@
           </button>
 
           <!-- Botão Limpar Filtros -->
-          <button id="btn-limpar-filtros" onclick="limparTodosFiltros()" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold hidden cursor-pointer">
+          <button id="btn-limpar-filtros" onclick="limparTodosFiltros()" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold hidden cursor-pointer px-1.5 py-1">
             Limpar filtros
           </button>
         </div>
@@ -1132,57 +1177,84 @@
       </div>
     </section>
 
-    <!-- VIEW 3: QUADRO KANBAN -->
-    <section id="view-kanban" class="hidden grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-      
-      <!-- Coluna: Pendente -->
-      <div class="bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Pendente</h3>
-          </div>
-          <span id="kanban-count-pendente" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
-        </div>
-        <div id="kanban-col-pendente" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
+    <!-- VIEW 3: QUADRO KANBAN (RESPONSIVO COM TOUCH-SNAP NO MOBILE) -->
+    <section id="view-kanban" class="hidden">
+      <!-- Navegação Rápida de Colunas (Mobile < md) -->
+      <div class="flex md:hidden items-center gap-1.5 overflow-x-auto no-scrollbar pb-2.5 mb-1 whitespace-nowrap">
+        <button type="button" onclick="rolarParaColunaKanban('kanban-col-wrapper-pendente')" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/60 flex items-center gap-1.5 cursor-pointer">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span>Pendente</span>
+          <span id="kanban-badge-mob-pendente" class="text-[10px] px-1.5 py-0.2 bg-white dark:bg-slate-800 rounded-full font-extrabold text-slate-700 dark:text-slate-300">0</span>
+        </button>
+        <button type="button" onclick="rolarParaColunaKanban('kanban-col-wrapper-agendado')" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-900/60 flex items-center gap-1.5 cursor-pointer">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          <span>Agendado</span>
+          <span id="kanban-badge-mob-agendado" class="text-[10px] px-1.5 py-0.2 bg-white dark:bg-slate-800 rounded-full font-extrabold text-slate-700 dark:text-slate-300">0</span>
+        </button>
+        <button type="button" onclick="rolarParaColunaKanban('kanban-col-wrapper-producao')" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-900/60 flex items-center gap-1.5 cursor-pointer">
+          <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          <span>Produção</span>
+          <span id="kanban-badge-mob-producao" class="text-[10px] px-1.5 py-0.2 bg-white dark:bg-slate-800 rounded-full font-extrabold text-slate-700 dark:text-slate-300">0</span>
+        </button>
+        <button type="button" onclick="rolarParaColunaKanban('kanban-col-wrapper-concluido')" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-900/60 flex items-center gap-1.5 cursor-pointer">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Concluído</span>
+          <span id="kanban-badge-mob-concluido" class="text-[10px] px-1.5 py-0.2 bg-white dark:bg-slate-800 rounded-full font-extrabold text-slate-700 dark:text-slate-300">0</span>
+        </button>
       </div>
 
-      <!-- Coluna: Confirmado / Agendado -->
-      <div class="bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Agendado / Conf.</h3>
+      <!-- Container de Colunas Kanban -->
+      <div id="kanban-colunas-wrapper" class="flex md:grid md:grid-cols-2 xl:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-scrollbar pb-3">
+        
+        <!-- Coluna: Pendente -->
+        <div id="kanban-col-wrapper-pendente" class="w-[82vw] sm:w-[65vw] md:w-auto shrink-0 snap-center bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Pendente</h3>
+            </div>
+            <span id="kanban-count-pendente" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
           </div>
-          <span id="kanban-count-agendado" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          <div id="kanban-col-pendente" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
         </div>
-        <div id="kanban-col-agendado" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
-      </div>
 
-      <!-- Coluna: Em Produção / Andamento -->
-      <div class="bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
-            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Em Produção</h3>
+        <!-- Coluna: Confirmado / Agendado -->
+        <div id="kanban-col-wrapper-agendado" class="w-[82vw] sm:w-[65vw] md:w-auto shrink-0 snap-center bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+              <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Agendado / Conf.</h3>
+            </div>
+            <span id="kanban-count-agendado" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
           </div>
-          <span id="kanban-count-producao" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          <div id="kanban-col-agendado" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
         </div>
-        <div id="kanban-col-producao" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
-      </div>
 
-      <!-- Coluna: Concluído -->
-      <div class="bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Concluído</h3>
+        <!-- Coluna: Em Produção / Andamento -->
+        <div id="kanban-col-wrapper-producao" class="w-[82vw] sm:w-[65vw] md:w-auto shrink-0 snap-center bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse"></span>
+              <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Em Produção</h3>
+            </div>
+            <span id="kanban-count-producao" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
           </div>
-          <span id="kanban-count-concluido" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          <div id="kanban-col-producao" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
         </div>
-        <div id="kanban-col-concluido" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
-      </div>
 
+        <!-- Coluna: Concluído -->
+        <div id="kanban-col-wrapper-concluido" class="w-[82vw] sm:w-[65vw] md:w-auto shrink-0 snap-center bg-slate-100/70 dark:bg-slate-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 flex flex-col">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Concluído</h3>
+            </div>
+            <span id="kanban-count-concluido" class="text-xs font-extrabold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+          </div>
+          <div id="kanban-col-concluido" class="space-y-3 flex-1 overflow-y-auto max-h-[70vh] pr-1"></div>
+        </div>
+
+      </div>
     </section>
 
     <!-- VIEW 4: AGRUPADO POR SETOR -->
@@ -1211,20 +1283,20 @@
 
   </main>
 
-  <!-- BARRA FLUTUANTE DE AÇÕES EM LOTE (BULK ACTIONS DOCK) -->
-  <div id="barra-acoes-lote" class="fixed bottom-6 inset-x-0 mx-auto max-w-2xl px-4 z-40 transition-all duration-300 transform translate-y-32 pointer-events-none">
-    <div class="pointer-events-auto bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
-        <div>
+  <!-- BARRA FLUTUANTE DE AÇÕES EM LOTE (BULK ACTIONS DOCK RESPONSIVO) -->
+  <div id="barra-acoes-lote" class="fixed bottom-4 sm:bottom-6 inset-x-0 mx-auto max-w-2xl px-3 sm:px-4 z-40 transition-all duration-300 transform translate-y-36 pointer-events-none">
+    <div class="pointer-events-auto bg-slate-900/95 dark:bg-slate-850/95 backdrop-blur-md text-white p-3 sm:p-4 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+      <div class="flex items-center justify-between sm:justify-start gap-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse shrink-0"></span>
           <p class="text-xs font-bold leading-tight"><span id="lote-qtd-selecionados">0</span> selecionados</p>
-          <p class="text-[11px] text-slate-300 font-medium">Total: <span id="lote-soma-selecionados" class="font-extrabold text-indigo-300">R$ 0,00</span></p>
         </div>
+        <p class="text-xs text-slate-300 font-medium">Total: <span id="lote-soma-selecionados" class="font-extrabold text-indigo-300">R$ 0,00</span></p>
       </div>
 
-      <div class="flex items-center gap-2 flex-wrap">
-        <select id="seletor-status-lote" class="text-xs bg-slate-800 dark:bg-slate-700 border border-slate-600 rounded-xl px-2.5 py-1.5 font-semibold text-white focus:outline-none cursor-pointer">
-          <option value="">Alterar Status...</option>
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap justify-end">
+        <select id="seletor-status-lote" class="text-xs bg-slate-800 dark:bg-slate-700 border border-slate-600 rounded-xl px-2.5 py-1.5 font-semibold text-white focus:outline-none cursor-pointer flex-1 sm:flex-none">
+          <option value="">Status...</option>
           <option value="Confirmado">Confirmar</option>
           <option value="Em produção">Em Produção</option>
           <option value="Concluído">Concluir</option>
@@ -1233,16 +1305,16 @@
         <button onclick="aplicarStatusEmLote()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
           Aplicar
         </button>
-        <button onclick="imprimirSelecionadosLote()" class="px-2.5 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer flex items-center gap-1 font-semibold text-xs" title="Imprimir Comprovantes / Etiquetas dos Selecionados">
+        <button onclick="imprimirSelecionadosLote()" class="p-1.5 sm:px-2.5 sm:py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer flex items-center gap-1 font-semibold text-xs" title="Imprimir Comprovantes">
           <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          <span class="hidden sm:inline">Comprovantes</span>
+          <span class="hidden md:inline">Comprovantes</span>
         </button>
         <button onclick="exportarSelecionadosCSV()" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Exportar Selecionados para CSV">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </button>
-        <button onclick="excluirSelecionadosLote()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center gap-1" title="Excluir pedidos selecionados">
+        <button onclick="excluirSelecionadosLote()" class="px-2.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center gap-1" title="Excluir pedidos selecionados">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-          <span>Excluir</span>
+          <span class="hidden sm:inline">Excluir</span>
         </button>
         <button onclick="desmarcarTodosLote()" class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Desmarcar todos">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -1256,11 +1328,14 @@
     <p>Central de Pedidos Operacional &bull; Supabase Realtime &bull; Cloudflare Pages</p>
   </footer>
 
-  <!-- MODAL: DETALHES DO PEDIDO -->
-  <div id="modal-detalhes" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+  <!-- MODAL: DETALHES DO PEDIDO (BOTTOM-SHEET EM TELAS MÓVEIS) -->
+  <div id="modal-detalhes" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[85vh] animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
       
-      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span id="modal-det-setor" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Setor</span>
           <span id="modal-det-status" class="px-2.5 py-0.5 text-xs font-semibold rounded-full border">Status</span>
@@ -1270,22 +1345,22 @@
         </button>
       </div>
 
-      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+      <div class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
         
         <!-- STEPPER / LINHA DO TEMPO DO STATUS INTERATIVA -->
-        <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
           <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Linha do Tempo / Avançar Etapa:</span>
-          <div class="grid grid-cols-4 gap-1.5 text-center">
-            <button onclick="avancarStatusModal('Pendente')" id="step-pendente" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">1. Pendente</button>
-            <button onclick="avancarStatusModal('Confirmado')" id="step-confirmado" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">2. Confirmado</button>
-            <button onclick="avancarStatusModal('Em produção')" id="step-producao" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">3. Produção</button>
-            <button onclick="avancarStatusModal('Concluído')" id="step-concluido" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">4. Concluído</button>
+          <div class="grid grid-cols-4 gap-1 sm:gap-1.5 text-center">
+            <button onclick="avancarStatusModal('Pendente')" id="step-pendente" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">1. Pendente</button>
+            <button onclick="avancarStatusModal('Confirmado')" id="step-confirmado" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">2. Confirmado</button>
+            <button onclick="avancarStatusModal('Em produção')" id="step-producao" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">3. Produção</button>
+            <button onclick="avancarStatusModal('Concluído')" id="step-concluido" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">4. Concluído</button>
           </div>
         </div>
 
         <div>
-          <h2 id="modal-det-cliente" class="text-xl font-extrabold text-slate-900 dark:text-white">Nome do Cliente</h2>
-          <p id="modal-det-servico" class="text-sm font-medium text-slate-600 dark:text-slate-300 mt-0.5">Descrição do Serviço</p>
+          <h2 id="modal-det-cliente" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">Nome do Cliente</h2>
+          <p id="modal-det-servico" class="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 mt-0.5">Descrição do Serviço</p>
         </div>
 
         <div class="grid grid-cols-2 gap-3 py-3 border-y border-slate-100 dark:border-slate-800 text-xs">
@@ -1306,7 +1381,7 @@
         </div>
 
         <!-- WIDGET DE COBRANÇA PIX COM QR CODE DINÂMICO -->
-        <div class="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-slate-900 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
+        <div class="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-slate-900 p-3.5 sm:p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -1339,7 +1414,7 @@
         </div>
 
         <!-- CALCULADORA DE TROCO (PAGAMENTO EM DINHEIRO / CAIXA) -->
-        <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 space-y-2">
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
@@ -1387,29 +1462,29 @@
 
       </div>
 
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <button onclick="copiarResumoPedido()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer">
+      <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <button onclick="copiarResumoPedido()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
             Copiar
           </button>
-          <button onclick="compartilharPedidoNativo()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer" title="Compartilhar pedido">
+          <button onclick="compartilharPedidoNativo()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer shrink-0" title="Compartilhar pedido">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
             Compartilhar
           </button>
-          <button onclick="imprimirComprovanteIndividual()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer">
+          <button onclick="imprimirComprovanteIndividual()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
             Comprovante
           </button>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="excluirPedido(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition cursor-pointer flex items-center gap-1" title="Excluir este pedido permanentemente">
+        <div class="flex items-center gap-2 justify-end">
+          <button onclick="excluirPedido(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-2.5 sm:px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition cursor-pointer flex items-center gap-1" title="Excluir este pedido permanentemente">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            Excluir
+            <span class="hidden xs:inline">Excluir</span>
           </button>
-          <button onclick="duplicarPedidoAtual()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition cursor-pointer flex items-center gap-1" title="Duplicar este pedido para um novo cadastro">
+          <button onclick="duplicarPedidoAtual()" class="px-2.5 sm:px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition cursor-pointer flex items-center gap-1" title="Duplicar este pedido para um novo cadastro">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
-            Duplicar
+            <span class="hidden xs:inline">Duplicar</span>
           </button>
           <button onclick="abrirModalEdicao(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer flex items-center gap-1">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -1425,11 +1500,14 @@
   </div>
 
   <!-- MODAL: NOVO / EDITAR PEDIDO -->
-  <div id="modal-novo" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+  <div id="modal-novo" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
       
-      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <h2 id="modal-form-titulo" class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h2 id="modal-form-titulo" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           </span>
@@ -1440,7 +1518,7 @@
         </button>
       </div>
 
-      <form id="form-novo-pedido" onsubmit="salvarPedido(event)" class="p-6 space-y-4">
+      <form id="form-novo-pedido" onsubmit="salvarPedido(event)" class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
         <input type="hidden" id="pedido-id-edicao" value="" />
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1497,16 +1575,16 @@
 
         <div id="novo-pedido-erro" class="hidden text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/50 p-3 rounded-xl border border-rose-200 dark:border-rose-800"></div>
 
-        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <button type="button" id="btn-excluir-pedido" onclick="excluirPedidoAtual()" class="hidden px-3.5 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 rounded-xl transition cursor-pointer flex items-center gap-1.5" title="Excluir este pedido permanentemente">
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+          <button type="button" id="btn-excluir-pedido" onclick="excluirPedidoAtual()" class="hidden w-full sm:w-auto px-3.5 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-rose-200 dark:border-rose-900/60 rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5" title="Excluir este pedido permanentemente">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             <span>Excluir Pedido</span>
           </button>
-          <div class="flex items-center gap-2 ml-auto">
-            <button type="button" onclick="fecharModalNovoPedido()" class="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
+          <div class="flex items-center gap-2 w-full sm:w-auto sm:ml-auto justify-end">
+            <button type="button" onclick="fecharModalNovoPedido()" class="flex-1 sm:flex-initial px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
               Cancelar
             </button>
-            <button type="submit" id="btn-salvar-pedido" class="px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5">
+            <button type="submit" id="btn-salvar-pedido" class="flex-1 sm:flex-initial px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
               <span>Salvar Pedido</span>
             </button>
           </div>
@@ -1518,9 +1596,13 @@
   </div>
 
   <!-- MODAL: ATIVIDADES RECENTES (DRAWER / HISTÓRICO) -->
-  <div id="modal-atividades" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+  <div id="modal-atividades" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[85vh] animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           Registro de Atividades
@@ -1530,11 +1612,11 @@
         </button>
       </div>
 
-      <div id="lista-atividades" class="p-6 space-y-3 max-h-[60vh] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+      <div id="lista-atividades" class="p-5 sm:p-6 space-y-3 max-h-[60vh] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 flex-1">
         <!-- Populado dinamicamente -->
       </div>
 
-      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div class="px-5 sm:px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <button onclick="limparHistoricoAtividades()" class="text-xs text-slate-400 hover:text-rose-600 font-semibold cursor-pointer">
           Limpar Registro
         </button>
@@ -1546,15 +1628,19 @@
   </div>
 
   <!-- MODAL: FECHAMENTO DO DIA / RELATÓRIO EXECUTIVO -->
-  <div id="modal-fechamento" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
-      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+  <div id="modal-fechamento" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150 flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </span>
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Fechamento do Dia &bull; Relatório Executivo</h3>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Fechamento do Dia &bull; Relatório Executivo</h3>
             <p id="fechamento-data-geracao" class="text-[11px] text-slate-400">Sumário consolidado de movimentação</p>
           </div>
         </div>
@@ -1563,24 +1649,24 @@
         </button>
       </div>
 
-      <div class="p-6 space-y-5 overflow-y-auto flex-1">
+      <div class="p-5 sm:p-6 space-y-5 overflow-y-auto flex-1">
         <!-- 4 Mini KPIs do Fechamento -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
           <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faturamento</span>
-            <p id="fechamento-faturamento" class="text-base font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0,00</p>
+            <p id="fechamento-faturamento" class="text-sm sm:text-base font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0,00</p>
           </div>
           <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ticket Médio</span>
-            <p id="fechamento-ticket-medio" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">R$ 0,00</p>
+            <p id="fechamento-ticket-medio" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white mt-0.5">R$ 0,00</p>
           </div>
           <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Pedidos</span>
-            <p id="fechamento-pedidos-total" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">0</p>
+            <p id="fechamento-pedidos-total" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white mt-0.5">0</p>
           </div>
           <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Concluídos</span>
-            <p id="fechamento-concluidos" class="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">0</p>
+            <p id="fechamento-concluidos" class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">0</p>
           </div>
         </div>
 
@@ -1597,24 +1683,31 @@
         </div>
       </div>
 
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <button onclick="imprimirRelatorioFechamento()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+      <div class="px-5 sm:px-6 py-3.5 sm:py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+        <button onclick="imprimirRelatorioFechamento()" class="w-full sm:w-auto justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
           <span>Imprimir Relatório</span>
         </button>
-        <button onclick="fecharModalFechamento()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+        <button onclick="fecharModalFechamento()" class="w-full sm:w-auto px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer text-center">
           Fechar
         </button>
+      </div>
+    </div>
+  </div>
   <!-- MODAL: IMPORTAR CSV / PLANILHA -->
-  <div id="modal-importar-csv" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
-      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+  <div id="modal-importar-csv" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150 flex flex-col max-h-[92vh] sm:max-h-[90vh]">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
           </span>
           <div>
-            <h3 class="text-base font-bold text-slate-900 dark:text-white">Importar Pedidos via CSV / Planilha</h3>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Importar Pedidos via CSV / Planilha</h3>
             <p class="text-[11px] text-slate-400">Importação em lote diretamente para o banco Supabase</p>
           </div>
         </div>
@@ -1623,12 +1716,12 @@
         </button>
       </div>
 
-      <div class="p-6 space-y-4 overflow-y-auto flex-1">
+      <div class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
         <!-- Área de Upload / Drag and drop -->
         <div 
           id="dropzone-csv" 
           onclick="document.getElementById('input-arquivo-csv').click()" 
-          class="border-2 border-dashed border-indigo-200 dark:border-indigo-900 hover:border-indigo-500 dark:hover:border-indigo-400 rounded-2xl p-6 text-center cursor-pointer bg-indigo-50/40 dark:bg-indigo-950/20 transition"
+          class="border-2 border-dashed border-indigo-200 dark:border-indigo-900 hover:border-indigo-500 dark:hover:border-indigo-400 rounded-2xl p-5 sm:p-6 text-center cursor-pointer bg-indigo-50/40 dark:bg-indigo-950/20 transition"
         >
           <input type="file" id="input-arquivo-csv" accept=".csv" class="hidden" onchange="processarArquivoCSV(this.files[0])" />
           <div class="w-12 h-12 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
@@ -1671,11 +1764,11 @@
         <div id="csv-erro" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-xs text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800"></div>
       </div>
 
-      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <button onclick="fecharModalImportarCSV()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+      <div class="px-5 sm:px-6 py-3.5 sm:py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+        <button onclick="fecharModalImportarCSV()" class="w-full sm:w-auto px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer text-center">
           Cancelar
         </button>
-        <button id="btn-confirmar-importacao-csv" disabled onclick="confirmarImportacaoCSV()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition cursor-pointer shadow-xs flex items-center gap-1.5">
+        <button id="btn-confirmar-importacao-csv" disabled onclick="confirmarImportacaoCSV()" class="w-full sm:w-auto justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition cursor-pointer shadow-xs flex items-center gap-1.5">
           <span>Cadastrar Pedidos no Supabase</span>
         </button>
       </div>
@@ -1683,9 +1776,13 @@
   </div>
 
   <!-- MODAL: ATALHOS DE TECLADO (?) -->
-  <div id="modal-atalhos" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+  <div id="modal-atalhos" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150 flex flex-col max-h-[92vh] sm:max-h-[85vh]">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">?</span>
           <div>
@@ -1697,7 +1794,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <div class="p-6 space-y-3 text-xs">
+      <div class="p-5 sm:p-6 space-y-3 text-xs overflow-y-auto flex-1">
         <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
           <span class="text-slate-600 dark:text-slate-300">Novo Pedido</span>
           <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">N</kbd>
@@ -1737,8 +1834,8 @@
           <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Esc</kbd>
         </div>
       </div>
-      <div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 text-center">
-        <button onclick="fecharModalAtalhos()" class="px-4 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer">
+      <div class="px-5 sm:px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 text-center">
+        <button onclick="fecharModalAtalhos()" class="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer">
           Entendido
         </button>
       </div>
@@ -2999,6 +3096,21 @@
       const btnAtivo = btnMap[modo] || btnCards;
       if (btnAtivo) btnAtivo.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold';
 
+      // Sincronizar botões da barra móvel
+      const btnCardsMob = document.getElementById('btn-view-cards-mob');
+      const btnTabelaMob = document.getElementById('btn-view-tabela-mob');
+      const btnKanbanMob = document.getElementById('btn-view-kanban-mob');
+      const btnSetoresMob = document.getElementById('btn-view-setores-mob');
+      const btnAgendaMob = document.getElementById('btn-view-agenda-mob');
+
+      [btnCardsMob, btnTabelaMob, btnKanbanMob, btnSetoresMob, btnAgendaMob].forEach(btn => {
+        if (btn) btn.className = 'px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+      });
+
+      const btnMapMob = { cards: btnCardsMob, tabela: btnTabelaMob, kanban: btnKanbanMob, setores: btnSetoresMob, agenda: btnAgendaMob };
+      const btnAtivoMob = btnMapMob[modo] || btnCardsMob;
+      if (btnAtivoMob) btnAtivoMob.className = 'px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-slate-800 shadow-2xs cursor-pointer';
+
       filtrarEOrdenar();
     }
 
@@ -3313,7 +3425,7 @@
 
     // RENDERIZAR MODO KANBAN
     function renderizarKanban(pedidos, termoBusca = '') {
-      const colPendente = document.getElementById('kanban-col-pendente');
+const colPendente = document.getElementById('kanban-col-pendente');
       const colAgendado = document.getElementById('kanban-col-agendado');
       const colProducao = document.getElementById('kanban-col-producao');
       const colConcluido = document.getElementById('kanban-col-concluido');
@@ -3338,6 +3450,15 @@
       document.getElementById('kanban-count-producao').textContent = grupos.producao.length;
       document.getElementById('kanban-count-concluido').textContent = grupos.concluido.length;
 
+      const badgeMobPendente = document.getElementById('kanban-badge-mob-pendente');
+      if (badgeMobPendente) badgeMobPendente.textContent = grupos.pendente.length;
+      const badgeMobAgendado = document.getElementById('kanban-badge-mob-agendado');
+      if (badgeMobAgendado) badgeMobAgendado.textContent = grupos.agendado.length;
+      const badgeMobProducao = document.getElementById('kanban-badge-mob-producao');
+      if (badgeMobProducao) badgeMobProducao.textContent = grupos.producao.length;
+      const badgeMobConcluido = document.getElementById('kanban-badge-mob-concluido');
+      if (badgeMobConcluido) badgeMobConcluido.textContent = grupos.concluido.length;
+
       function renderColuna(lista, statusDestino) {
         if (lista.length === 0) {
           return `
@@ -3347,33 +3468,36 @@
           `;
         }
         return lista.map(p => {
-          const id = p.id;
-          const clienteRaw = getCampo(p, 'cliente', 'nome') || 'Cliente';
-          const servicoRaw = getCampo(p, 'servico', 'serviço') || 'Serviço';
-          const setor = getCampo(p, 'setor', 'categoria') || 'Geral';
-          const valor = getCampo(p, 'valor', 'preco');
-          const data = getCampo(p, 'data_pedido', 'data');
-
-          const cliente = destacarTexto(clienteRaw, termoBusca);
-          const servico = destacarTexto(servicoRaw, termoBusca);
+          const id = Number(p.id);
+          const cliente = getCampo(p, 'cliente', 'nome', 'nome_cliente') || 'Sem nome';
+          const servico = getCampo(p, 'servico', 'descricao', 'serviço') || 'Sem serviço';
+          const setor = getCampo(p, 'setor', 'departamento') || 'Geral';
+          const valor = extrairNumero(getCampo(p, 'valor', 'preco', 'preço'));
 
           return `
             <div 
               id="kanban-card-${id}"
-              draggable="true"
-              ondragstart="iniciarArrasto(event, ${id})"
-              onclick="abrirModalDetalhes(${id})" 
-              class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-2xs hover:shadow-md transition cursor-grab active:cursor-grabbing space-y-2 select-none group"
+              draggable="true" 
+              ondragstart="iniciarArrasto(event, ${id})" 
+              ondragend="finalizarArrasto(${id})"
+              onclick="abrirModalDetalhes(${id})"
+              class="bg-white dark:bg-slate-800/90 p-4 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-xs hover:shadow-md transition cursor-grab active:cursor-grabbing group select-none"
             >
-              <div class="flex items-center justify-between text-[10px] font-bold">
-                <span class="text-indigo-600 dark:text-indigo-400 uppercase">${setor}</span>
-                <span class="text-slate-400">${formatarData(data)}</span>
+              <div class="flex items-center justify-between gap-2 mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded">
+                  ${escapeHtml(setor)}
+                </span>
+                <span class="text-[10px] text-slate-400 font-mono">#${id}</span>
               </div>
-              <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-tight">${cliente}</h4>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">${servico}</p>
-              <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs">
+              <h4 class="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition mb-1">
+                ${realcarTermo(cliente, termoBusca)}
+              </h4>
+              <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-3">
+                ${realcarTermo(servico, termoBusca)}
+              </p>
+              <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs">
                 <div class="flex items-center gap-1">
-                  <button onclick="event.stopPropagation(); abrirModalEdicao(${id})" class="p-1 text-slate-400 hover:text-amber-500 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer" title="Editar pedido">
+                  <button onclick="abrirModalEditar(${id}, event)" class="p-1 text-slate-400 hover:text-indigo-600 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer" title="Editar pedido">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                   </button>
                   <button onclick="excluirPedido(${id}, event)" class="p-1 text-slate-400 hover:text-rose-500 rounded hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer" title="Excluir pedido">
@@ -3400,6 +3524,14 @@
       colAgendado.innerHTML = renderColuna(grupos.agendado, 'Agendado');
       colProducao.innerHTML = renderColuna(grupos.producao, 'Em produção');
       colConcluido.innerHTML = renderColuna(grupos.concluido, 'Concluído');
+    }
+
+    // NAVEGAÇÃO ENTRE COLUNAS DO KANBAN NO MOBILE
+    function rolarParaColunaKanban(colunaId) {
+      const el = document.getElementById(colunaId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
     }
 
     // KANBAN DRAG & DROP
