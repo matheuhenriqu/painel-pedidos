@@ -178,7 +178,7 @@
           <button 
             id="btn-tema"
             onclick="alternarTema()"
-            title="Alternar Modo Claro / Escuro"
+            title="Alternar Modo Claro / Escuro (Atalho: T)"
             class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
           >
             <svg id="icon-tema-lua" class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,6 +187,15 @@
             <svg id="icon-tema-sol" class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
             </svg>
+          </button>
+
+          <!-- Botão Atalhos de Teclado (?) -->
+          <button 
+            onclick="abrirModalAtalhos()"
+            title="Atalhos de Teclado (Pressione ?)"
+            class="hidden md:flex w-8 h-8 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer items-center justify-center font-bold text-xs"
+          >
+            ?
           </button>
 
         </div>
@@ -344,13 +353,26 @@
 
       </div>
 
-      <!-- Filtros Rápidos de Faixa de Valor (Chips) -->
-      <div class="flex flex-wrap items-center gap-2 pt-1">
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Faixa:</span>
-        <button onclick="filtrarFaixaValor('todos')" id="btn-faixa-todos" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todos</button>
-        <button onclick="filtrarFaixaValor('ate100')" id="btn-faixa-ate100" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Até R$ 100</button>
-        <button onclick="filtrarFaixaValor('100a200')" id="btn-faixa-100a200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">R$ 100 a R$ 200</button>
-        <button onclick="filtrarFaixaValor('acima200')" id="btn-faixa-acima200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Acima de R$ 200</button>
+      <!-- Filtros Rápidos de Período e Faixa de Valor (Chips) -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <!-- Chips Período -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Período:</span>
+          <button onclick="filtrarPeriodo('todos')" id="btn-periodo-todos" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todos</button>
+          <button onclick="filtrarPeriodo('hoje')" id="btn-periodo-hoje" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Hoje</button>
+          <button onclick="filtrarPeriodo('ontem')" id="btn-periodo-ontem" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Ontem</button>
+          <button onclick="filtrarPeriodo('semana')" id="btn-periodo-semana" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Últimos 7 Dias</button>
+          <button onclick="filtrarPeriodo('mes')" id="btn-periodo-mes" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer">Este Mês</button>
+        </div>
+
+        <!-- Chips Faixa de Valor -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Faixa:</span>
+          <button onclick="filtrarFaixaValor('todos')" id="btn-faixa-todos" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer">Todas</button>
+          <button onclick="filtrarFaixaValor('ate100')" id="btn-faixa-ate100" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">Até R$ 100</button>
+          <button onclick="filtrarFaixaValor('100a200')" id="btn-faixa-100a200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">R$ 100 - 200</button>
+          <button onclick="filtrarFaixaValor('acima200')" id="btn-faixa-acima200" class="px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer">&gt; R$ 200</button>
+        </div>
       </div>
 
       <!-- Rodapé dos Filtros com Contador e Ações -->
@@ -360,7 +382,7 @@
           <span id="filtro-ativo-tag" class="hidden px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800 text-[11px] font-semibold"></span>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 flex-wrap">
           <!-- Botão Selecionar Todos -->
           <button 
             onclick="selecionarTodosFiltrados()" 
@@ -369,6 +391,16 @@
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
             <span id="label-selecionar-todos">Selecionar Todos</span>
+          </button>
+
+          <!-- Botão Importar CSV -->
+          <button 
+            onclick="abrirModalImportarCSV()" 
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            title="Importar pedidos em massa via arquivo CSV / Excel"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span>Importar CSV</span>
           </button>
 
           <!-- Botão Exportar CSV -->
@@ -571,6 +603,10 @@
         <button onclick="aplicarStatusEmLote()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
           Aplicar
         </button>
+        <button onclick="imprimirSelecionadosLote()" class="px-2.5 py-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer flex items-center gap-1 font-semibold text-xs" title="Imprimir Comprovantes / Etiquetas dos Selecionados">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span class="hidden sm:inline">Comprovantes</span>
+        </button>
         <button onclick="exportarSelecionadosCSV()" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Exportar Selecionados para CSV">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </button>
@@ -669,6 +705,30 @@
               <img id="img-qrcode-pix" src="" alt="QR Code PIX" class="w-36 h-36 mx-auto object-contain" />
             </div>
             <p class="text-[10px] text-slate-500 dark:text-slate-400">Aponte a câmera do celular ou banco para pagar na tela</p>
+          </div>
+        </div>
+
+        <!-- CALCULADORA DE TROCO (PAGAMENTO EM DINHEIRO / CAIXA) -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              Calculadora de Troco (Caixa)
+            </span>
+            <span class="text-[10px] text-slate-400">Pagamento em espécie</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input 
+              type="number" 
+              id="calc-dinheiro-recebido" 
+              placeholder="Valor recebido em R$ (ex: 100)" 
+              step="0.01" 
+              oninput="calcularTrocoDetalhes()" 
+              class="w-full text-xs px-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            />
+            <div id="resultado-troco-box" class="px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-extrabold text-emerald-700 dark:text-emerald-300 shrink-0 whitespace-nowrap">
+              Troco: R$ 0,00
+            </div>
           </div>
         </div>
 
@@ -915,6 +975,142 @@
         <button onclick="fecharModalFechamento()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
           Fechar
         </button>
+  <!-- MODAL: IMPORTAR CSV / PLANILHA -->
+  <div id="modal-importar-csv" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          </span>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Importar Pedidos via CSV / Planilha</h3>
+            <p class="text-[11px] text-slate-400">Importação em lote diretamente para o banco Supabase</p>
+          </div>
+        </div>
+        <button onclick="fecharModalImportarCSV()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 overflow-y-auto flex-1">
+        <!-- Área de Upload / Drag and drop -->
+        <div 
+          id="dropzone-csv" 
+          onclick="document.getElementById('input-arquivo-csv').click()" 
+          class="border-2 border-dashed border-indigo-200 dark:border-indigo-900 hover:border-indigo-500 dark:hover:border-indigo-400 rounded-2xl p-6 text-center cursor-pointer bg-indigo-50/40 dark:bg-indigo-950/20 transition"
+        >
+          <input type="file" id="input-arquivo-csv" accept=".csv" class="hidden" onchange="processarArquivoCSV(this.files[0])" />
+          <div class="w-12 h-12 mx-auto rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          </div>
+          <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Clique para selecionar ou arraste seu arquivo .CSV aqui</p>
+          <p class="text-xs text-slate-400 mt-1">Colunas aceitas: cliente, telefone, setor, status, servico, valor, data_pedido, observacoes</p>
+        </div>
+
+        <div class="flex items-center justify-between text-xs pt-1">
+          <span class="text-slate-500">Precisa do formato correto?</span>
+          <button onclick="baixarModeloCSV()" class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Baixar Planilha Modelo (.CSV)
+          </button>
+        </div>
+
+        <!-- Preview da Tabela de Importação -->
+        <div id="box-preview-csv" class="hidden space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Pré-visualização dos Registros</h4>
+            <span id="badge-csv-qtd" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">0 registros válidos</span>
+          </div>
+          <div class="max-h-56 overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-800">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-800 text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800 sticky top-0">
+                <tr>
+                  <th class="px-3 py-2">Cliente</th>
+                  <th class="px-3 py-2">Setor</th>
+                  <th class="px-3 py-2">Serviço</th>
+                  <th class="px-3 py-2 text-right">Valor</th>
+                  <th class="px-3 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody id="corpo-preview-csv" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="csv-erro" class="hidden p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-xs text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800"></div>
+      </div>
+
+      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <button onclick="fecharModalImportarCSV()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+          Cancelar
+        </button>
+        <button id="btn-confirmar-importacao-csv" disabled onclick="confirmarImportacaoCSV()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition cursor-pointer shadow-xs flex items-center gap-1.5">
+          <span>Cadastrar Pedidos no Supabase</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ATALHOS DE TECLADO (?) -->
+  <div id="modal-atalhos" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">?</span>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Atalhos de Teclado</h3>
+            <p class="text-[11px] text-slate-400">Navegue com velocidade de operador profissional</p>
+          </div>
+        </div>
+        <button onclick="fecharModalAtalhos()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-3 text-xs">
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Novo Pedido</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">N</kbd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Focar Busca de Pedidos</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">/</kbd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Alternar Visualizações (Cards, Tabela...)</span>
+          <div class="flex gap-1">
+            <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold border border-slate-200 dark:border-slate-700">1</kbd>
+            <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold border border-slate-200 dark:border-slate-700">2</kbd>
+            <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold border border-slate-200 dark:border-slate-700">3</kbd>
+            <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold border border-slate-200 dark:border-slate-700">4</kbd>
+            <kbd class="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold border border-slate-200 dark:border-slate-700">5</kbd>
+          </div>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Sincronizar com Banco de Dados</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">R</kbd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Fechamento do Dia / Relatório</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">F</kbd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Histórico de Atividades</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">H</kbd>
+        </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Alternar Tema Claro / Escuro</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">T</kbd>
+        </div>
+        <div class="flex items-center justify-between py-1.5">
+          <span class="text-slate-600 dark:text-slate-300">Fechar Janelas / Modais</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Esc</kbd>
+        </div>
+      </div>
+      <div class="px-6 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 text-center">
+        <button onclick="fecharModalAtalhos()" class="px-4 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer">
+          Entendido
+        </button>
       </div>
     </div>
   </div>
@@ -935,6 +1131,9 @@
     let modoVisualizacao = localStorage.getItem('modo_visualizacao') || 'cards';
     let filtroKPIAtivo = null;
     let filtroFaixaValorAtiva = 'todos';
+    let filtroPeriodoAtivo = 'todos';
+    let pedidoArrastadoId = null;
+    let pedidosParaImportarCSV = [];
     let somAtivado = localStorage.getItem('som_notificacao') !== 'false';
     let metaDiaria = parseFloat(localStorage.getItem('meta_diaria')) || 2500;
     let historicoAtividades = JSON.parse(localStorage.getItem('historico_atividades') || '[]');
@@ -1357,6 +1556,22 @@
       }
     }
 
+    // FILTRO DE PERÍODO TEMPORAL (CHIPS)
+    function filtrarPeriodo(periodo) {
+      filtroPeriodoAtivo = periodo;
+      ['todos', 'hoje', 'ontem', 'semana', 'mes'].forEach(p => {
+        const btn = document.getElementById(`btn-periodo-${p}`);
+        if (btn) {
+          if (p === periodo) {
+            btn.className = 'px-2.5 py-1 text-xs rounded-lg font-semibold bg-indigo-600 text-white transition shadow-2xs cursor-pointer';
+          } else {
+            btn.className = 'px-2.5 py-1 text-xs rounded-lg font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer';
+          }
+        }
+      });
+      filtrarEOrdenar();
+    }
+
     // FILTRO DE FAIXA DE VALOR (CHIPS)
     function filtrarFaixaValor(faixa) {
       filtroFaixaValorAtiva = faixa;
@@ -1385,7 +1600,7 @@
       const tagFiltroAtivo = document.getElementById('filtro-ativo-tag');
 
       btnLimparBusca.classList.toggle('hidden', !busca);
-      const temFiltro = Boolean(busca || statusFiltro || setorFiltro || filtroKPIAtivo || filtroFaixaValorAtiva !== 'todos');
+      const temFiltro = Boolean(busca || statusFiltro || setorFiltro || filtroKPIAtivo || filtroFaixaValorAtiva !== 'todos' || filtroPeriodoAtivo !== 'todos');
       btnLimpar.classList.toggle('hidden', !temFiltro);
 
       if (filtroKPIAtivo) {
@@ -1421,7 +1636,28 @@
         else if (filtroFaixaValorAtiva === '100a200') bateValor = valor > 100 && valor <= 200;
         else if (filtroFaixaValorAtiva === 'acima200') bateValor = valor > 200;
 
-        return bateBusca && bateStatus && bateSetor && bateKPI && bateValor;
+        let batePeriodo = true;
+        if (filtroPeriodoAtivo !== 'todos') {
+          const ts = parseDataTimestamp(getCampo(p, 'data_pedido', 'data', 'criado_em'), p.id);
+          const agora = new Date();
+          const hojeInicio = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate()).getTime();
+          const hojeFim = hojeInicio + 86400000;
+          const ontemInicio = hojeInicio - 86400000;
+
+          if (filtroPeriodoAtivo === 'hoje') {
+            batePeriodo = ts >= hojeInicio && ts < hojeFim;
+          } else if (filtroPeriodoAtivo === 'ontem') {
+            batePeriodo = ts >= ontemInicio && ts < hojeInicio;
+          } else if (filtroPeriodoAtivo === 'semana') {
+            const seteDiasAtras = hojeFim - (7 * 86400000);
+            batePeriodo = ts >= seteDiasAtras && ts <= hojeFim;
+          } else if (filtroPeriodoAtivo === 'mes') {
+            const mesInicio = new Date(agora.getFullYear(), agora.getMonth(), 1).getTime();
+            batePeriodo = ts >= mesInicio && ts <= hojeFim;
+          }
+        }
+
+        return bateBusca && bateStatus && bateSetor && bateKPI && bateValor && batePeriodo;
       });
 
       // Ordenação
@@ -1833,8 +2069,14 @@
       document.getElementById('kanban-count-producao').textContent = grupos.producao.length;
       document.getElementById('kanban-count-concluido').textContent = grupos.concluido.length;
 
-      function renderColuna(lista) {
-        if (lista.length === 0) return '<div class="text-center py-8 text-xs text-slate-400">Vazio</div>';
+      function renderColuna(lista, statusDestino) {
+        if (lista.length === 0) {
+          return `
+            <div ondragover="permitirSoltar(event)" ondrop="soltarEmColuna(event, '${statusDestino}')" class="text-center py-8 text-xs text-slate-400 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl transition">
+              Arraste pedidos aqui
+            </div>
+          `;
+        }
         return lista.map(p => {
           const id = p.id;
           const clienteRaw = getCampo(p, 'cliente', 'nome') || 'Cliente';
@@ -1847,7 +2089,13 @@
           const servico = destacarTexto(servicoRaw, termoBusca);
 
           return `
-            <div onclick="abrirModalDetalhes(${id})" class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-2xs hover:shadow-md transition cursor-pointer space-y-2">
+            <div 
+              id="kanban-card-${id}"
+              draggable="true"
+              ondragstart="iniciarArrasto(event, ${id})"
+              onclick="abrirModalDetalhes(${id})" 
+              class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-2xs hover:shadow-md transition cursor-grab active:cursor-grabbing space-y-2 select-none group"
+            >
               <div class="flex items-center justify-between text-[10px] font-bold">
                 <span class="text-indigo-600 dark:text-indigo-400 uppercase">${setor}</span>
                 <span class="text-slate-400">${formatarData(data)}</span>
@@ -1870,10 +2118,43 @@
         }).join('');
       }
 
-      colPendente.innerHTML = renderColuna(grupos.pendente);
-      colAgendado.innerHTML = renderColuna(grupos.agendado);
-      colProducao.innerHTML = renderColuna(grupos.producao);
-      colConcluido.innerHTML = renderColuna(grupos.concluido);
+      colPendente.setAttribute('ondragover', 'permitirSoltar(event)');
+      colPendente.setAttribute('ondrop', "soltarEmColuna(event, 'Pendente')");
+      colAgendado.setAttribute('ondragover', 'permitirSoltar(event)');
+      colAgendado.setAttribute('ondrop', "soltarEmColuna(event, 'Agendado')");
+      colProducao.setAttribute('ondragover', 'permitirSoltar(event)');
+      colProducao.setAttribute('ondrop', "soltarEmColuna(event, 'Em produção')");
+      colConcluido.setAttribute('ondragover', 'permitirSoltar(event)');
+      colConcluido.setAttribute('ondrop', "soltarEmColuna(event, 'Concluído')");
+
+      colPendente.innerHTML = renderColuna(grupos.pendente, 'Pendente');
+      colAgendado.innerHTML = renderColuna(grupos.agendado, 'Agendado');
+      colProducao.innerHTML = renderColuna(grupos.producao, 'Em produção');
+      colConcluido.innerHTML = renderColuna(grupos.concluido, 'Concluído');
+    }
+
+    // KANBAN DRAG & DROP
+    function iniciarArrasto(event, id) {
+      pedidoArrastadoId = Number(id);
+      event.dataTransfer.setData('text/plain', String(id));
+      event.dataTransfer.effectAllowed = 'move';
+      const el = document.getElementById(`kanban-card-${id}`);
+      if (el) el.classList.add('opacity-40');
+    }
+
+    function permitirSoltar(event) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    }
+
+    async function soltarEmColuna(event, novoStatus) {
+      event.preventDefault();
+      const id = pedidoArrastadoId || Number(event.dataTransfer.getData('text/plain'));
+      if (!id) return;
+      pedidoArrastadoId = null;
+      await atualizarStatusRapido(id, novoStatus);
+      tocarChime();
+      mostrarToast(`Pedido #${id} movido para "${novoStatus}"! 🎯`);
     }
 
     // RENDERIZAR MODO POR SETOR (AGRUPADO)
@@ -1974,6 +2255,14 @@
       if (qrBox) qrBox.classList.add('hidden');
       const btnQr = document.getElementById('btn-toggle-qr-pix');
       if (btnQr) btnQr.textContent = 'Ver QR Code';
+
+      const calcIn = document.getElementById('calc-dinheiro-recebido');
+      if (calcIn) calcIn.value = '';
+      const calcBox = document.getElementById('resultado-troco-box');
+      if (calcBox) {
+        calcBox.textContent = 'Troco: R$ 0,00';
+        calcBox.className = 'px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-extrabold text-emerald-700 dark:text-emerald-300 shrink-0 whitespace-nowrap';
+      }
 
       const elStatus = document.getElementById('modal-det-status');
       elStatus.textContent = status;
@@ -2267,6 +2556,103 @@
       mostrarToast(`Exportados ${selecionados.length} pedidos selecionados! 📊`);
     }
 
+    // IMPRIMIR COMPROVANTES / ETIQUETAS EM LOTE (TÉRMICA 80MM OU FOLHA A4)
+    function imprimirSelecionadosLote() {
+      if (pedidosSelecionados.size === 0) {
+        mostrarToast('Selecione ao menos 1 pedido para imprimir comprovantes.');
+        return;
+      }
+
+      const pedidosParaImprimir = dadosOriginais.filter(p => pedidosSelecionados.has(Number(p.id)));
+      if (pedidosParaImprimir.length === 0) return;
+
+      const htmlCupons = pedidosParaImprimir.map((p, idx) => {
+        const id = p.id;
+        const cliente = getCampo(p, 'cliente', 'nome') || 'Cliente';
+        const telefone = getCampo(p, 'telefone', 'contato') || '-';
+        const setor = getCampo(p, 'setor', 'categoria') || 'Geral';
+        const status = getCampo(p, 'status') || 'Pendente';
+        const servico = getCampo(p, 'servico', 'serviço') || 'Serviço sob consulta';
+        const valor = formatarMoeda(getCampo(p, 'valor', 'preco'));
+        const data = formatarData(getCampo(p, 'data_pedido', 'data'));
+        const obs = getCampo(p, 'observacoes', 'obs') || '-';
+
+        return `
+          <div class="cupom">
+            <div class="header">
+              <h2>CENTRAL DE PEDIDOS</h2>
+              <p>Comprovante Operacional de Serviço</p>
+              <div class="sep"></div>
+            </div>
+            <div class="linha"><span>Pedido:</span><strong>#${id}</strong></div>
+            <div class="linha"><span>Cliente:</span><strong>${cliente}</strong></div>
+            <div class="linha"><span>Telefone:</span><span>${telefone}</span></div>
+            <div class="linha"><span>Setor:</span><span>${setor}</span></div>
+            <div class="linha"><span>Data:</span><span>${data}</span></div>
+            <div class="linha"><span>Status:</span><span>${status}</span></div>
+            <div style="margin: 8px 0; border-top: 1px dashed #ccc; padding-top: 6px;">
+              <span style="font-size: 11px; font-weight: bold;">Serviço / Itens:</span>
+              <p style="margin: 3px 0; font-size: 13px;">${servico}</p>
+            </div>
+            ${obs !== '-' ? `
+              <div style="margin-bottom: 8px; font-size: 11px; color: #555;">
+                <span>Obs:</span> <em>${obs}</em>
+              </div>
+            ` : ''}
+            <div class="linha total">
+              <span>TOTAL:</span>
+              <span>${valor}</span>
+            </div>
+            <div class="footer">
+              <p>Etiqueta ${idx + 1} de ${pedidosParaImprimir.length} &bull; Emissão: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const win = window.open('', '_blank', 'width=450,height=700');
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Comprovantes e Etiquetas em Lote (${pedidosParaImprimir.length} itens)</title>
+          <meta charset="utf-8">
+          <style>
+            @media print {
+              body { margin: 0; padding: 0; }
+              .cupom { page-break-after: always; }
+              .cupom:last-child { page-break-after: auto; }
+            }
+            body {
+              font-family: 'Courier New', Courier, monospace;
+              padding: 10px;
+              max-width: 320px;
+              margin: 0 auto;
+              color: #000;
+            }
+            .cupom {
+              border-bottom: 2px dashed #666;
+              padding: 15px 0;
+              margin-bottom: 20px;
+            }
+            .header { text-align: center; margin-bottom: 12px; }
+            .header h2 { margin: 0; font-size: 16px; font-weight: 900; letter-spacing: 1px; }
+            .header p { margin: 3px 0 0; font-size: 11px; }
+            .sep { border-bottom: 1px dashed #000; margin: 8px 0; }
+            .linha { display: flex; justify-content: space-between; margin: 4px 0; font-size: 12px; }
+            .total { font-weight: 900; font-size: 15px; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0; margin-top: 8px; }
+            .footer { text-align: center; margin-top: 10px; font-size: 10px; color: #555; }
+          </style>
+        </head>
+        <body>
+          ${htmlCupons}
+          <script>window.onload = function() { window.print(); }<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+
     // RELATÓRIO EXECUTIVO E FECHAMENTO DO DIA
     function abrirModalFechamento() {
       const total = dadosOriginais.length;
@@ -2541,6 +2927,28 @@
       win.document.close();
     }
 
+    // CALCULADORA DE TROCO EM TEMPO REAL (MODAL DETALHES)
+    function calcularTrocoDetalhes() {
+      if (!pedidoSelecionado) return;
+      const valorTotal = extrairNumero(getCampo(pedidoSelecionado, 'valor', 'preco', 'total'));
+      const recebido = parseFloat(document.getElementById('calc-dinheiro-recebido').value) || 0;
+      const box = document.getElementById('resultado-troco-box');
+      if (!box) return;
+
+      if (recebido <= 0) {
+        box.textContent = 'Troco: R$ 0,00';
+        box.className = 'px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-500 shrink-0 whitespace-nowrap';
+      } else if (recebido < valorTotal) {
+        const falta = valorTotal - recebido;
+        box.textContent = `Falta: ${formatarMoeda(falta)}`;
+        box.className = 'px-3 py-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-xs font-extrabold text-rose-600 dark:text-rose-400 shrink-0 whitespace-nowrap';
+      } else {
+        const troco = recebido - valorTotal;
+        box.textContent = `Troco: ${formatarMoeda(troco)}`;
+        box.className = 'px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-extrabold text-emerald-700 dark:text-emerald-300 shrink-0 whitespace-nowrap';
+      }
+    }
+
     // MODAL NOVO / EDITAR PEDIDO
     function abrirModalNovoPedido() {
       document.getElementById('form-novo-pedido').reset();
@@ -2799,7 +3207,9 @@
       document.getElementById('filtro-ordem').value = 'data-desc';
       filtroKPIAtivo = null;
       filtroFaixaValorAtiva = 'todos';
+      filtroPeriodoAtivo = 'todos';
       filtrarFaixaValor('todos');
+      filtrarPeriodo('todos');
       filtrarPorKPI('todos');
       mostrarToast('Filtros limpos');
     }
@@ -2822,20 +3232,217 @@
       }, 3000);
     }
 
-    // ATALHOS DE TECLADO
-    window.addEventListener('keydown', e => {
-      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-        document.getElementById('filtro-busca').focus();
+    // MODAL DE IMPORTAÇÃO CSV
+    function abrirModalImportarCSV() {
+      pedidosParaImportarCSV = [];
+      document.getElementById('box-preview-csv').classList.add('hidden');
+      document.getElementById('csv-erro').classList.add('hidden');
+      document.getElementById('btn-confirmar-importacao-csv').disabled = true;
+      document.getElementById('btn-confirmar-importacao-csv').textContent = 'Cadastrar no Supabase';
+      document.getElementById('input-arquivo-csv').value = '';
+      document.getElementById('modal-importar-csv').classList.remove('hidden');
+    }
+
+    function fecharModalImportarCSV() {
+      document.getElementById('modal-importar-csv').classList.add('hidden');
+    }
+
+    function baixarModeloCSV() {
+      const conteudo = 'cliente,telefone,setor,status,servico,valor,data_pedido,observacoes\n' +
+        '"Maria Silva","(11) 98765-4321","Atendimento","Pendente","Consultoria Operacional",150.00,"Hoje","Cliente prioritária"\n' +
+        '"João Oliveira","(21) 99887-1122","Produção","Em produção","Confecção de Material",320.50,"Hoje","Entregar até às 18h"\n';
+      const blob = new Blob(["\uFEFF" + conteudo], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'modelo_importacao_pedidos.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function processarArquivoCSV(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      const erroBox = document.getElementById('csv-erro');
+      erroBox.classList.add('hidden');
+
+      reader.onload = function(e) {
+        const texto = e.target.result;
+        const linhas = texto.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+        if (linhas.length < 2) {
+          erroBox.textContent = 'O arquivo CSV precisa conter ao menos uma linha de cabeçalho e um registro.';
+          erroBox.classList.remove('hidden');
+          return;
+        }
+
+        const separador = linhas[0].includes(';') ? ';' : ',';
+        const cabecalhos = linhas[0].split(separador).map(c => removerAcentos(c.replace(/["']/g, '').trim()));
+
+        function parseLinha(str) {
+          const colunas = [];
+          let dentroAspas = false;
+          let campoAtual = '';
+
+          for (let i = 0; i < str.length; i++) {
+            const char = str[i];
+            if (char === '"') {
+              if (dentroAspas && str[i + 1] === '"') {
+                campoAtual += '"';
+                i++;
+              } else {
+                dentroAspas = !dentroAspas;
+              }
+            } else if (char === separador && !dentroAspas) {
+              colunas.push(campoAtual.trim());
+              campoAtual = '';
+            } else {
+              campoAtual += char;
+            }
+          }
+          colunas.push(campoAtual.trim());
+          return colunas;
+        }
+
+        const novos = [];
+        for (let i = 1; i < linhas.length; i++) {
+          const colunas = parseLinha(linhas[i]);
+          if (colunas.length === 0 || !colunas[0]) continue;
+
+          const obj = {};
+          cabecalhos.forEach((cab, idx) => {
+            obj[cab] = colunas[idx] || '';
+          });
+
+          const cliente = getCampo(obj, 'cliente', 'nome', 'nome_cliente') || colunas[0] || 'Cliente Importado';
+          const telefone = getCampo(obj, 'telefone', 'contato', 'celular') || colunas[1] || '';
+          const setor = getCampo(obj, 'setor', 'categoria') || colunas[2] || 'Geral';
+          const status = getCampo(obj, 'status', 'situacao') || colunas[3] || 'Pendente';
+          const servico = getCampo(obj, 'servico', 'serviço', 'descricao') || colunas[4] || 'Serviço';
+          const valor = extrairNumero(getCampo(obj, 'valor', 'preco') || colunas[5]) || 0;
+          const data_pedido = getCampo(obj, 'data_pedido', 'data') || colunas[6] || 'Hoje';
+          const observacoes = getCampo(obj, 'observacoes', 'obs') || colunas[7] || '(Importado via CSV)';
+
+          novos.push({ cliente, telefone, setor, status, servico, valor, data_pedido, observacoes });
+        }
+
+        if (novos.length === 0) {
+          erroBox.textContent = 'Nenhum registro válido pôde ser extraído do arquivo CSV.';
+          erroBox.classList.remove('hidden');
+          return;
+        }
+
+        pedidosParaImportarCSV = novos;
+        document.getElementById('badge-csv-qtd').textContent = `${novos.length} pedidos encontrados`;
+        const tbody = document.getElementById('corpo-preview-csv');
+        tbody.innerHTML = novos.slice(0, 8).map(p => `
+          <tr>
+            <td class="px-3 py-2 font-bold">${p.cliente}</td>
+            <td class="px-3 py-2">${p.setor}</td>
+            <td class="px-3 py-2 truncate max-w-xs">${p.servico}</td>
+            <td class="px-3 py-2 text-right font-bold">${formatarMoeda(p.valor)}</td>
+            <td class="px-3 py-2">${p.status}</td>
+          </tr>
+        `).join('');
+
+        document.getElementById('box-preview-csv').classList.remove('hidden');
+        document.getElementById('btn-confirmar-importacao-csv').disabled = false;
+        document.getElementById('btn-confirmar-importacao-csv').textContent = `Cadastrar ${novos.length} Pedidos no Supabase`;
+      };
+
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    async function confirmarImportacaoCSV() {
+      if (!pedidosParaImportarCSV || pedidosParaImportarCSV.length === 0) return;
+      const btn = document.getElementById('btn-confirmar-importacao-csv');
+      const erroBox = document.getElementById('csv-erro');
+      btn.disabled = true;
+      btn.textContent = 'Enviando ao Supabase...';
+      erroBox.classList.add('hidden');
+
+      try {
+        const { error } = await supabaseClient
+          .from('pedidos')
+          .insert(pedidosParaImportarCSV);
+
+        if (error) throw error;
+
+        mostrarToast(`${pedidosParaImportarCSV.length} pedidos importados com sucesso! 🚀`);
+        registrarAtividade('Importação CSV', `${pedidosParaImportarCSV.length} novos pedidos importados`);
+        fecharModalImportarCSV();
+        await carregarPedidos();
+      } catch (err) {
+        console.error('Erro ao importar CSV:', err);
+        erroBox.textContent = `Erro ao cadastrar no Supabase: ${err.message || 'Verifique permissões'}`;
+        erroBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Cadastrar Pedidos no Supabase';
       }
+    }
+
+    // MODAL DE ATALHOS DE TECLADO
+    function abrirModalAtalhos() {
+      document.getElementById('modal-atalhos').classList.remove('hidden');
+    }
+
+    function fecharModalAtalhos() {
+      document.getElementById('modal-atalhos').classList.add('hidden');
+    }
+
+    // ATALHOS DE TECLADO GLOBAIS
+    window.addEventListener('keydown', e => {
+      const tag = document.activeElement ? document.activeElement.tagName : '';
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) {
+        if (e.key === 'Escape') {
+          document.activeElement.blur();
+        }
+        return;
+      }
+
       if (e.key === 'Escape') {
         fecharModalDetalhes();
         fecharModalNovoPedido();
         fecharModalAtividades();
         fecharModalFechamento();
+        fecharModalImportarCSV();
+        fecharModalAtalhos();
+        return;
       }
-      if ((e.key === 'r' || e.key === 'R') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+
+      const key = e.key.toLowerCase();
+      if (key === 'n') {
+        e.preventDefault();
+        abrirModalNovoPedido();
+      } else if (key === '/' || e.key === '/') {
+        e.preventDefault();
+        const busca = document.getElementById('filtro-busca');
+        if (busca) {
+          busca.focus();
+          busca.select();
+        }
+      } else if (key === 'r') {
+        e.preventDefault();
         carregarPedidos();
+      } else if (key === 'f') {
+        e.preventDefault();
+        abrirModalFechamento();
+      } else if (key === 'h') {
+        e.preventDefault();
+        abrirModalAtividades();
+      } else if (key === 't') {
+        e.preventDefault();
+        alternarTema();
+      } else if (e.key === '?' || (e.shiftKey && e.key === '?')) {
+        e.preventDefault();
+        abrirModalAtalhos();
+      } else if (['1', '2', '3', '4', '5'].includes(key)) {
+        e.preventDefault();
+        const modos = ['cards', 'tabela', 'kanban', 'setores', 'agenda'];
+        const idx = parseInt(key, 10) - 1;
+        if (modos[idx]) alternarVisualizacao(modos[idx]);
       }
     });
 
