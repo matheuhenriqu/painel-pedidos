@@ -51,7 +51,7 @@
     @media print {
       header, #barra-filtros, #kpis-container, #secao-analytics, .no-print { display: none !important; }
       body { background: white !important; color: black !important; font-size: 11pt; }
-      #lista-pedidos, #view-tabela { display: block !important; }
+      #lista-pedidos, #view-tabela, #view-setores { display: block !important; }
       .card-pedido { break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
     }
   </style>
@@ -80,6 +80,7 @@
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Ao Vivo
               </span>
+              <span id="label-ultima-sync" class="hidden xl:inline text-[10px] text-slate-400 font-medium">Sincronizado</span>
             </div>
             <p class="text-xs font-medium text-slate-400 dark:text-slate-500 hidden sm:block truncate">Acompanhamento e Gestão Operacional de Vendas e Serviços</p>
           </div>
@@ -88,9 +89,9 @@
         <!-- Controles da Direita -->
         <div class="flex items-center gap-2 shrink-0">
           
-          <!-- Seletor de Modo de Visualização (Cards / Tabela / Kanban) -->
+          <!-- Seletor de Modo de Visualização (Cards / Tabela / Kanban / Setores) -->
           <div class="hidden lg:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
-            <button id="btn-view-cards" onclick="alternarVisualizacao('cards')" title="Visualização em Grade de Cards" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs">
+            <button id="btn-view-cards" onclick="alternarVisualizacao('cards')" title="Visualização em Grade de Cards" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
               <span>Cards</span>
             </button>
@@ -101,6 +102,10 @@
             <button id="btn-view-kanban" onclick="alternarVisualizacao('kanban')" title="Visualização em Colunas Kanban" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
               <span>Kanban</span>
+            </button>
+            <button id="btn-view-setores" onclick="alternarVisualizacao('setores')" title="Visualização Agrupada por Setor" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              <span>Setores</span>
             </button>
           </div>
 
@@ -464,6 +469,11 @@
 
     </section>
 
+    <!-- VIEW 4: AGRUPADO POR SETOR -->
+    <section id="view-setores" class="hidden space-y-6">
+      <!-- Populado dinamicamente com seções para cada setor -->
+    </section>
+
     <!-- ESTADO VAZIO -->
     <div id="estado-vazio" class="hidden text-center py-16 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
       <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 mx-auto flex items-center justify-center text-slate-400 mb-3">
@@ -499,7 +509,19 @@
         </button>
       </div>
 
-      <div class="p-6 space-y-4">
+      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        
+        <!-- STEPPER / LINHA DO TEMPO DO STATUS INTERATIVA -->
+        <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Linha do Tempo / Avançar Etapa:</span>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="avancarStatusModal('Pendente')" id="step-pendente" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">1. Pendente</button>
+            <button onclick="avancarStatusModal('Confirmado')" id="step-confirmado" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">2. Confirmado</button>
+            <button onclick="avancarStatusModal('Em produção')" id="step-producao" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">3. Produção</button>
+            <button onclick="avancarStatusModal('Concluído')" id="step-concluido" class="py-1.5 px-1 rounded-xl text-[11px] font-bold border transition cursor-pointer">4. Concluído</button>
+          </div>
+        </div>
+
         <div>
           <h2 id="modal-det-cliente" class="text-xl font-extrabold text-slate-900 dark:text-white">Nome do Cliente</h2>
           <p id="modal-det-servico" class="text-sm font-medium text-slate-600 dark:text-slate-300 mt-0.5">Descrição do Serviço</p>
@@ -522,9 +544,30 @@
           <div id="modal-det-obs" class="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 italic leading-relaxed"></div>
         </div>
 
+        <!-- WIDGET DE COBRANÇA PIX -->
+        <div class="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-slate-900 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              Cobrança PIX
+            </span>
+            <span id="pix-valor-display" class="font-extrabold text-sm text-indigo-700 dark:text-indigo-300">R$ 0,00</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="text" id="campo-chave-pix" value="financeiro@centralpedidos.com.br" readonly class="w-full text-xs font-mono px-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-indigo-200 dark:border-indigo-800 text-slate-700 dark:text-slate-300" />
+            <button onclick="copiarChavePIX()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shrink-0 transition cursor-pointer" title="Copiar Chave PIX">
+              Copiar
+            </button>
+          </div>
+          <a id="btn-whats-pix" href="#" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Enviar Cobrança PIX no WhatsApp
+          </a>
+        </div>
+
         <!-- Ações de WhatsApp Rápidas -->
-        <div class="space-y-2 pt-2">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Ações Rápidas de Contato (WhatsApp)</span>
+        <div class="space-y-2 pt-1">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Ações Rápidas de Atendimento</span>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <a id="modal-btn-whats-confirmar" href="#" target="_blank" class="px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
               <span>Confirmar Pedido</span>
@@ -667,6 +710,7 @@
     let filtroKPIAtivo = null;
     let filtroFaixaValorAtiva = 'todos';
     let somAtivado = localStorage.getItem('som_notificacao') !== 'false';
+    let segundosDesdeSync = 0;
 
     // INICIALIZAÇÃO DE TEMA (DARK / LIGHT)
     function iniciarTema() {
@@ -704,8 +748,8 @@
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Nota D5
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // Nota A5
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
         gain.gain.setValueAtTime(0.12, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
         osc.connect(gain);
@@ -736,12 +780,41 @@
       label.textContent = oculto ? 'Expandir' : 'Recolher';
     }
 
-    // HELPER: NORMALIZAÇÃO DE TEXTO PARA BUSCA ROBUSTA
+    // RELÓGIO DE SINCRONIZAÇÃO
+    setInterval(() => {
+      segundosDesdeSync++;
+      const el = document.getElementById('label-ultima-sync');
+      if (el) {
+        el.textContent = segundosDesdeSync <= 1 ? 'Sincronizado agora' : `Sincronizado há ${segundosDesdeSync}s`;
+      }
+    }, 1000);
+
+    // AUTO-REFRESH A CADA 45 SEGUNDOS
+    setInterval(() => {
+      carregarPedidos(true);
+    }, 45000);
+
+    // HELPER: NORMALIZAÇÃO DE TEXTO
     function removerAcentos(str) {
       return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     }
 
-    // HELPER: TOLERÂNCIA A MAIÚSCULAS/MINÚSCULAS E ACENTUAÇÃO EM NOMES DE COLUNAS
+    // HELPER: DESTAQUE DE TERMOS DE BUSCA
+    function destacarTexto(texto, termo) {
+      if (!termo || !texto) return texto || '';
+      const t = String(texto);
+      const termoNorm = removerAcentos(termo);
+      const textoNorm = removerAcentos(t);
+      const idx = textoNorm.indexOf(termoNorm);
+      if (idx === -1) return t;
+
+      const antes = t.substring(0, idx);
+      const correspondente = t.substring(idx, idx + termo.length);
+      const depois = t.substring(idx + termo.length);
+      return `${antes}<mark class="bg-amber-200 dark:bg-amber-800/80 text-slate-900 dark:text-white rounded px-0.5">${correspondente}</mark>${destacarTexto(depois, termo)}`;
+    }
+
+    // HELPER: TOLERÂNCIA DE NOMES DE COLUNA
     function getCampo(item, ...nomesPossiveis) {
       if (!item || typeof item !== 'object') return '';
       for (const nome of nomesPossiveis) {
@@ -755,7 +828,7 @@
       return '';
     }
 
-    // HELPER: EXTRAÇÃO NUMÉRICA ROBUSTA (BRL / Moeda / String / Float)
+    // HELPER: EXTRAÇÃO NUMÉRICA
     function extrairNumero(val) {
       if (typeof val === 'number') return isNaN(val) ? 0 : val;
       if (!val) return 0;
@@ -769,7 +842,7 @@
       return isNaN(num) ? 0 : num;
     }
 
-    // HELPER: TIMESTAMP PARA ORDENAÇÃO CRONOLÓGICA
+    // HELPER: TIMESTAMP
     function parseDataTimestamp(val, fallbackId = 0) {
       if (!val) return Number(fallbackId) || 0;
       if (val instanceof Date) return val.getTime();
@@ -783,23 +856,27 @@
     }
 
     // CARREGAR DADOS DO SUPABASE
-    async function carregarPedidos() {
+    async function carregarPedidos(emSegundoPlano = false) {
       const skeletons = document.getElementById('skeletons');
       const lista = document.getElementById('lista-pedidos');
       const tabela = document.getElementById('view-tabela');
       const kanban = document.getElementById('view-kanban');
+      const viewSetores = document.getElementById('view-setores');
       const painelErro = document.getElementById('painel-erro');
       const detalheErro = document.getElementById('detalhe-erro');
       const vazioBox = document.getElementById('estado-vazio');
       const iconRefresh = document.getElementById('icon-refresh');
 
-      iconRefresh.classList.add('rotate-180');
-      skeletons.classList.remove('hidden');
-      lista.classList.add('hidden');
-      tabela.classList.add('hidden');
-      kanban.classList.add('hidden');
-      painelErro.classList.add('hidden');
-      vazioBox.classList.add('hidden');
+      if (!emSegundoPlano) {
+        iconRefresh.classList.add('rotate-180');
+        skeletons.classList.remove('hidden');
+        lista.classList.add('hidden');
+        tabela.classList.add('hidden');
+        kanban.classList.add('hidden');
+        viewSetores.classList.add('hidden');
+        painelErro.classList.add('hidden');
+        vazioBox.classList.add('hidden');
+      }
 
       try {
         const { data, error } = await supabaseClient
@@ -809,14 +886,17 @@
         if (error) throw error;
 
         dadosOriginais = data || [];
+        segundosDesdeSync = 0;
         preencherFiltrosDinamicos(dadosOriginais);
         atualizarKPIs(dadosOriginais);
         renderizarAnalyticsSetores(dadosOriginais);
         filtrarEOrdenar();
       } catch (err) {
         console.error('Erro Supabase:', err);
-        painelErro.classList.remove('hidden');
-        detalheErro.textContent = err.message || JSON.stringify(err);
+        if (!emSegundoPlano) {
+          painelErro.classList.remove('hidden');
+          detalheErro.textContent = err.message || JSON.stringify(err);
+        }
       } finally {
         skeletons.classList.add('hidden');
         setTimeout(() => iconRefresh.classList.remove('rotate-180'), 500);
@@ -838,7 +918,7 @@
             } else if (payload.eventType === 'DELETE') {
               mostrarToast(`Pedido removido`);
             }
-            carregarPedidos();
+            carregarPedidos(true);
           })
           .subscribe();
       } catch (e) {
@@ -970,7 +1050,8 @@
 
     // FILTRAGEM E ORDENAÇÃO
     function filtrarEOrdenar() {
-      const busca = removerAcentos(document.getElementById('filtro-busca').value);
+      const buscaInput = document.getElementById('filtro-busca').value;
+      const busca = removerAcentos(buscaInput);
       const statusFiltro = document.getElementById('filtro-status').value;
       const setorFiltro = document.getElementById('filtro-setor').value;
       const ordem = document.getElementById('filtro-ordem').value;
@@ -1003,7 +1084,6 @@
         const bateStatus = !statusFiltro || status === statusFiltro;
         const bateSetor = !setorFiltro || setor === setorFiltro;
 
-        // Filtro rápido de KPI
         let bateKPI = true;
         if (filtroKPIAtivo === 'abertos') {
           bateKPI = !statusNorm.includes('conclu') && !statusNorm.includes('finaliz') && !statusNorm.includes('pago') && !statusNorm.includes('entreg');
@@ -1011,7 +1091,6 @@
           bateKPI = statusNorm.includes('conclu') || statusNorm.includes('finaliz') || statusNorm.includes('pago') || statusNorm.includes('entreg');
         }
 
-        // Filtro de faixa de valor
         let bateValor = true;
         if (filtroFaixaValorAtiva === 'ate100') bateValor = valor <= 100;
         else if (filtroFaixaValorAtiva === '100a200') bateValor = valor > 100 && valor <= 200;
@@ -1038,7 +1117,7 @@
         return 0;
       });
 
-      renderizar(filtrados);
+      renderizar(filtrados, buscaInput.trim());
     }
 
     // ATUALIZAÇÃO RÁPIDA DE STATUS INLINE (SUPABASE UPDATE)
@@ -1047,7 +1126,7 @@
       if (!pedido) return;
 
       const statusAntigo = pedido.status;
-      pedido.status = novoStatus; // Atualização otimista
+      pedido.status = novoStatus;
       atualizarKPIs(dadosOriginais);
       renderizarAnalyticsSetores(dadosOriginais);
       filtrarEOrdenar();
@@ -1062,13 +1141,13 @@
         mostrarToast(`Status alterado para "${novoStatus}"! ✅`);
       } catch (err) {
         console.error('Erro ao atualizar status:', err);
-        pedido.status = statusAntigo; // Reverte se falhar
+        pedido.status = statusAntigo;
         filtrarEOrdenar();
         mostrarToast('Erro ao atualizar status no banco de dados.');
       }
     }
 
-    // CONTROLE DE VISUALIZAÇÕES (CARDS / TABELA / KANBAN)
+    // CONTROLE DE VISUALIZAÇÕES
     function alternarVisualizacao(modo) {
       modoVisualizacao = modo;
       localStorage.setItem('modo_visualizacao', modo);
@@ -1076,12 +1155,14 @@
       const btnCards = document.getElementById('btn-view-cards');
       const btnTabela = document.getElementById('btn-view-tabela');
       const btnKanban = document.getElementById('btn-view-kanban');
+      const btnSetores = document.getElementById('btn-view-setores');
 
-      [btnCards, btnTabela, btnKanban].forEach(btn => {
+      [btnCards, btnTabela, btnKanban, btnSetores].forEach(btn => {
         if (btn) btn.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
       });
 
-      const btnAtivo = modo === 'tabela' ? btnTabela : (modo === 'kanban' ? btnKanban : btnCards);
+      const btnMap = { cards: btnCards, tabela: btnTabela, kanban: btnKanban, setores: btnSetores };
+      const btnAtivo = btnMap[modo] || btnCards;
       if (btnAtivo) btnAtivo.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold';
 
       filtrarEOrdenar();
@@ -1146,10 +1227,11 @@
     }
 
     // RENDERIZADOR PRINCIPAL
-    function renderizar(pedidos) {
+    function renderizar(pedidos, termoBusca = '') {
       const containerCards = document.getElementById('lista-pedidos');
       const containerTabela = document.getElementById('view-tabela');
       const containerKanban = document.getElementById('view-kanban');
+      const containerSetores = document.getElementById('view-setores');
       const contador = document.getElementById('contador-resultado');
       const vazioBox = document.getElementById('estado-vazio');
 
@@ -1160,6 +1242,7 @@
         containerCards.classList.add('hidden');
         containerTabela.classList.add('hidden');
         containerKanban.classList.add('hidden');
+        containerSetores.classList.add('hidden');
         vazioBox.classList.remove('hidden');
         return;
       }
@@ -1169,35 +1252,48 @@
       if (modoVisualizacao === 'tabela') {
         containerCards.classList.add('hidden');
         containerKanban.classList.add('hidden');
+        containerSetores.classList.add('hidden');
         containerTabela.classList.remove('hidden');
-        renderizarTabela(pedidos);
+        renderizarTabela(pedidos, termoBusca);
       } else if (modoVisualizacao === 'kanban') {
         containerCards.classList.add('hidden');
         containerTabela.classList.add('hidden');
+        containerSetores.classList.add('hidden');
         containerKanban.classList.remove('hidden');
-        renderizarKanban(pedidos);
+        renderizarKanban(pedidos, termoBusca);
+      } else if (modoVisualizacao === 'setores') {
+        containerCards.classList.add('hidden');
+        containerTabela.classList.add('hidden');
+        containerKanban.classList.add('hidden');
+        containerSetores.classList.remove('hidden');
+        renderizarSetores(pedidos, termoBusca);
       } else {
         containerTabela.classList.add('hidden');
         containerKanban.classList.add('hidden');
+        containerSetores.classList.add('hidden');
         containerCards.classList.remove('hidden');
-        renderizarCards(pedidos);
+        renderizarCards(pedidos, termoBusca);
       }
     }
 
     // RENDERIZAR MODO CARDS
-    function renderizarCards(pedidos) {
+    function renderizarCards(pedidos, termoBusca = '') {
       const container = document.getElementById('lista-pedidos');
       container.innerHTML = pedidos.map(p => {
         const id = p.id;
-        const cliente = getCampo(p, 'cliente', 'nome', 'nome_cliente') || 'Cliente não identificado';
-        const servico = getCampo(p, 'servico', 'serviço', 'descricao', 'descrição', 'produto') || 'Serviço sob consulta';
+        const clienteRaw = getCampo(p, 'cliente', 'nome', 'nome_cliente') || 'Cliente não identificado';
+        const servicoRaw = getCampo(p, 'servico', 'serviço', 'descricao', 'descrição', 'produto') || 'Serviço sob consulta';
         const setor = getCampo(p, 'setor', 'categoria', 'departamento', 'area', 'área') || 'Geral';
         const status = getCampo(p, 'status', 'situacao', 'situação') || 'Pendente';
         const telefone = getCampo(p, 'telefone', 'contato', 'celular', 'whatsapp');
         const data = getCampo(p, 'data_pedido', 'data', 'criado_em', 'created_at');
         const valor = getCampo(p, 'valor', 'preco', 'preço', 'total');
-        const observacoes = getCampo(p, 'observacoes', 'observações', 'obs', 'detalhes');
-        const whatsUrl = linkWhatsApp(telefone, cliente, servico);
+        const observacoesRaw = getCampo(p, 'observacoes', 'observações', 'obs', 'detalhes');
+        const whatsUrl = linkWhatsApp(telefone, clienteRaw, servicoRaw);
+
+        const cliente = destacarTexto(clienteRaw, termoBusca);
+        const servico = destacarTexto(servicoRaw, termoBusca);
+        const observacoes = destacarTexto(observacoesRaw, termoBusca);
 
         return `
           <article class="card-pedido group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 p-5 flex flex-col justify-between relative overflow-hidden">
@@ -1281,18 +1377,21 @@
     }
 
     // RENDERIZAR MODO TABELA
-    function renderizarTabela(pedidos) {
+    function renderizarTabela(pedidos, termoBusca = '') {
       const corpo = document.getElementById('tabela-corpo');
       corpo.innerHTML = pedidos.map(p => {
         const id = p.id;
-        const cliente = getCampo(p, 'cliente', 'nome', 'nome_cliente') || 'Não identificado';
-        const servico = getCampo(p, 'servico', 'serviço', 'descricao', 'descrição', 'produto') || '-';
+        const clienteRaw = getCampo(p, 'cliente', 'nome', 'nome_cliente') || 'Não identificado';
+        const servicoRaw = getCampo(p, 'servico', 'serviço', 'descricao', 'descrição', 'produto') || '-';
         const setor = getCampo(p, 'setor', 'categoria', 'departamento', 'area', 'área') || 'Geral';
         const status = getCampo(p, 'status', 'situacao', 'situação') || 'Pendente';
         const telefone = getCampo(p, 'telefone', 'contato', 'celular', 'whatsapp');
         const data = getCampo(p, 'data_pedido', 'data', 'criado_em', 'created_at');
         const valor = getCampo(p, 'valor', 'preco', 'preço', 'total');
-        const whatsUrl = linkWhatsApp(telefone, cliente, servico);
+        const whatsUrl = linkWhatsApp(telefone, clienteRaw, servicoRaw);
+
+        const cliente = destacarTexto(clienteRaw, termoBusca);
+        const servico = destacarTexto(servicoRaw, termoBusca);
 
         return `
           <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
@@ -1345,7 +1444,7 @@
     }
 
     // RENDERIZAR MODO KANBAN
-    function renderizarKanban(pedidos) {
+    function renderizarKanban(pedidos, termoBusca = '') {
       const colPendente = document.getElementById('kanban-col-pendente');
       const colAgendado = document.getElementById('kanban-col-agendado');
       const colProducao = document.getElementById('kanban-col-producao');
@@ -1375,11 +1474,14 @@
         if (lista.length === 0) return '<div class="text-center py-8 text-xs text-slate-400">Vazio</div>';
         return lista.map(p => {
           const id = p.id;
-          const cliente = getCampo(p, 'cliente', 'nome') || 'Cliente';
-          const servico = getCampo(p, 'servico', 'serviço') || 'Serviço';
+          const clienteRaw = getCampo(p, 'cliente', 'nome') || 'Cliente';
+          const servicoRaw = getCampo(p, 'servico', 'serviço') || 'Serviço';
           const setor = getCampo(p, 'setor', 'categoria') || 'Geral';
           const valor = getCampo(p, 'valor', 'preco');
           const data = getCampo(p, 'data_pedido', 'data');
+
+          const cliente = destacarTexto(clienteRaw, termoBusca);
+          const servico = destacarTexto(servicoRaw, termoBusca);
 
           return `
             <div onclick="abrirModalDetalhes(${id})" class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-2xs hover:shadow-md transition cursor-pointer space-y-2">
@@ -1404,6 +1506,70 @@
       colConcluido.innerHTML = renderColuna(grupos.concluido);
     }
 
+    // RENDERIZAR MODO POR SETOR (AGRUPADO)
+    function renderizarSetores(pedidos, termoBusca = '') {
+      const container = document.getElementById('view-setores');
+      const setoresMap = {};
+
+      pedidos.forEach(p => {
+        const s = getCampo(p, 'setor', 'categoria', 'departamento') || 'Geral';
+        if (!setoresMap[s]) setoresMap[s] = [];
+        setoresMap[s].push(p);
+      });
+
+      const setoresNomes = Object.keys(setoresMap).sort();
+
+      container.innerHTML = setoresNomes.map(s => {
+        const itens = setoresMap[s];
+        const soma = itens.reduce((acc, p) => acc + extrairNumero(getCampo(p, 'valor', 'preco')), 0);
+
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+            <div class="px-5 py-4 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${s}</h3>
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                  ${itens.length} ${itens.length === 1 ? 'pedido' : 'pedidos'}
+                </span>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-medium text-slate-400">Total do Setor: </span>
+                <span class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">${formatarMoeda(soma)}</span>
+              </div>
+            </div>
+            <div class="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${itens.map(p => {
+                const id = p.id;
+                const cliente = destacarTexto(getCampo(p, 'cliente', 'nome') || 'Cliente', termoBusca);
+                const servico = destacarTexto(getCampo(p, 'servico', 'serviço') || 'Serviço', termoBusca);
+                const status = getCampo(p, 'status') || 'Pendente';
+                const valor = getCampo(p, 'valor', 'preco');
+                const data = getCampo(p, 'data_pedido', 'data');
+
+                return `
+                  <div onclick="abrirModalDetalhes(${id})" class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-3">
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${badgeStatus(status)}">${status}</span>
+                        <span class="text-[11px] text-slate-400">${formatarData(data)}</span>
+                      </div>
+                      <h4 class="text-sm font-bold text-slate-900 dark:text-white pt-1">${cliente}</h4>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">${servico}</p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
+                      <span class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">Ver detalhes</span>
+                      <span class="font-extrabold text-slate-900 dark:text-white text-sm">${formatarMoeda(valor)}</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     // MODAL DETALHES
     function abrirModalDetalhes(id) {
       const pedido = dadosOriginais.find(p => p.id === id);
@@ -1424,10 +1590,14 @@
       document.getElementById('modal-det-setor').textContent = setor;
       document.getElementById('modal-det-data').textContent = formatarData(data);
       document.getElementById('modal-det-valor').textContent = formatarMoeda(valor);
+      document.getElementById('pix-valor-display').textContent = formatarMoeda(valor);
 
       const elStatus = document.getElementById('modal-det-status');
       elStatus.textContent = status;
       elStatus.className = `px-2.5 py-0.5 text-xs font-semibold rounded-full border ${badgeStatus(status)}`;
+
+      // Atualizar botões do Stepper
+      atualizarStepperVisual(status);
 
       const boxObs = document.getElementById('modal-det-box-obs');
       if (observacoes) {
@@ -1441,20 +1611,60 @@
       const ddi = numLimpo.startsWith('55') ? numLimpo : `55${numLimpo}`;
       const btnConf = document.getElementById('modal-btn-whats-confirmar');
       const btnPronto = document.getElementById('modal-btn-whats-pronto');
+      const btnWhatsPix = document.getElementById('btn-whats-pix');
 
       if (numLimpo.length >= 10) {
         const msgConf = encodeURIComponent(`Olá ${cliente}! Confirmamos o seu pedido de "${servico}" agendado para ${formatarData(data)}. Total: ${formatarMoeda(valor)}.`);
         const msgPronto = encodeURIComponent(`Olá ${cliente}! Passando para avisar que o seu pedido de "${servico}" já está pronto e finalizado! Qualquer dúvida estamos à disposição.`);
+        const chavePix = document.getElementById('campo-chave-pix').value;
+        const msgPix = encodeURIComponent(`Olá ${cliente}! Seguem os dados para pagamento do seu pedido de "${servico}" no valor de ${formatarMoeda(valor)}:\n\nChave PIX: ${chavePix}\nFavorecido: Central de Pedidos\n\nApós o pagamento, por gentileza envie o comprovante por aqui! Obrigado.`);
+
         btnConf.href = `https://wa.me/${ddi}?text=${msgConf}`;
         btnPronto.href = `https://wa.me/${ddi}?text=${msgPronto}`;
-        btnConf.classList.remove('opacity-50', 'pointer-events-none');
-        btnPronto.classList.remove('opacity-50', 'pointer-events-none');
+        btnWhatsPix.href = `https://wa.me/${ddi}?text=${msgPix}`;
+
+        [btnConf, btnPronto, btnWhatsPix].forEach(b => b.classList.remove('opacity-50', 'pointer-events-none'));
       } else {
-        btnConf.classList.add('opacity-50', 'pointer-events-none');
-        btnPronto.classList.add('opacity-50', 'pointer-events-none');
+        [btnConf, btnPronto, btnWhatsPix].forEach(b => b.classList.add('opacity-50', 'pointer-events-none'));
       }
 
       document.getElementById('modal-detalhes').classList.remove('hidden');
+    }
+
+    function atualizarStepperVisual(status) {
+      const s = removerAcentos(status);
+      const steps = [
+        { id: 'step-pendente', ativo: s.includes('pendente') },
+        { id: 'step-confirmado', ativo: s.includes('agend') || s.includes('confirm') },
+        { id: 'step-producao', ativo: s.includes('produ') || s.includes('andamento') },
+        { id: 'step-concluido', ativo: s.includes('conclu') || s.includes('finaliz') || s.includes('pago') }
+      ];
+
+      steps.forEach(st => {
+        const el = document.getElementById(st.id);
+        if (el) {
+          if (st.ativo) {
+            el.className = 'py-1.5 px-1 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white border-indigo-600 shadow-xs cursor-pointer';
+          } else {
+            el.className = 'py-1.5 px-1 rounded-xl text-[11px] font-medium bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-100 cursor-pointer';
+          }
+        }
+      });
+    }
+
+    async function avancarStatusModal(novoStatus) {
+      if (!pedidoSelecionado) return;
+      await atualizarStatusRapido(pedidoSelecionado.id, novoStatus);
+      document.getElementById('modal-det-status').textContent = novoStatus;
+      document.getElementById('modal-det-status').className = `px-2.5 py-0.5 text-xs font-semibold rounded-full border ${badgeStatus(novoStatus)}`;
+      atualizarStepperVisual(novoStatus);
+    }
+
+    function copiarChavePIX() {
+      const chave = document.getElementById('campo-chave-pix').value;
+      navigator.clipboard.writeText(chave).then(() => {
+        mostrarToast('Chave PIX copiada! 💰');
+      });
     }
 
     function fecharModalDetalhes() {
@@ -1605,7 +1815,6 @@
 
       try {
         if (idEdicao) {
-          // UPDATE
           const { error } = await supabaseClient
             .from('pedidos')
             .update(payload)
@@ -1614,7 +1823,6 @@
           if (error) throw error;
           mostrarToast('Pedido atualizado com sucesso! ✨');
         } else {
-          // INSERT
           const { error } = await supabaseClient
             .from('pedidos')
             .insert([payload]);
@@ -1745,17 +1953,14 @@
 
     // ATALHOS DE TECLADO
     window.addEventListener('keydown', e => {
-      // Pressione "/" para focar no campo de busca
       if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         e.preventDefault();
         document.getElementById('filtro-busca').focus();
       }
-      // Pressione "Escape" para fechar modais
       if (e.key === 'Escape') {
         fecharModalDetalhes();
         fecharModalNovoPedido();
       }
-      // Pressione "r" fora de inputs para recarregar
       if ((e.key === 'r' || e.key === 'R') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         carregarPedidos();
       }
