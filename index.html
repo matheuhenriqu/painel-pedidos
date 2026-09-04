@@ -54,6 +54,16 @@
       #lista-pedidos, #view-tabela, #view-setores { display: block !important; }
       .card-pedido { break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
     }
+
+    /* Animação Háptica / Shake para Erros de Autenticação */
+    @keyframes authShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .shake-animation {
+      animation: authShake 0.4s ease-in-out;
+    }
   </style>
 </head>
 <body class="min-h-full flex flex-col font-sans bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
@@ -62,17 +72,17 @@
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- ========================================== -->
-  <!-- TELA DE AUTENTICAÇÃO (LOGIN & REGISTRO)    -->
+  <!-- TELA DE AUTENTICAÇÃO (SPLIT-SCREEN PREMIUM) -->
   <!-- ========================================== -->
-  <section id="tela-autenticacao" class="relative min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+  <section id="tela-autenticacao" class="relative min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-10 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
     
     <!-- Elementos Decorativos de Fundo (Glow / Efeito Visual) -->
     <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-500/20 dark:bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <!-- Botão Flutuante de Tema na Tela de Login -->
-    <div class="absolute top-4 right-4 z-20">
+    <div class="absolute top-4 right-4 z-30">
       <button 
         onclick="alternarTema()"
         title="Alternar Tema Claro / Escuro"
@@ -84,390 +94,562 @@
       </button>
     </div>
 
-    <!-- CARD PRINCIPAL DE AUTENTICAÇÃO -->
-    <div class="relative z-10 w-full max-w-md bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl rounded-3xl p-6 sm:p-8 transition-all duration-300">
-      
-      <!-- Linha Gradiente Decorativa no Topo do Card -->
-      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-t-3xl"></div>
+    <!-- WRAPPER SPLIT SCREEN (MAX 1100PX) -->
+    <div class="relative z-10 w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
-      <!-- Cabeçalho do Card (Logo e Título) -->
-      <div class="text-center space-y-2 mb-6 pt-1">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
+      <!-- COLUNA ESQUERDA: SHOWCASE DO PRODUTO (VISÍVEL EM TELAS LARGAS) -->
+      <div class="hidden lg:flex lg:col-span-6 xl:col-span-7 flex-col justify-between space-y-7 pr-4">
+        
+        <!-- Header Showcase -->
+        <div class="space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            Plataforma Operacional 2.0 &bull; Supabase Realtime
+          </div>
+
+          <h2 class="text-3xl xl:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            Gestão Inteligente de Pedidos, Produção &amp; Faturamento
+          </h2>
+
+          <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-lg">
+            Acompanhe pedidos em tempo real através de Kanban interativo, visualização inteligente por setores, métricas de faturamento e relatórios executivos em uma única interface ultrarrápida.
+          </p>
         </div>
-        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Central de Pedidos</h1>
-        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Acesso Restrito ao Painel Operacional &bull; Supabase Auth</p>
+
+        <!-- Cards de Destaques Operacionais -->
+        <div class="grid grid-cols-2 gap-3.5 max-w-lg">
+          <div class="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-1.5">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Sincronização Ao Vivo</p>
+            <p class="text-[11px] text-slate-400">Notificações sonoras e atualizações de pedidos via Supabase Realtime sem recarregar a página.</p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-1.5">
+            <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
+            </div>
+            <p class="text-xs font-bold text-slate-800 dark:text-slate-200">5 Modos Operacionais</p>
+            <p class="text-[11px] text-slate-400">Cards interativos, Tabela, Colunas Kanban, Setores agrupados e Cronograma de Agenda.</p>
+          </div>
+        </div>
+
+        <!-- Indicador de Confiança -->
+        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 max-w-lg">
+          <div class="flex -space-x-2">
+            <div class="w-7 h-7 rounded-full bg-indigo-500 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">JD</div>
+            <div class="w-7 h-7 rounded-full bg-violet-500 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">AS</div>
+            <div class="w-7 h-7 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">MH</div>
+          </div>
+          <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+            Painel otimizado para operações ágeis com <strong class="text-slate-900 dark:text-white">gestão de caixa, PIX integrado e WhatsApp</strong>.
+          </p>
+        </div>
+
       </div>
 
-      <!-- Abas de Navegação (Entrar vs Criar Conta) -->
-      <div id="auth-tabs" class="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-6 text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
-        <button 
-          id="tab-btn-login"
-          type="button"
-          onclick="alternarAbaAuth('login')"
-          class="py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center"
-        >
-          Acessar Conta
-        </button>
-        <button 
-          id="tab-btn-registro"
-          type="button"
-          onclick="alternarAbaAuth('registro')"
-          class="py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center"
-        >
-          Criar Nova Conta
-        </button>
-      </div>
+      <!-- COLUNA DIREITA: CARD PRINCIPAL DE AUTENTICAÇÃO -->
+      <div class="lg:col-span-6 xl:col-span-5 w-full">
+        <div id="card-auth-container" class="relative w-full max-w-md mx-auto bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl rounded-3xl p-6 sm:p-8 transition-all duration-300">
+          
+          <!-- Linha Gradiente Decorativa no Topo do Card -->
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-t-3xl"></div>
 
-      <!-- Caixa de Feedback / Alertas (Erro, Aviso ou Sucesso) -->
-      <div id="auth-alert" class="hidden mb-5 p-3.5 rounded-2xl border text-xs leading-relaxed transition-all duration-200 flex items-start gap-2.5">
-        <div id="auth-alert-icon" class="shrink-0 mt-0.5"></div>
-        <div class="flex-1">
-          <p id="auth-alert-mensagem" class="font-medium"></p>
-          <div id="auth-alert-acao" class="mt-2 hidden"></div>
-        </div>
-        <button type="button" onclick="limparFeedbackAuth()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shrink-0">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <!-- ===================================== -->
-      <!-- FORMULÁRIO: LOGIN (ENTRAR)           -->
-      <!-- ===================================== -->
-      <form id="form-auth-login" onsubmit="executarLogin(event)" class="space-y-4">
-        
-        <!-- Campo E-mail -->
-        <div class="space-y-1.5">
-          <label for="login-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-            Endereço de E-mail
-          </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+          <!-- Cabeçalho do Card (Logo e Título) -->
+          <div class="text-center space-y-2 mb-5 pt-1">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            <input 
-              id="login-email"
-              type="email" 
-              required
-              autocomplete="email"
-              placeholder="seu.email@empresa.com"
-              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Central de Pedidos</h1>
+            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Acesso Restrito ao Painel Operacional</p>
           </div>
-        </div>
 
-        <!-- Campo Senha -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <label for="login-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-              Senha de Acesso
-            </label>
+          <!-- Abas de Navegação (Entrar vs Criar Conta) -->
+          <div id="auth-tabs" class="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-5 text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
             <button 
-              type="button" 
-              onclick="alternarAbaAuth('recuperar')" 
-              class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-            >
-              Esqueceu?
-            </button>
-          </div>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <input 
-              id="login-senha"
-              type="password" 
-              required
-              autocomplete="current-password"
-              placeholder="••••••••"
-              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
-            <button 
+              id="tab-btn-login"
               type="button"
-              id="btn-toggle-senha-login"
-              onclick="alternarVisibilidadeSenha('login-senha', this)"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              title="Mostrar / Ocultar Senha"
+              onclick="alternarAbaAuth('login')"
+              class="py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              Acessar Conta
             </button>
-          </div>
-        </div>
-
-        <!-- Opção Lembrar E-mail -->
-        <div class="flex items-center justify-between pt-1">
-          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
-            <input 
-              id="login-lembrar"
-              type="checkbox" 
-              class="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
-            />
-            <span>Lembrar meu e-mail</span>
-          </label>
-        </div>
-
-        <!-- Botão Entrar -->
-        <button 
-          id="btn-submit-login"
-          type="submit"
-          class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/25 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-        >
-          <span id="btn-text-login">Entrar no Painel</span>
-          <svg id="btn-spinner-login" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </button>
-
-        <!-- Divisor Social -->
-        <div class="relative flex items-center justify-center my-4">
-          <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
-          <span class="bg-white dark:bg-slate-900 px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">ou continue com</span>
-          <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
-        </div>
-
-        <!-- Botão Login com Google -->
-        <button 
-          id="btn-google-login"
-          type="button"
-          onclick="executarLoginGoogle()"
-          class="w-full py-2.5 px-4 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm shadow-xs hover:shadow transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2.5 group"
-          title="Acessar conta usando o Google"
-        >
-          <svg class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/>
-            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-          </svg>
-          <span id="btn-text-google-login">Continuar com o Google</span>
-        </button>
-
-      </form>
-
-      <!-- ===================================== -->
-      <!-- FORMULÁRIO: REGISTRO (CRIAR CONTA)   -->
-      <!-- ===================================== -->
-      <form id="form-auth-registro" onsubmit="executarRegistro(event)" class="hidden space-y-4">
-        
-        <!-- Campo Nome Completo -->
-        <div class="space-y-1.5">
-          <label for="registro-nome" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-            Seu Nome Completo
-          </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <input 
-              id="registro-nome"
-              type="text" 
-              required
-              autocomplete="name"
-              placeholder="Ex: Matheus Henrique"
-              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
-          </div>
-        </div>
-
-        <!-- Campo E-mail -->
-        <div class="space-y-1.5">
-          <label for="registro-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-            Endereço de E-mail
-          </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
-              </svg>
-            </div>
-            <input 
-              id="registro-email"
-              type="email" 
-              required
-              autocomplete="email"
-              placeholder="seu.email@empresa.com"
-              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
-          </div>
-        </div>
-
-        <!-- Campo Senha -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <label for="registro-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-              Crie uma Senha
-            </label>
-            <span class="text-[10px] text-slate-400">Mínimo 6 caracteres</span>
-          </div>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <input 
-              id="registro-senha"
-              type="password" 
-              required
-              minlength="6"
-              autocomplete="new-password"
-              placeholder="••••••••"
-              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
             <button 
+              id="tab-btn-registro"
               type="button"
-              id="btn-toggle-senha-registro"
-              onclick="alternarVisibilidadeSenha('registro-senha', this)"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              title="Mostrar / Ocultar Senha"
+              onclick="alternarAbaAuth('registro')"
+              class="py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              Criar Nova Conta
             </button>
           </div>
-        </div>
 
-        <!-- Campo Confirmar Senha -->
-        <div class="space-y-1.5">
-          <label for="registro-confirma-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-            Confirmar Senha
-          </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+          <!-- Caixa de Feedback / Alertas (Erro, Aviso ou Sucesso) -->
+          <div id="auth-alert" class="hidden mb-4 p-3.5 rounded-2xl border text-xs leading-relaxed transition-all duration-200 flex items-start gap-2.5">
+            <div id="auth-alert-icon" class="shrink-0 mt-0.5"></div>
+            <div class="flex-1">
+              <p id="auth-alert-mensagem" class="font-medium"></p>
+              <div id="auth-alert-acao" class="mt-2 hidden"></div>
             </div>
-            <input 
-              id="registro-confirma-senha"
-              type="password" 
-              required
-              minlength="6"
-              autocomplete="new-password"
-              placeholder="••••••••"
-              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
+            <button type="button" onclick="limparFeedbackAuth()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Sugestão Inteligente de E-mail (Typo Detector) -->
+          <div id="sugestao-email-box" class="hidden mb-3.5 px-3.5 py-2.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between gap-2">
+            <span>Você quis dizer: <strong id="sugestao-email-valor"></strong>?</span>
+            <button type="button" onclick="aplicarSugestaoEmail()" class="font-bold underline cursor-pointer text-[11px] shrink-0">Corrigir</button>
+          </div>
+
+          <!-- ===================================== -->
+          <!-- FORMULÁRIO: LOGIN (ENTRAR)           -->
+          <!-- ===================================== -->
+          <form id="form-auth-login" onsubmit="executarLogin(event)" class="space-y-4">
+            
+            <!-- Campo E-mail -->
+            <div class="space-y-1.5">
+              <label for="login-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Endereço de E-mail
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                  </svg>
+                </div>
+                <input 
+                  id="login-email"
+                  type="email" 
+                  required
+                  autocomplete="email"
+                  oninput="verificarTypoEmail('login-email')"
+                  placeholder="seu.email@empresa.com"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+              </div>
+            </div>
+
+            <!-- Campo Senha -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <label for="login-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Senha de Acesso
+                </label>
+                <button 
+                  type="button" 
+                  onclick="alternarAbaAuth('recuperar')" 
+                  class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                >
+                  Esqueceu?
+                </button>
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input 
+                  id="login-senha"
+                  type="password" 
+                  required
+                  autocomplete="current-password"
+                  onkeyup="checarCapsLock(event, 'caps-lock-login')"
+                  onkeydown="checarCapsLock(event, 'caps-lock-login')"
+                  placeholder="••••••••"
+                  class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+                <button 
+                  type="button"
+                  id="btn-toggle-senha-login"
+                  onclick="alternarVisibilidadeSenha('login-senha', this)"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  title="Mostrar / Ocultar Senha"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+
+              <!-- Aviso de Caps Lock Ativado -->
+              <div id="caps-lock-login" class="hidden flex items-center gap-1.5 text-[10px] text-amber-600 dark:text-amber-400 font-semibold pt-0.5">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>Atenção: Caps Lock (Fixa) ativado</span>
+              </div>
+            </div>
+
+            <!-- Opção Lembrar E-mail & Link Mágico -->
+            <div class="flex items-center justify-between pt-1">
+              <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
+                <input 
+                  id="login-lembrar"
+                  type="checkbox" 
+                  class="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
+                />
+                <span>Lembrar e-mail</span>
+              </label>
+
+              <button 
+                type="button" 
+                onclick="alternarAbaAuth('magiclink')" 
+                class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                title="Acessar com link direto por e-mail sem precisar de senha"
+              >
+                <span>Link Mágico ✨</span>
+              </button>
+            </div>
+
+            <!-- Botão Entrar -->
             <button 
-              type="button"
-              id="btn-toggle-confirma-registro"
-              onclick="alternarVisibilidadeSenha('registro-confirma-senha', this)"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              title="Mostrar / Ocultar Senha"
+              id="btn-submit-login"
+              type="submit"
+              class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/25 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Botão Criar Conta -->
-        <button 
-          id="btn-submit-registro"
-          type="submit"
-          class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-emerald-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-        >
-          <span id="btn-text-registro">Criar Minha Conta</span>
-          <svg id="btn-spinner-registro" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </button>
-
-        <!-- Divisor Social -->
-        <div class="relative flex items-center justify-center my-4">
-          <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
-          <span class="bg-white dark:bg-slate-900 px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">ou cadastre-se com</span>
-          <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
-        </div>
-
-        <!-- Botão Registro com Google -->
-        <button 
-          id="btn-google-registro"
-          type="button"
-          onclick="executarLoginGoogle()"
-          class="w-full py-2.5 px-4 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm shadow-xs hover:shadow transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2.5 group"
-          title="Cadastrar e entrar usando o Google"
-        >
-          <svg class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/>
-            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-          </svg>
-          <span id="btn-text-google-registro">Cadastrar com o Google</span>
-        </button>
-
-      </form>
-
-      <!-- ===================================== -->
-      <!-- FORMULÁRIO: RECUPERAR SENHA          -->
-      <!-- ===================================== -->
-      <form id="form-auth-recuperar" onsubmit="executarRecuperacao(event)" class="hidden space-y-4">
-        
-        <div class="text-left space-y-1 mb-2">
-          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Recuperar Senha</h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400">Informe seu e-mail cadastrado e enviaremos o link para redefinição de senha.</p>
-        </div>
-
-        <!-- Campo E-mail para Recuperar -->
-        <div class="space-y-1.5">
-          <label for="recuperar-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-            Endereço de E-mail
-          </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+              <span id="btn-text-login">Entrar no Painel</span>
+              <svg id="btn-spinner-login" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
+            </button>
+
+            <!-- Divisor Social -->
+            <div class="relative flex items-center justify-center my-3.5">
+              <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
+              <span class="bg-white dark:bg-slate-900 px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">ou continue com</span>
+              <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
             </div>
-            <input 
-              id="recuperar-email"
-              type="email" 
-              required
-              autocomplete="email"
-              placeholder="seu.email@empresa.com"
-              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
+
+            <!-- Botão Login com Google -->
+            <button 
+              id="btn-google-login"
+              type="button"
+              onclick="executarLoginGoogle()"
+              class="w-full py-2.5 px-4 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm shadow-xs hover:shadow transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2.5 group"
+              title="Acessar conta usando o Google"
+            >
+              <svg class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span id="btn-text-google-login">Continuar com o Google</span>
+            </button>
+
+          </form>
+
+          <!-- ===================================== -->
+          <!-- FORMULÁRIO: REGISTRO (CRIAR CONTA)   -->
+          <!-- ===================================== -->
+          <form id="form-auth-registro" onsubmit="executarRegistro(event)" class="hidden space-y-3.5">
+            
+            <!-- Campo Nome Completo -->
+            <div class="space-y-1">
+              <label for="registro-nome" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Seu Nome Completo
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input 
+                  id="registro-nome"
+                  type="text" 
+                  required
+                  autocomplete="name"
+                  placeholder="Ex: Matheus Henrique"
+                  class="w-full pl-10 pr-3.5 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+              </div>
+            </div>
+
+            <!-- Campo E-mail -->
+            <div class="space-y-1">
+              <label for="registro-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Endereço de E-mail
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                  </svg>
+                </div>
+                <input 
+                  id="registro-email"
+                  type="email" 
+                  required
+                  autocomplete="email"
+                  oninput="verificarTypoEmail('registro-email')"
+                  placeholder="seu.email@empresa.com"
+                  class="w-full pl-10 pr-3.5 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+              </div>
+            </div>
+
+            <!-- Campo Senha -->
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <label for="registro-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Crie uma Senha
+                </label>
+                <span id="label-forca-senha" class="text-[10px] font-bold text-slate-400">Força da Senha</span>
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input 
+                  id="registro-senha"
+                  type="password" 
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                  oninput="analisarForcaSenha(this.value)"
+                  onkeyup="checarCapsLock(event, 'caps-lock-registro')"
+                  onkeydown="checarCapsLock(event, 'caps-lock-registro')"
+                  placeholder="••••••••"
+                  class="w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+                <button 
+                  type="button"
+                  id="btn-toggle-senha-registro"
+                  onclick="alternarVisibilidadeSenha('registro-senha', this)"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  title="Mostrar / Ocultar Senha"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+
+              <!-- Barra Medidora de Força de Senha -->
+              <div class="pt-1 space-y-1">
+                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex gap-1">
+                  <div id="barra-forca-1" class="h-full w-1/4 rounded-full bg-slate-300 dark:bg-slate-700 transition-all duration-300"></div>
+                  <div id="barra-forca-2" class="h-full w-1/4 rounded-full bg-slate-300 dark:bg-slate-700 transition-all duration-300"></div>
+                  <div id="barra-forca-3" class="h-full w-1/4 rounded-full bg-slate-300 dark:bg-slate-700 transition-all duration-300"></div>
+                  <div id="barra-forca-4" class="h-full w-1/4 rounded-full bg-slate-300 dark:bg-slate-700 transition-all duration-300"></div>
+                </div>
+                
+                <!-- Checklist de Requisitos -->
+                <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] text-slate-400 pt-0.5">
+                  <span id="req-tam" class="flex items-center gap-1 transition-colors"><span>&bull;</span> Mín. 6 caracteres</span>
+                  <span id="req-mai" class="flex items-center gap-1 transition-colors"><span>&bull;</span> Maiúscula &amp; Minúscula</span>
+                  <span id="req-num" class="flex items-center gap-1 transition-colors"><span>&bull;</span> Número</span>
+                  <span id="req-esp" class="flex items-center gap-1 transition-colors"><span>&bull;</span> Símbolo (@#$)</span>
+                </div>
+              </div>
+
+              <!-- Aviso de Caps Lock -->
+              <div id="caps-lock-registro" class="hidden flex items-center gap-1.5 text-[10px] text-amber-600 dark:text-amber-400 font-semibold pt-0.5">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>Atenção: Caps Lock ativado</span>
+              </div>
+            </div>
+
+            <!-- Campo Confirmar Senha -->
+            <div class="space-y-1">
+              <label for="registro-confirma-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Confirmar Senha
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <input 
+                  id="registro-confirma-senha"
+                  type="password" 
+                  required
+                  minlength="6"
+                  autocomplete="new-password"
+                  placeholder="••••••••"
+                  class="w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+                <button 
+                  type="button"
+                  id="btn-toggle-confirma-registro"
+                  onclick="alternarVisibilidadeSenha('registro-confirma-senha', this)"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  title="Mostrar / Ocultar Senha"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Botão Criar Conta -->
+            <button 
+              id="btn-submit-registro"
+              type="submit"
+              class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-emerald-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span id="btn-text-registro">Criar Minha Conta</span>
+              <svg id="btn-spinner-registro" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+
+            <!-- Divisor Social -->
+            <div class="relative flex items-center justify-center my-3.5">
+              <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
+              <span class="bg-white dark:bg-slate-900 px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">ou cadastre-se com</span>
+              <div class="border-t border-slate-200 dark:border-slate-800 w-full"></div>
+            </div>
+
+            <!-- Botão Registro com Google -->
+            <button 
+              id="btn-google-registro"
+              type="button"
+              onclick="executarLoginGoogle()"
+              class="w-full py-2.5 px-4 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs sm:text-sm shadow-xs hover:shadow transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2.5 group"
+              title="Cadastrar e entrar usando o Google"
+            >
+              <svg class="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.35 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.35 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              </svg>
+              <span id="btn-text-google-registro">Cadastrar com o Google</span>
+            </button>
+
+          </form>
+
+          <!-- ===================================== -->
+          <!-- FORMULÁRIO: MAGIC LINK (LINK MÁGICO) -->
+          <!-- ===================================== -->
+          <form id="form-auth-magiclink" onsubmit="executarLoginMagicLink(event)" class="hidden space-y-4">
+            
+            <div class="text-left space-y-1 mb-2">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                ✨ Acesso Sem Senha
+              </div>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Entrar por Link Mágico</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Informe seu e-mail e enviaremos um link de login direto na sua caixa de entrada, sem necessidade de senha.</p>
+            </div>
+
+            <!-- Campo E-mail Magic Link -->
+            <div class="space-y-1.5">
+              <label for="magiclink-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Seu E-mail
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                  </svg>
+                </div>
+                <input 
+                  id="magiclink-email"
+                  type="email" 
+                  required
+                  autocomplete="email"
+                  oninput="verificarTypoEmail('magiclink-email')"
+                  placeholder="seu.email@empresa.com"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+              </div>
+            </div>
+
+            <!-- Botões de Ação Magic Link -->
+            <div class="space-y-2 pt-1">
+              <button 
+                id="btn-submit-magiclink"
+                type="submit"
+                class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span id="btn-text-magiclink">Enviar Link de Acesso</span>
+                <svg id="btn-spinner-magiclink" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+              <button 
+                type="button" 
+                onclick="alternarAbaAuth('login')"
+                class="w-full py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-center cursor-pointer"
+              >
+                &larr; Voltar para Login com Senha
+              </button>
+            </div>
+
+          </form>
+
+          <!-- ===================================== -->
+          <!-- FORMULÁRIO: RECUPERAR SENHA          -->
+          <!-- ===================================== -->
+          <form id="form-auth-recuperar" onsubmit="executarRecuperacao(event)" class="hidden space-y-4">
+            
+            <div class="text-left space-y-1 mb-2">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Recuperar Senha</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Informe seu e-mail cadastrado e enviaremos o link para redefinição de senha.</p>
+            </div>
+
+            <!-- Campo E-mail para Recuperar -->
+            <div class="space-y-1.5">
+              <label for="recuperar-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Endereço de E-mail
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                  </svg>
+                </div>
+                <input 
+                  id="recuperar-email"
+                  type="email" 
+                  required
+                  autocomplete="email"
+                  oninput="verificarTypoEmail('recuperar-email')"
+                  placeholder="seu.email@empresa.com"
+                  class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                />
+              </div>
+            </div>
+
+            <!-- Botões de Ação da Recuperação -->
+            <div class="space-y-2 pt-1">
+              <button 
+                id="btn-submit-recuperar"
+                type="submit"
+                class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span id="btn-text-recuperar">Enviar Link de Recuperação</span>
+                <svg id="btn-spinner-recuperar" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </button>
+              <button 
+                type="button" 
+                onclick="alternarAbaAuth('login')"
+                class="w-full py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-center cursor-pointer"
+              >
+                &larr; Voltar para o Login
+              </button>
+            </div>
+
+          </form>
+
+          <!-- Rodapé do Card -->
+          <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800 text-center">
+            <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              Sessão protegida por criptografia de ponta a ponta
+            </p>
           </div>
+
         </div>
-
-        <!-- Botões de Ação da Recuperação -->
-        <div class="space-y-2 pt-1">
-          <button 
-            id="btn-submit-recuperar"
-            type="submit"
-            class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
-          >
-            <span id="btn-text-recuperar">Enviar Link de Recuperação</span>
-            <svg id="btn-spinner-recuperar" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </button>
-          <button 
-            type="button" 
-            onclick="alternarAbaAuth('login')"
-            class="w-full py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-center cursor-pointer"
-          >
-            &larr; Voltar para o Login
-          </button>
-        </div>
-
-      </form>
-
-      <!-- Rodapé do Card -->
-      <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
-        <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-          Sessão protegida por criptografia de ponta a ponta
-        </p>
       </div>
 
     </div>
@@ -1590,41 +1772,199 @@
       }
     }
 
-    // ALTERNAR ABAS DE AUTENTICAÇÃO (LOGIN / REGISTRO / RECUPERAR)
+    // ALTERNAR ABAS DE AUTENTICAÇÃO (LOGIN / REGISTRO / RECUPERAR / MAGIC LINK)
     function alternarAbaAuth(aba) {
       const formLogin = document.getElementById('form-auth-login');
       const formRegistro = document.getElementById('form-auth-registro');
       const formRecuperar = document.getElementById('form-auth-recuperar');
+      const formMagicLink = document.getElementById('form-auth-magiclink');
       const tabLogin = document.getElementById('tab-btn-login');
       const tabRegistro = document.getElementById('tab-btn-registro');
       const tabsContainer = document.getElementById('auth-tabs');
+      const boxSugestao = document.getElementById('sugestao-email-box');
 
       limparFeedbackAuth();
+      if (boxSugestao) boxSugestao.classList.add('hidden');
 
       if (aba === 'login') {
-        formLogin.classList.remove('hidden');
-        formRegistro.classList.add('hidden');
-        formRecuperar.classList.add('hidden');
-        tabsContainer.classList.remove('hidden');
+        formLogin?.classList.remove('hidden');
+        formRegistro?.classList.add('hidden');
+        formRecuperar?.classList.add('hidden');
+        formMagicLink?.classList.add('hidden');
+        tabsContainer?.classList.remove('hidden');
 
-        tabLogin.className = 'py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center';
-        tabRegistro.className = 'py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center';
+        if (tabLogin) tabLogin.className = 'py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center';
+        if (tabRegistro) tabRegistro.className = 'py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center';
         setTimeout(() => document.getElementById('login-email')?.focus(), 100);
       } else if (aba === 'registro') {
-        formLogin.classList.add('hidden');
-        formRegistro.classList.remove('hidden');
-        formRecuperar.classList.add('hidden');
-        tabsContainer.classList.remove('hidden');
+        formLogin?.classList.add('hidden');
+        formRegistro?.classList.remove('hidden');
+        formRecuperar?.classList.add('hidden');
+        formMagicLink?.classList.add('hidden');
+        tabsContainer?.classList.remove('hidden');
 
-        tabRegistro.className = 'py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center';
-        tabLogin.className = 'py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center';
+        if (tabRegistro) tabRegistro.className = 'py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center';
+        if (tabLogin) tabLogin.className = 'py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center';
         setTimeout(() => document.getElementById('registro-nome')?.focus(), 100);
       } else if (aba === 'recuperar') {
-        formLogin.classList.add('hidden');
-        formRegistro.classList.add('hidden');
-        formRecuperar.classList.remove('hidden');
-        tabsContainer.classList.add('hidden');
+        formLogin?.classList.add('hidden');
+        formRegistro?.classList.add('hidden');
+        formRecuperar?.classList.remove('hidden');
+        formMagicLink?.classList.add('hidden');
+        tabsContainer?.classList.add('hidden');
         setTimeout(() => document.getElementById('recuperar-email')?.focus(), 100);
+      } else if (aba === 'magiclink') {
+        formLogin?.classList.add('hidden');
+        formRegistro?.classList.add('hidden');
+        formRecuperar?.classList.add('hidden');
+        formMagicLink?.classList.remove('hidden');
+        tabsContainer?.classList.add('hidden');
+        setTimeout(() => document.getElementById('magiclink-email')?.focus(), 100);
+      }
+    }
+
+    // ANIMAÇÃO DE SHAKE PARA ERROS DE AUTENTICAÇÃO
+    function animarErroAuth() {
+      const card = document.getElementById('card-auth-container');
+      if (card) {
+        card.classList.remove('shake-animation');
+        void card.offsetWidth; // Trigger reflow
+        card.classList.add('shake-animation');
+        setTimeout(() => card.classList.remove('shake-animation'), 450);
+      }
+    }
+
+    // DETECÇÃO DE CAPS LOCK ATIVADO
+    function checarCapsLock(e, elementId) {
+      const isCaps = e.getModifierState && e.getModifierState('CapsLock');
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.classList.toggle('hidden', !isCaps);
+      }
+    }
+
+    // SUGESTÃO INTELIGENTE DE TYPO DE E-MAIL
+    let typoEmailAtual = null;
+    let inputEmailAlvo = null;
+
+    function verificarTypoEmail(inputId) {
+      const input = document.getElementById(inputId);
+      const box = document.getElementById('sugestao-email-box');
+      const valorSpan = document.getElementById('sugestao-email-valor');
+      if (!input || !box || !valorSpan) return;
+
+      const valor = input.value.trim().toLowerCase();
+      const dominiosComuns = {
+        'gmai.com': 'gmail.com',
+        'gamil.com': 'gmail.com',
+        'gmaill.com': 'gmail.com',
+        'hotmial.com': 'hotmail.com',
+        'hotmaill.com': 'hotmail.com',
+        'outlok.com': 'outlook.com',
+        'outloo.com': 'outlook.com',
+        'yahho.com': 'yahoo.com',
+        'yaho.com': 'yahoo.com'
+      };
+
+      const partes = valor.split('@');
+      if (partes.length === 2 && dominiosComuns[partes[1]]) {
+        typoEmailAtual = partes[0] + '@' + dominiosComuns[partes[1]];
+        inputEmailAlvo = inputId;
+        valorSpan.textContent = typoEmailAtual;
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+        typoEmailAtual = null;
+        inputEmailAlvo = null;
+      }
+    }
+
+    function aplicarSugestaoEmail() {
+      if (typoEmailAtual && inputEmailAlvo) {
+        const input = document.getElementById(inputEmailAlvo);
+        if (input) input.value = typoEmailAtual;
+        const box = document.getElementById('sugestao-email-box');
+        if (box) box.classList.add('hidden');
+        mostrarToast('E-mail corrigido com sucesso! ✨');
+      }
+    }
+
+    // MEDIDOR DE FORÇA DE SENHA EM TEMPO REAL
+    function analisarForcaSenha(senha) {
+      const val = senha || '';
+      const b1 = document.getElementById('barra-forca-1');
+      const b2 = document.getElementById('barra-forca-2');
+      const b3 = document.getElementById('barra-forca-3');
+      const b4 = document.getElementById('barra-forca-4');
+      const label = document.getElementById('label-forca-senha');
+
+      const reqTam = document.getElementById('req-tam');
+      const reqMai = document.getElementById('req-mai');
+      const reqNum = document.getElementById('req-num');
+      const reqEsp = document.getElementById('req-esp');
+
+      const temTam = val.length >= 6;
+      const temMai = /[A-Z]/.test(val) && /[a-z]/.test(val);
+      const temNum = /[0-9]/.test(val);
+      const temEsp = /[^A-Za-z0-9]/.test(val);
+
+      if (reqTam) reqTam.className = temTam ? 'flex items-center gap-1 font-bold text-emerald-500' : 'flex items-center gap-1 text-slate-400';
+      if (reqMai) reqMai.className = temMai ? 'flex items-center gap-1 font-bold text-emerald-500' : 'flex items-center gap-1 text-slate-400';
+      if (reqNum) reqNum.className = temNum ? 'flex items-center gap-1 font-bold text-emerald-500' : 'flex items-center gap-1 text-slate-400';
+      if (reqEsp) reqEsp.className = temEsp ? 'flex items-center gap-1 font-bold text-emerald-500' : 'flex items-center gap-1 text-slate-400';
+
+      let score = 0;
+      if (temTam) score++;
+      if (temMai) score++;
+      if (temNum) score++;
+      if (temEsp) score++;
+
+      const resetBars = () => {
+        [b1, b2, b3, b4].forEach(b => {
+          if (b) b.className = 'h-full w-1/4 rounded-full bg-slate-200 dark:bg-slate-700 transition-all duration-300';
+        });
+      };
+
+      resetBars();
+
+      if (!val) {
+        if (label) {
+          label.textContent = 'Força da Senha';
+          label.className = 'text-[10px] font-bold text-slate-400';
+        }
+        return;
+      }
+
+      if (score === 1) {
+        if (b1) b1.className = 'h-full w-1/4 rounded-full bg-rose-500 transition-all duration-300';
+        if (label) {
+          label.textContent = 'Fraca ⚠️';
+          label.className = 'text-[10px] font-bold text-rose-500';
+        }
+      } else if (score === 2) {
+        if (b1) b1.className = 'h-full w-1/4 rounded-full bg-amber-500 transition-all duration-300';
+        if (b2) b2.className = 'h-full w-1/4 rounded-full bg-amber-500 transition-all duration-300';
+        if (label) {
+          label.textContent = 'Razoável 🟡';
+          label.className = 'text-[10px] font-bold text-amber-500';
+        }
+      } else if (score === 3) {
+        if (b1) b1.className = 'h-full w-1/4 rounded-full bg-indigo-500 transition-all duration-300';
+        if (b2) b2.className = 'h-full w-1/4 rounded-full bg-indigo-500 transition-all duration-300';
+        if (b3) b3.className = 'h-full w-1/4 rounded-full bg-indigo-500 transition-all duration-300';
+        if (label) {
+          label.textContent = 'Boa 🔵';
+          label.className = 'text-[10px] font-bold text-indigo-500';
+        }
+      } else if (score === 4) {
+        if (b1) b1.className = 'h-full w-1/4 rounded-full bg-emerald-500 transition-all duration-300';
+        if (b2) b2.className = 'h-full w-1/4 rounded-full bg-emerald-500 transition-all duration-300';
+        if (b3) b3.className = 'h-full w-1/4 rounded-full bg-emerald-500 transition-all duration-300';
+        if (b4) b4.className = 'h-full w-1/4 rounded-full bg-emerald-500 transition-all duration-300';
+        if (label) {
+          label.textContent = 'Excelente! 🛡️';
+          label.className = 'text-[10px] font-bold text-emerald-500';
+        }
       }
     }
 
@@ -1640,6 +1980,7 @@
       container.className = 'mb-5 p-3.5 rounded-2xl border text-xs leading-relaxed transition-all duration-200 flex items-start gap-2.5';
 
       if (tipo === 'error') {
+        animarErroAuth();
         container.classList.add('bg-rose-50', 'dark:bg-rose-950/40', 'border-rose-200', 'dark:border-rose-900/60', 'text-rose-800', 'dark:text-rose-200');
         icon.innerHTML = `<svg class="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
       } else if (tipo === 'success') {
@@ -1897,6 +2238,49 @@
       } catch (err) {
         console.error('Erro de login com Google:', err);
         mostrarFeedbackAuth('error', 'Não foi possível iniciar o login com o Google. Verifique sua conexão.');
+      }
+    }
+
+    // SUBMISSÃO DE LOGIN POR MAGIC LINK (LINK MÁGICO SEM SENHA)
+    async function executarLoginMagicLink(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+
+      const email = document.getElementById('magiclink-email').value.trim();
+      const btn = document.getElementById('btn-submit-magiclink');
+      const btnText = document.getElementById('btn-text-magiclink');
+      const btnSpinner = document.getElementById('btn-spinner-magiclink');
+
+      btn.disabled = true;
+      btnText.classList.add('hidden');
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname
+          }
+        });
+
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+
+        if (error) {
+          animarErroAuth();
+          mostrarFeedbackAuth('error', traduzirErroSupabase(error.message));
+          return;
+        }
+
+        mostrarFeedbackAuth('success', `Link Mágico enviado para <b>${email}</b>! ✨<br/>Abra sua caixa de entrada e clique no link para acessar o painel diretamente.`);
+      } catch (err) {
+        console.error('Erro ao enviar Magic Link:', err);
+        animarErroAuth();
+        mostrarFeedbackAuth('error', 'Falha ao solicitar link de acesso. Verifique sua conexão.');
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
       }
     }
 
