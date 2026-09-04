@@ -109,6 +109,16 @@
             </button>
           </div>
 
+          <!-- Botão Atividades Recentes -->
+          <button 
+            onclick="abrirModalAtividades()"
+            class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer relative"
+            title="Histórico de Atividades Recentes"
+          >
+            <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span id="badge-atividades-count" class="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center">0</span>
+          </button>
+
           <!-- Botão Novo Pedido -->
           <button 
             onclick="abrirModalNovoPedido()"
@@ -192,16 +202,28 @@
         <p class="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Clique para ver todos</p>
       </div>
 
-      <!-- KPI Faturamento -->
+      <!-- KPI Faturamento & Meta Diária -->
       <div 
-        class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs relative overflow-hidden"
+        onclick="editarMetaDiaria()"
+        class="group bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition cursor-pointer relative overflow-hidden"
+        title="Clique para ajustar a Meta Diária de Vendas"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
           <p class="text-xs font-bold uppercase tracking-wider">Faturamento Total</p>
           <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <p id="kpi-faturamento" class="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">R$ 0,00</p>
-        <p id="kpi-ticket-medio" class="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Ticket Médio: R$ 0,00</p>
+        
+        <!-- Barra de Progresso da Meta Diária -->
+        <div class="mt-2 space-y-1">
+          <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div id="barra-progresso-meta" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <span id="label-meta-faturamento">Meta: R$ 2.000</span>
+            <span id="pct-meta-faturamento" class="font-bold text-indigo-600 dark:text-indigo-400">0%</span>
+          </div>
+        </div>
       </div>
 
       <!-- KPI Em Aberto -->
@@ -559,23 +581,29 @@
               Copiar
             </button>
           </div>
-          <a id="btn-whats-pix" href="#" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            Enviar Cobrança PIX no WhatsApp
-          </a>
         </div>
 
-        <!-- Ações de WhatsApp Rápidas -->
+        <!-- SELETOR DE TEMPLATES DE MENSAGEM WHATSAPP -->
         <div class="space-y-2 pt-1">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Ações Rápidas de Atendimento</span>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <a id="modal-btn-whats-confirmar" href="#" target="_blank" class="px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
-              <span>Confirmar Pedido</span>
-            </a>
-            <a id="modal-btn-whats-pronto" href="#" target="_blank" class="px-3 py-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
-              <span>Avisar que está Pronto</span>
-            </a>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Templates Rápidos de WhatsApp</span>
+            <span class="text-[10px] text-slate-400">Escolha o modelo</span>
           </div>
+          
+          <select id="seletor-template-whats" onchange="atualizarTemplateWhats()" class="w-full text-xs px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-800 dark:text-slate-200 font-medium cursor-pointer">
+            <option value="confirmar">1. 📌 Confirmação do Pedido</option>
+            <option value="producao">2. ⚙️ Pedido em Produção/Execução</option>
+            <option value="pronto">3. 📦 Pedido Pronto para Retirada</option>
+            <option value="pix">4. 💰 Cobrança com Chave PIX</option>
+            <option value="agradecimento">5. ⭐ Agradecimento e Feedback</option>
+          </select>
+
+          <div id="preview-template-whats" class="text-[11px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 italic leading-relaxed max-h-20 overflow-y-auto"></div>
+
+          <a id="btn-enviar-template-whats" href="#" target="_blank" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span>Enviar Mensagem Selecionada no WhatsApp</span>
+          </a>
         </div>
 
       </div>
@@ -584,7 +612,11 @@
         <div class="flex items-center gap-2">
           <button onclick="copiarResumoPedido()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            Copiar Resumo
+            Copiar
+          </button>
+          <button onclick="compartilharPedidoNativo()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer" title="Compartilhar pedido">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+            Compartilhar
           </button>
           <button onclick="imprimirComprovanteIndividual()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
@@ -696,6 +728,34 @@
     </div>
   </div>
 
+  <!-- MODAL: ATIVIDADES RECENTES (DRAWER / HISTÓRICO) -->
+  <div id="modal-atividades" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Registro de Atividades
+        </h3>
+        <button onclick="fecharModalAtividades()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div id="lista-atividades" class="p-6 space-y-3 max-h-[60vh] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+        <!-- Populado dinamicamente -->
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <button onclick="limparHistoricoAtividades()" class="text-xs text-slate-400 hover:text-rose-600 font-semibold cursor-pointer">
+          Limpar Registro
+        </button>
+        <button onclick="fecharModalAtividades()" class="px-4 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT OPERACIONAL -->
   <script>
     // CREDENCIAIS DO SUPABASE
@@ -710,6 +770,8 @@
     let filtroKPIAtivo = null;
     let filtroFaixaValorAtiva = 'todos';
     let somAtivado = localStorage.getItem('som_notificacao') !== 'false';
+    let metaDiaria = parseFloat(localStorage.getItem('meta_diaria')) || 2500;
+    let historicoAtividades = JSON.parse(localStorage.getItem('historico_atividades') || '[]');
     let segundosDesdeSync = 0;
 
     // INICIALIZAÇÃO DE TEMA (DARK / LIGHT)
@@ -727,6 +789,67 @@
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('tema', isDark ? 'dark' : 'light');
       mostrarToast(isDark ? 'Modo Escuro ativado 🌙' : 'Modo Claro ativado ☀️');
+    }
+
+    // REGISTRO DE ATIVIDADES OPERACIONAIS
+    function registrarAtividade(acao, detalhes) {
+      const registro = {
+        id: Date.now(),
+        acao,
+        detalhes,
+        hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      };
+      historicoAtividades.unshift(registro);
+      if (historicoAtividades.length > 50) historicoAtividades.pop();
+      localStorage.setItem('historico_atividades', JSON.stringify(historicoAtividades));
+      atualizarBadgeAtividades();
+    }
+
+    function atualizarBadgeAtividades() {
+      const badge = document.getElementById('badge-atividades-count');
+      if (badge) badge.textContent = historicoAtividades.length;
+    }
+
+    function abrirModalAtividades() {
+      const container = document.getElementById('lista-atividades');
+      if (historicoAtividades.length === 0) {
+        container.innerHTML = '<div class="text-center py-8 text-xs text-slate-400">Nenhuma atividade registrada na sessão.</div>';
+      } else {
+        container.innerHTML = historicoAtividades.map(a => `
+          <div class="pt-3 first:pt-0 space-y-1 text-xs">
+            <div class="flex items-center justify-between font-bold">
+              <span class="text-indigo-600 dark:text-indigo-400">${a.acao}</span>
+              <span class="text-[10px] text-slate-400">${a.hora}</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300">${a.detalhes}</p>
+          </div>
+        `).join('');
+      }
+      document.getElementById('modal-atividades').classList.remove('hidden');
+    }
+
+    function fecharModalAtividades() {
+      document.getElementById('modal-atividades').classList.add('hidden');
+    }
+
+    function limparHistoricoAtividades() {
+      historicoAtividades = [];
+      localStorage.removeItem('historico_atividades');
+      abrirModalAtividades();
+      atualizarBadgeAtividades();
+      mostrarToast('Registro de atividades limpo.');
+    }
+
+    // AJUSTAR META DIÁRIA
+    function editarMetaDiaria() {
+      const valorAtual = metaDiaria;
+      const novo = prompt('Definir nova Meta Diária de Faturamento (R$):', valorAtual);
+      if (novo !== null && !isNaN(parseFloat(novo)) && parseFloat(novo) > 0) {
+        metaDiaria = parseFloat(novo);
+        localStorage.setItem('meta_diaria', metaDiaria);
+        atualizarKPIs(dadosOriginais);
+        mostrarToast(`Meta diária atualizada para ${formatarMoeda(metaDiaria)} 🎯`);
+      }
     }
 
     // CONTROLE DE SOM WEB AUDIO
@@ -748,8 +871,8 @@
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
         gain.gain.setValueAtTime(0.12, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
         osc.connect(gain);
@@ -912,11 +1035,16 @@
             console.log('Realtime Event:', payload);
             tocarChime();
             if (payload.eventType === 'INSERT') {
-              mostrarToast(`Novo pedido recebido: ${getCampo(payload.new, 'cliente', 'nome') || 'Cliente'}`);
+              const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
+              mostrarToast(`Novo pedido recebido: ${cli}`);
+              registrarAtividade('Novo Pedido', `Pedido recebido para ${cli}`);
             } else if (payload.eventType === 'UPDATE') {
-              mostrarToast(`Pedido atualizado: ${getCampo(payload.new, 'cliente', 'nome') || 'Cliente'}`);
+              const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
+              mostrarToast(`Pedido atualizado: ${cli}`);
+              registrarAtividade('Atualização', `Pedido #${payload.new.id} de ${cli} atualizado`);
             } else if (payload.eventType === 'DELETE') {
-              mostrarToast(`Pedido removido`);
+              mostrarToast(`Pedido #${payload.old.id} removido`);
+              registrarAtividade('Exclusão', `Pedido #${payload.old.id} excluído`);
             }
             carregarPedidos(true);
           })
@@ -945,15 +1073,19 @@
         }
       });
 
-      const ticketMedio = total > 0 ? (soma / total) : 0;
       const taxaConclusao = total > 0 ? Math.round((concluidos / total) * 100) : 0;
+      const pctMeta = metaDiaria > 0 ? Math.min(100, Math.round((soma / metaDiaria) * 100)) : 0;
 
       document.getElementById('kpi-total').textContent = total;
       document.getElementById('kpi-faturamento').textContent = formatarMoeda(soma);
-      document.getElementById('kpi-ticket-medio').textContent = `Ticket Médio: ${formatarMoeda(ticketMedio)}`;
       document.getElementById('kpi-abertos').textContent = abertos;
       document.getElementById('kpi-concluidos').textContent = concluidos;
       document.getElementById('kpi-taxa-sucesso').textContent = `${taxaConclusao}% de conclusão`;
+
+      // Barra da Meta Diária
+      document.getElementById('barra-progresso-meta').style.width = `${pctMeta}%`;
+      document.getElementById('label-meta-faturamento').textContent = `Meta: ${formatarMoeda(metaDiaria)}`;
+      document.getElementById('pct-meta-faturamento').textContent = `${pctMeta}% atingida`;
     }
 
     // ANALYTICS / BARRAS DE DISTRIBUIÇÃO POR SETOR
@@ -1130,6 +1262,7 @@
       atualizarKPIs(dadosOriginais);
       renderizarAnalyticsSetores(dadosOriginais);
       filtrarEOrdenar();
+      registrarAtividade('Status Alterado', `Pedido #${id} de ${getCampo(pedido, 'cliente', 'nome')} alterado para "${novoStatus}"`);
 
       try {
         const { error } = await supabaseClient
@@ -1596,7 +1729,6 @@
       elStatus.textContent = status;
       elStatus.className = `px-2.5 py-0.5 text-xs font-semibold rounded-full border ${badgeStatus(status)}`;
 
-      // Atualizar botões do Stepper
       atualizarStepperVisual(status);
 
       const boxObs = document.getElementById('modal-det-box-obs');
@@ -1607,28 +1739,46 @@
         boxObs.classList.add('hidden');
       }
 
-      const numLimpo = String(telefone || '').replace(/\D/g, '');
-      const ddi = numLimpo.startsWith('55') ? numLimpo : `55${numLimpo}`;
-      const btnConf = document.getElementById('modal-btn-whats-confirmar');
-      const btnPronto = document.getElementById('modal-btn-whats-pronto');
-      const btnWhatsPix = document.getElementById('btn-whats-pix');
+      atualizarTemplateWhats();
+      document.getElementById('modal-detalhes').classList.remove('hidden');
+    }
 
-      if (numLimpo.length >= 10) {
-        const msgConf = encodeURIComponent(`Olá ${cliente}! Confirmamos o seu pedido de "${servico}" agendado para ${formatarData(data)}. Total: ${formatarMoeda(valor)}.`);
-        const msgPronto = encodeURIComponent(`Olá ${cliente}! Passando para avisar que o seu pedido de "${servico}" já está pronto e finalizado! Qualquer dúvida estamos à disposição.`);
-        const chavePix = document.getElementById('campo-chave-pix').value;
-        const msgPix = encodeURIComponent(`Olá ${cliente}! Seguem os dados para pagamento do seu pedido de "${servico}" no valor de ${formatarMoeda(valor)}:\n\nChave PIX: ${chavePix}\nFavorecido: Central de Pedidos\n\nApós o pagamento, por gentileza envie o comprovante por aqui! Obrigado.`);
+    // TEMPLATES DE MENSAGENS WHATSAPP
+    function atualizarTemplateWhats() {
+      if (!pedidoSelecionado) return;
+      const cliente = getCampo(pedidoSelecionado, 'cliente', 'nome') || 'Cliente';
+      const servico = getCampo(pedidoSelecionado, 'servico', 'serviço') || 'Serviço';
+      const valor = formatarMoeda(getCampo(pedidoSelecionado, 'valor', 'preco'));
+      const data = formatarData(getCampo(pedidoSelecionado, 'data_pedido', 'data'));
+      const telefone = getCampo(pedidoSelecionado, 'telefone', 'contato');
+      const chavePix = document.getElementById('campo-chave-pix').value;
+      const tipo = document.getElementById('seletor-template-whats').value;
 
-        btnConf.href = `https://wa.me/${ddi}?text=${msgConf}`;
-        btnPronto.href = `https://wa.me/${ddi}?text=${msgPronto}`;
-        btnWhatsPix.href = `https://wa.me/${ddi}?text=${msgPix}`;
-
-        [btnConf, btnPronto, btnWhatsPix].forEach(b => b.classList.remove('opacity-50', 'pointer-events-none'));
-      } else {
-        [btnConf, btnPronto, btnWhatsPix].forEach(b => b.classList.add('opacity-50', 'pointer-events-none'));
+      let msg = '';
+      if (tipo === 'confirmar') {
+        msg = `Olá ${cliente}! Confirmamos o seu pedido de "${servico}" agendado para ${data}. Valor total: ${valor}. Qualquer dúvida, estamos à disposição!`;
+      } else if (tipo === 'producao') {
+        msg = `Olá ${cliente}! Informamos que seu pedido de "${servico}" já entrou em produção/execução pela nossa equipe técnica!`;
+      } else if (tipo === 'pronto') {
+        msg = `Olá ${cliente}! Boas notícias! Seu pedido de "${servico}" já está pronto e finalizado para retirada ou entrega. Aguardamos você!`;
+      } else if (tipo === 'pix') {
+        msg = `Olá ${cliente}! Seguem os dados para pagamento do seu pedido de "${servico}" no valor de ${valor}:\n\nChave PIX: ${chavePix}\nFavorecido: Central de Pedidos\n\nApós o pagamento, por gentileza envie o comprovante por aqui. Obrigado!`;
+      } else if (tipo === 'agradecimento') {
+        msg = `Olá ${cliente}! Agradecemos pela preferência em nosso serviço de "${servico}". Esperamos que tenha ficado satisfeito(a)!`;
       }
 
-      document.getElementById('modal-detalhes').classList.remove('hidden');
+      document.getElementById('preview-template-whats').textContent = `"${msg}"`;
+
+      const numLimpo = String(telefone || '').replace(/\D/g, '');
+      const btn = document.getElementById('btn-enviar-template-whats');
+
+      if (numLimpo.length >= 10) {
+        const ddi = numLimpo.startsWith('55') ? numLimpo : `55${numLimpo}`;
+        btn.href = `https://wa.me/${ddi}?text=${encodeURIComponent(msg)}`;
+        btn.classList.remove('opacity-50', 'pointer-events-none');
+      } else {
+        btn.classList.add('opacity-50', 'pointer-events-none');
+      }
     }
 
     function atualizarStepperVisual(status) {
@@ -1684,6 +1834,27 @@
       navigator.clipboard.writeText(texto).then(() => {
         mostrarToast('Resumo copiado para a área de transferência! 📋');
       });
+    }
+
+    // COMPARTILHAMENTO NATIVO (WEB SHARE API)
+    function compartilharPedidoNativo() {
+      if (!pedidoSelecionado) return;
+      const cliente = getCampo(pedidoSelecionado, 'cliente', 'nome');
+      const servico = getCampo(pedidoSelecionado, 'servico', 'serviço');
+      const valor = formatarMoeda(getCampo(pedidoSelecionado, 'valor', 'preco'));
+      const status = getCampo(pedidoSelecionado, 'status');
+
+      const shareData = {
+        title: `Pedido #${pedidoSelecionado.id} - ${cliente}`,
+        text: `Pedido #${pedidoSelecionado.id}\nCliente: ${cliente}\nServiço: ${servico}\nStatus: ${status}\nTotal: ${valor}`,
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        copiarResumoPedido();
+      }
     }
 
     // IMPRIMIR COMPROVANTE INDIVIDUAL
@@ -1822,6 +1993,7 @@
 
           if (error) throw error;
           mostrarToast('Pedido atualizado com sucesso! ✨');
+          registrarAtividade('Pedido Editado', `Pedido #${idEdicao} de ${cliente} modificado`);
         } else {
           const { error } = await supabaseClient
             .from('pedidos')
@@ -1829,6 +2001,7 @@
 
           if (error) throw error;
           mostrarToast('Pedido cadastrado com sucesso! 🎉');
+          registrarAtividade('Novo Pedido', `Cadastrado pedido para ${cliente} no setor ${setor}`);
         }
 
         fecharModalNovoPedido();
@@ -1857,6 +2030,7 @@
         if (error) throw error;
         fecharModalNovoPedido();
         mostrarToast('Pedido excluído com sucesso.');
+        registrarAtividade('Pedido Excluído', `Pedido #${idEdicao} foi deletado`);
         await carregarPedidos();
       } catch (err) {
         alert(`Erro ao excluir: ${err.message || 'Verifique as permissões no banco'}`);
@@ -1960,6 +2134,7 @@
       if (e.key === 'Escape') {
         fecharModalDetalhes();
         fecharModalNovoPedido();
+        fecharModalAtividades();
       }
       if ((e.key === 'r' || e.key === 'R') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         carregarPedidos();
@@ -1978,6 +2153,7 @@
       alternarVisualizacao(modoVisualizacao);
       carregarPedidos();
       iniciarRealtime();
+      atualizarBadgeAtividades();
     });
   </script>
 </body>
