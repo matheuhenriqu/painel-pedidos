@@ -89,7 +89,7 @@
         <!-- Controles da Direita -->
         <div class="flex items-center gap-2 shrink-0">
           
-          <!-- Seletor de Modo de Visualização (Cards / Tabela / Kanban / Setores) -->
+          <!-- Seletor de Modo de Visualização (Cards / Tabela / Kanban / Setores / Agenda) -->
           <div class="hidden lg:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/60 text-xs font-semibold">
             <button id="btn-view-cards" onclick="alternarVisualizacao('cards')" title="Visualização em Grade de Cards" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
@@ -107,7 +107,20 @@
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
               <span>Setores</span>
             </button>
+            <button id="btn-view-agenda" onclick="alternarVisualizacao('agenda')" title="Visualização em Agenda / Cronograma" class="px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Agenda</span>
+            </button>
           </div>
+
+          <!-- Botão Fechamento do Dia -->
+          <button 
+            onclick="abrirModalFechamento()"
+            class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
+            title="Relatório Executivo & Fechamento do Dia"
+          >
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </button>
 
           <!-- Botão Atividades Recentes -->
           <button 
@@ -348,6 +361,16 @@
         </div>
 
         <div class="flex items-center gap-3">
+          <!-- Botão Selecionar Todos -->
+          <button 
+            onclick="selecionarTodosFiltrados()" 
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            title="Selecionar ou desmarcar todos os pedidos da listagem"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            <span id="label-selecionar-todos">Selecionar Todos</span>
+          </button>
+
           <!-- Botão Exportar CSV -->
           <button 
             onclick="exportarCSV()" 
@@ -421,6 +444,15 @@
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             <tr>
+              <th class="px-3 py-3.5 w-10 text-center">
+                <input 
+                  type="checkbox" 
+                  id="chk-selecionar-todos-tab"
+                  onchange="toggleSelecionarTodos(this.checked)"
+                  class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer"
+                  title="Selecionar todos os pedidos visíveis"
+                />
+              </th>
               <th class="px-4 py-3.5">Cliente</th>
               <th class="px-4 py-3.5">Serviço</th>
               <th class="px-4 py-3.5">Setor</th>
@@ -496,6 +528,11 @@
       <!-- Populado dinamicamente com seções para cada setor -->
     </section>
 
+    <!-- VIEW 5: MODO AGENDA / LINHA DO TEMPO CRONOLÓGICA -->
+    <section id="view-agenda" class="hidden space-y-6">
+      <!-- Populado dinamicamente com timeline cronológica -->
+    </section>
+
     <!-- ESTADO VAZIO -->
     <div id="estado-vazio" class="hidden text-center py-16 px-4 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
       <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 mx-auto flex items-center justify-center text-slate-400 mb-3">
@@ -511,6 +548,38 @@
     </div>
 
   </main>
+
+  <!-- BARRA FLUTUANTE DE AÇÕES EM LOTE (BULK ACTIONS DOCK) -->
+  <div id="barra-acoes-lote" class="fixed bottom-6 inset-x-0 mx-auto max-w-2xl px-4 z-40 transition-all duration-300 transform translate-y-32 pointer-events-none">
+    <div class="pointer-events-auto bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse"></span>
+        <div>
+          <p class="text-xs font-bold leading-tight"><span id="lote-qtd-selecionados">0</span> selecionados</p>
+          <p class="text-[11px] text-slate-300 font-medium">Total: <span id="lote-soma-selecionados" class="font-extrabold text-indigo-300">R$ 0,00</span></p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <select id="seletor-status-lote" class="text-xs bg-slate-800 dark:bg-slate-700 border border-slate-600 rounded-xl px-2.5 py-1.5 font-semibold text-white focus:outline-none cursor-pointer">
+          <option value="">Alterar Status...</option>
+          <option value="Confirmado">Confirmar</option>
+          <option value="Em produção">Em Produção</option>
+          <option value="Concluído">Concluir</option>
+          <option value="Cancelado">Cancelar</option>
+        </select>
+        <button onclick="aplicarStatusEmLote()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+          Aplicar
+        </button>
+        <button onclick="exportarSelecionadosCSV()" class="p-1.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Exportar Selecionados para CSV">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </button>
+        <button onclick="desmarcarTodosLote()" class="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition cursor-pointer" title="Desmarcar todos">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- RODAPÉ -->
   <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 text-center text-xs text-slate-400 dark:text-slate-500 transition-colors">
@@ -566,20 +635,36 @@
           <div id="modal-det-obs" class="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 italic leading-relaxed"></div>
         </div>
 
-        <!-- WIDGET DE COBRANÇA PIX -->
+        <!-- WIDGET DE COBRANÇA PIX COM QR CODE DINÂMICO -->
         <div class="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-slate-900 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
               Cobrança PIX
             </span>
-            <span id="pix-valor-display" class="font-extrabold text-sm text-indigo-700 dark:text-indigo-300">R$ 0,00</span>
+            <div class="flex items-center gap-2">
+              <span id="pix-valor-display" class="font-extrabold text-sm text-indigo-700 dark:text-indigo-300">R$ 0,00</span>
+              <button onclick="alternarQRCodePIX()" id="btn-toggle-qr-pix" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                Ver QR Code
+              </button>
+            </div>
           </div>
           <div class="flex items-center gap-2">
             <input type="text" id="campo-chave-pix" value="financeiro@centralpedidos.com.br" readonly class="w-full text-xs font-mono px-3 py-2 bg-white dark:bg-slate-800 rounded-xl border border-indigo-200 dark:border-indigo-800 text-slate-700 dark:text-slate-300" />
             <button onclick="copiarChavePIX()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shrink-0 transition cursor-pointer" title="Copiar Chave PIX">
               Copiar
             </button>
+            <button onclick="configurarChavePIX()" class="p-2 text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 bg-white dark:bg-slate-800 rounded-xl border border-indigo-200 dark:border-indigo-800 transition cursor-pointer" title="Configurar Chave PIX padrão">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </button>
+          </div>
+
+          <!-- Container Expansível do QR Code -->
+          <div id="container-qrcode-pix" class="hidden text-center py-2 space-y-2">
+            <div class="inline-block p-3 bg-white rounded-2xl shadow-md border border-indigo-100">
+              <img id="img-qrcode-pix" src="" alt="QR Code PIX" class="w-36 h-36 mx-auto object-contain" />
+            </div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400">Aponte a câmera do celular ou banco para pagar na tela</p>
           </div>
         </div>
 
@@ -624,6 +709,10 @@
           </button>
         </div>
         <div class="flex items-center gap-2">
+          <button onclick="duplicarPedidoAtual()" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition cursor-pointer flex items-center gap-1" title="Duplicar este pedido para um novo cadastro">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+            Duplicar
+          </button>
           <button onclick="abrirModalEdicao()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer">
             Editar
           </button>
@@ -756,6 +845,70 @@
     </div>
   </div>
 
+  <!-- MODAL: FECHAMENTO DO DIA / RELATÓRIO EXECUTIVO -->
+  <div id="modal-fechamento" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]">
+      <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </span>
+          <div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Fechamento do Dia &bull; Relatório Executivo</h3>
+            <p id="fechamento-data-geracao" class="text-[11px] text-slate-400">Sumário consolidado de movimentação</p>
+          </div>
+        </div>
+        <button onclick="fecharModalFechamento()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5 overflow-y-auto flex-1">
+        <!-- 4 Mini KPIs do Fechamento -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faturamento</span>
+            <p id="fechamento-faturamento" class="text-base font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0,00</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ticket Médio</span>
+            <p id="fechamento-ticket-medio" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">R$ 0,00</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Pedidos</span>
+            <p id="fechamento-pedidos-total" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5">0</p>
+          </div>
+          <div class="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Concluídos</span>
+            <p id="fechamento-concluidos" class="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">0</p>
+          </div>
+        </div>
+
+        <!-- Ranking por Setor -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Desempenho por Departamento</h4>
+          <div id="fechamento-lista-setores" class="space-y-2"></div>
+        </div>
+
+        <!-- Top Serviços Executados -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Principais Serviços</h4>
+          <div id="fechamento-top-servicos" class="space-y-1.5 text-xs"></div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <button onclick="imprimirRelatorioFechamento()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>Imprimir Relatório</span>
+        </button>
+        <button onclick="fecharModalFechamento()" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT OPERACIONAL -->
   <script>
     // CREDENCIAIS DO SUPABASE
@@ -765,6 +918,9 @@
 
     // ESTADO DA APLICAÇÃO
     let dadosOriginais = [];
+    let pedidosFiltradosAtuais = [];
+    let pedidosSelecionados = new Set();
+    let chavePixPadrao = localStorage.getItem('chave_pix') || 'financeiro@centralpedidos.com.br';
     let pedidoSelecionado = null;
     let modoVisualizacao = localStorage.getItem('modo_visualizacao') || 'cards';
     let filtroKPIAtivo = null;
@@ -1249,6 +1405,8 @@
         return 0;
       });
 
+      pedidosFiltradosAtuais = filtrados;
+      atualizarBarraAcoesLote();
       renderizar(filtrados, buscaInput.trim());
     }
 
@@ -1289,12 +1447,13 @@
       const btnTabela = document.getElementById('btn-view-tabela');
       const btnKanban = document.getElementById('btn-view-kanban');
       const btnSetores = document.getElementById('btn-view-setores');
+      const btnAgenda = document.getElementById('btn-view-agenda');
 
-      [btnCards, btnTabela, btnKanban, btnSetores].forEach(btn => {
+      [btnCards, btnTabela, btnKanban, btnSetores, btnAgenda].forEach(btn => {
         if (btn) btn.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
       });
 
-      const btnMap = { cards: btnCards, tabela: btnTabela, kanban: btnKanban, setores: btnSetores };
+      const btnMap = { cards: btnCards, tabela: btnTabela, kanban: btnKanban, setores: btnSetores, agenda: btnAgenda };
       const btnAtivo = btnMap[modo] || btnCards;
       if (btnAtivo) btnAtivo.className = 'px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 shadow-xs font-bold';
 
@@ -1365,6 +1524,7 @@
       const containerTabela = document.getElementById('view-tabela');
       const containerKanban = document.getElementById('view-kanban');
       const containerSetores = document.getElementById('view-setores');
+      const containerAgenda = document.getElementById('view-agenda');
       const contador = document.getElementById('contador-resultado');
       const vazioBox = document.getElementById('estado-vazio');
 
@@ -1376,34 +1536,32 @@
         containerTabela.classList.add('hidden');
         containerKanban.classList.add('hidden');
         containerSetores.classList.add('hidden');
+        containerAgenda.classList.add('hidden');
         vazioBox.classList.remove('hidden');
         return;
       }
 
       vazioBox.classList.add('hidden');
 
+      containerCards.classList.add('hidden');
+      containerTabela.classList.add('hidden');
+      containerKanban.classList.add('hidden');
+      containerSetores.classList.add('hidden');
+      containerAgenda.classList.add('hidden');
+
       if (modoVisualizacao === 'tabela') {
-        containerCards.classList.add('hidden');
-        containerKanban.classList.add('hidden');
-        containerSetores.classList.add('hidden');
         containerTabela.classList.remove('hidden');
         renderizarTabela(pedidos, termoBusca);
       } else if (modoVisualizacao === 'kanban') {
-        containerCards.classList.add('hidden');
-        containerTabela.classList.add('hidden');
-        containerSetores.classList.add('hidden');
         containerKanban.classList.remove('hidden');
         renderizarKanban(pedidos, termoBusca);
       } else if (modoVisualizacao === 'setores') {
-        containerCards.classList.add('hidden');
-        containerTabela.classList.add('hidden');
-        containerKanban.classList.add('hidden');
         containerSetores.classList.remove('hidden');
         renderizarSetores(pedidos, termoBusca);
+      } else if (modoVisualizacao === 'agenda') {
+        containerAgenda.classList.remove('hidden');
+        renderizarAgenda(pedidos, termoBusca);
       } else {
-        containerTabela.classList.add('hidden');
-        containerKanban.classList.add('hidden');
-        containerSetores.classList.add('hidden');
         containerCards.classList.remove('hidden');
         renderizarCards(pedidos, termoBusca);
       }
@@ -1434,9 +1592,19 @@
 
             <div>
               <div class="flex items-center justify-between gap-2 mb-3">
-                <span class="inline-flex items-center text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-100 dark:border-indigo-800/80 px-2.5 py-1 rounded-lg">
-                  ${setor}
-                </span>
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    onchange="toggleSelecionarPedido(${id}, event)" 
+                    ${pedidosSelecionados.has(Number(id)) ? 'checked' : ''}
+                    onclick="event.stopPropagation()"
+                    class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer"
+                    title="Selecionar pedido"
+                  />
+                  <span class="inline-flex items-center text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-100 dark:border-indigo-800/80 px-2.5 py-1 rounded-lg">
+                    ${setor}
+                  </span>
+                </div>
 
                 <!-- Seletor Rápido de Status no Card -->
                 <select 
@@ -1528,6 +1696,15 @@
 
         return `
           <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition">
+            <td class="px-3 py-3 text-center">
+              <input 
+                type="checkbox" 
+                onchange="toggleSelecionarPedido(${id}, event)" 
+                ${pedidosSelecionados.has(Number(id)) ? 'checked' : ''}
+                onclick="event.stopPropagation()"
+                class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer"
+              />
+            </td>
             <td class="px-4 py-3 font-bold text-slate-900 dark:text-white cursor-pointer" onclick="abrirModalDetalhes(${id})">
               ${cliente}
             </td>
@@ -1724,6 +1901,11 @@
       document.getElementById('modal-det-data').textContent = formatarData(data);
       document.getElementById('modal-det-valor').textContent = formatarMoeda(valor);
       document.getElementById('pix-valor-display').textContent = formatarMoeda(valor);
+      document.getElementById('campo-chave-pix').value = chavePixPadrao;
+      const qrBox = document.getElementById('container-qrcode-pix');
+      if (qrBox) qrBox.classList.add('hidden');
+      const btnQr = document.getElementById('btn-toggle-qr-pix');
+      if (btnQr) btnQr.textContent = 'Ver QR Code';
 
       const elStatus = document.getElementById('modal-det-status');
       elStatus.textContent = status;
@@ -1815,6 +1997,374 @@
       navigator.clipboard.writeText(chave).then(() => {
         mostrarToast('Chave PIX copiada! 💰');
       });
+    }
+
+    // QR CODE PIX DINÂMICO
+    function alternarQRCodePIX() {
+      const container = document.getElementById('container-qrcode-pix');
+      const btn = document.getElementById('btn-toggle-qr-pix');
+      const img = document.getElementById('img-qrcode-pix');
+
+      const oculto = container.classList.toggle('hidden');
+      if (btn) btn.textContent = oculto ? 'Ver QR Code' : 'Ocultar QR Code';
+
+      if (!oculto && pedidoSelecionado) {
+        const chave = document.getElementById('campo-chave-pix').value || chavePixPadrao;
+        const valor = extrairNumero(getCampo(pedidoSelecionado, 'valor', 'preco'));
+        const cli = getCampo(pedidoSelecionado, 'cliente', 'nome') || 'Cliente';
+        const payloadPix = `Chave: ${chave} | Valor: R$ ${valor.toFixed(2)} | Pedido #${pedidoSelecionado.id} | Cliente: ${cli}`;
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payloadPix)}`;
+      }
+    }
+
+    function configurarChavePIX() {
+      const nova = prompt('Definir Chave PIX Padrão do Estabelecimento:', chavePixPadrao);
+      if (nova && nova.trim().length > 3) {
+        chavePixPadrao = nova.trim();
+        localStorage.setItem('chave_pix', chavePixPadrao);
+        const campo = document.getElementById('campo-chave-pix');
+        if (campo) campo.value = chavePixPadrao;
+        atualizarTemplateWhats();
+        mostrarToast('Chave PIX atualizada com sucesso! 💰');
+      }
+    }
+
+    // DUPLICAR PEDIDO COM 1 CLIQUE
+    function duplicarPedidoAtual() {
+      if (!pedidoSelecionado) return;
+      const p = pedidoSelecionado;
+      fecharModalDetalhes();
+      abrirModalNovoPedido();
+
+      document.getElementById('novo-cliente').value = getCampo(p, 'cliente', 'nome') || '';
+      document.getElementById('novo-telefone').value = getCampo(p, 'telefone', 'contato') || '';
+      document.getElementById('novo-setor').value = getCampo(p, 'setor', 'categoria') || '';
+      document.getElementById('novo-status').value = 'Pendente';
+      document.getElementById('novo-servico').value = getCampo(p, 'servico', 'serviço') || '';
+      document.getElementById('novo-valor').value = extrairNumero(getCampo(p, 'valor', 'preco')) || '';
+      document.getElementById('novo-data').value = 'Hoje, ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('novo-obs').value = getCampo(p, 'observacoes', 'obs') ? `(Duplicado do pedido #${p.id}) ${getCampo(p, 'observacoes', 'obs')}` : `Duplicado do pedido #${p.id}`;
+
+      document.getElementById('modal-form-titulo').innerHTML = `
+        <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+        </span>
+        Duplicar Pedido #${p.id}
+      `;
+      mostrarToast('Dados do pedido preenchidos. Ajuste e salve! 📋');
+    }
+
+    // SELEÇÃO MÚLTIPLA E AÇÕES EM LOTE (BULK ACTIONS)
+    function toggleSelecionarPedido(id, event) {
+      if (event) event.stopPropagation();
+      const numId = Number(id);
+      if (pedidosSelecionados.has(numId)) {
+        pedidosSelecionados.delete(numId);
+      } else {
+        pedidosSelecionados.add(numId);
+      }
+      atualizarBarraAcoesLote();
+    }
+
+    function toggleSelecionarTodos(checked) {
+      if (checked) {
+        pedidosFiltradosAtuais.forEach(p => pedidosSelecionados.add(Number(p.id)));
+      } else {
+        pedidosSelecionados.clear();
+      }
+      atualizarBarraAcoesLote();
+      filtrarEOrdenar();
+    }
+
+    function selecionarTodosFiltrados() {
+      if (pedidosSelecionados.size === pedidosFiltradosAtuais.length && pedidosFiltradosAtuais.length > 0) {
+        pedidosSelecionados.clear();
+      } else {
+        pedidosFiltradosAtuais.forEach(p => pedidosSelecionados.add(Number(p.id)));
+      }
+      atualizarBarraAcoesLote();
+      filtrarEOrdenar();
+    }
+
+    function desmarcarTodosLote() {
+      pedidosSelecionados.clear();
+      atualizarBarraAcoesLote();
+      filtrarEOrdenar();
+    }
+
+    function atualizarBarraAcoesLote() {
+      const barra = document.getElementById('barra-acoes-lote');
+      const qtdEl = document.getElementById('lote-qtd-selecionados');
+      const somaEl = document.getElementById('lote-soma-selecionados');
+      const labelSelectAll = document.getElementById('label-selecionar-todos');
+      const chkTab = document.getElementById('chk-selecionar-todos-tab');
+
+      if (!barra || !qtdEl || !somaEl) return;
+
+      const count = pedidosSelecionados.size;
+      qtdEl.textContent = count;
+
+      if (labelSelectAll) {
+        labelSelectAll.textContent = (count === pedidosFiltradosAtuais.length && count > 0) ? 'Desmarcar Todos' : 'Selecionar Todos';
+      }
+      if (chkTab) {
+        chkTab.checked = count === pedidosFiltradosAtuais.length && count > 0;
+        chkTab.indeterminate = count > 0 && count < pedidosFiltradosAtuais.length;
+      }
+
+      if (count > 0) {
+        let soma = 0;
+        dadosOriginais.forEach(p => {
+          if (pedidosSelecionados.has(Number(p.id))) {
+            soma += extrairNumero(getCampo(p, 'valor', 'preco'));
+          }
+        });
+        somaEl.textContent = formatarMoeda(soma);
+        barra.classList.remove('translate-y-32');
+        barra.classList.add('translate-y-0');
+      } else {
+        barra.classList.remove('translate-y-0');
+        barra.classList.add('translate-y-32');
+      }
+    }
+
+    async function aplicarStatusEmLote() {
+      const select = document.getElementById('seletor-status-lote');
+      const novoStatus = select.value;
+      if (!novoStatus) {
+        mostrarToast('Selecione um status para aplicar aos pedidos.');
+        return;
+      }
+      if (pedidosSelecionados.size === 0) return;
+
+      const ids = Array.from(pedidosSelecionados);
+      const confirmacao = confirm(`Deseja alterar o status de ${ids.length} pedidos selecionados para "${novoStatus}"?`);
+      if (!confirmacao) return;
+
+      dadosOriginais.forEach(p => {
+        if (pedidosSelecionados.has(Number(p.id))) {
+          p.status = novoStatus;
+        }
+      });
+      atualizarKPIs(dadosOriginais);
+      renderizarAnalyticsSetores(dadosOriginais);
+      filtrarEOrdenar();
+      registrarAtividade('Ação em Lote', `${ids.length} pedidos alterados para "${novoStatus}"`);
+
+      try {
+        const { error } = await supabaseClient
+          .from('pedidos')
+          .update({ status: novoStatus })
+          .in('id', ids);
+
+        if (error) throw error;
+        mostrarToast(`${ids.length} pedidos atualizados para "${novoStatus}"! ✨`);
+        desmarcarTodosLote();
+      } catch (err) {
+        console.error('Erro ao atualizar em lote:', err);
+        mostrarToast('Erro ao atualizar pedidos no Supabase.');
+        await carregarPedidos(true);
+      }
+    }
+
+    function exportarSelecionadosCSV() {
+      if (pedidosSelecionados.size === 0) {
+        mostrarToast('Nenhum pedido selecionado.');
+        return;
+      }
+      const selecionados = dadosOriginais.filter(p => pedidosSelecionados.has(Number(p.id)));
+      
+      const cabecalhos = ['ID', 'Cliente', 'Telefone', 'Setor', 'Serviço', 'Data/Horário', 'Status', 'Valor', 'Observações'];
+      const linhas = selecionados.map(p => [
+        p.id || '',
+        `"${(getCampo(p, 'cliente', 'nome') || '').replace(/"/g, '""')}"`,
+        `"${(getCampo(p, 'telefone', 'contato') || '').replace(/"/g, '""')}"`,
+        `"${(getCampo(p, 'setor', 'categoria') || '').replace(/"/g, '""')}"`,
+        `"${(getCampo(p, 'servico', 'serviço') || '').replace(/"/g, '""')}"`,
+        `"${(formatarData(getCampo(p, 'data_pedido', 'data')) || '').replace(/"/g, '""')}"`,
+        `"${(getCampo(p, 'status', 'situacao') || '').replace(/"/g, '""')}"`,
+        (extrairNumero(getCampo(p, 'valor', 'preco')) || 0).toFixed(2).replace('.', ','),
+        `"${(getCampo(p, 'observacoes', 'obs') || '').replace(/"/g, '""')}"`,
+      ]);
+
+      const csvContent = '\uFEFF' + [cabecalhos.join(';'), ...linhas.map(l => l.join(';'))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `pedidos_selecionados_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      mostrarToast(`Exportados ${selecionados.length} pedidos selecionados! 📊`);
+    }
+
+    // RELATÓRIO EXECUTIVO E FECHAMENTO DO DIA
+    function abrirModalFechamento() {
+      const total = dadosOriginais.length;
+      let faturamento = 0;
+      let concluidos = 0;
+      const setoresMap = {};
+      const servicosMap = {};
+
+      dadosOriginais.forEach(p => {
+        const val = extrairNumero(getCampo(p, 'valor', 'preco'));
+        faturamento += val;
+        const st = removerAcentos(getCampo(p, 'status'));
+        if (st.includes('conclu') || st.includes('finaliz') || st.includes('pago')) concluidos++;
+
+        const set = getCampo(p, 'setor', 'categoria') || 'Geral';
+        if (!setoresMap[set]) setoresMap[set] = { valor: 0, qtd: 0 };
+        setoresMap[set].valor += val;
+        setoresMap[set].qtd++;
+
+        const srv = getCampo(p, 'servico', 'serviço') || 'Geral';
+        servicosMap[srv] = (servicosMap[srv] || 0) + 1;
+      });
+
+      const ticketMedio = total > 0 ? faturamento / total : 0;
+
+      document.getElementById('fechamento-faturamento').textContent = formatarMoeda(faturamento);
+      document.getElementById('fechamento-ticket-medio').textContent = formatarMoeda(ticketMedio);
+      document.getElementById('fechamento-pedidos-total').textContent = total;
+      document.getElementById('fechamento-concluidos').textContent = concluidos;
+      document.getElementById('fechamento-data-geracao').textContent = `Posição consolidada em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+      const listaSetoresEl = document.getElementById('fechamento-lista-setores');
+      const setoresOrdenados = Object.keys(setoresMap).sort((a, b) => setoresMap[b].valor - setoresMap[a].valor);
+      listaSetoresEl.innerHTML = setoresOrdenados.map(s => {
+        const item = setoresMap[s];
+        const pct = faturamento > 0 ? Math.round((item.valor / faturamento) * 100) : 0;
+        return `
+          <div class="flex items-center justify-between text-xs py-1.5 border-b border-slate-100 dark:border-slate-800/80">
+            <span class="font-bold text-slate-800 dark:text-slate-200">${s} (${item.qtd})</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400 font-semibold">${pct}%</span>
+              <span class="font-extrabold text-indigo-600 dark:text-indigo-400">${formatarMoeda(item.valor)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const listaServicosEl = document.getElementById('fechamento-top-servicos');
+      const servicosOrdenados = Object.keys(servicosMap).sort((a, b) => servicosMap[b] - servicosMap[a]).slice(0, 5);
+      listaServicosEl.innerHTML = servicosOrdenados.map(srv => `
+        <div class="flex items-center justify-between text-xs py-1">
+          <span class="text-slate-700 dark:text-slate-300 truncate max-w-xs">&bull; ${srv}</span>
+          <span class="font-bold text-slate-900 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800">${servicosMap[srv]}x</span>
+        </div>
+      `).join('');
+
+      document.getElementById('modal-fechamento').classList.remove('hidden');
+    }
+
+    function fecharModalFechamento() {
+      document.getElementById('modal-fechamento').classList.add('hidden');
+    }
+
+    function imprimirRelatorioFechamento() {
+      fecharModalFechamento();
+      window.print();
+    }
+
+    // RENDERIZAR MODO AGENDA / CRONOGRAMA
+    function renderizarAgenda(pedidos, termoBusca = '') {
+      const container = document.getElementById('view-agenda');
+      
+      const gruposAgenda = {};
+      pedidos.forEach(p => {
+        const dataStr = formatarData(getCampo(p, 'data_pedido', 'data', 'criado_em'));
+        if (!gruposAgenda[dataStr]) gruposAgenda[dataStr] = [];
+        gruposAgenda[dataStr].push(p);
+      });
+
+      const datas = Object.keys(gruposAgenda);
+
+      container.innerHTML = datas.map(dataLabel => {
+        const itens = gruposAgenda[dataLabel];
+        const somaData = itens.reduce((acc, p) => acc + extrairNumero(getCampo(p, 'valor', 'preco')), 0);
+
+        return `
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div class="flex items-center gap-2.5">
+                <span class="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </span>
+                <div>
+                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${dataLabel}</h3>
+                  <p class="text-[11px] text-slate-400">${itens.length} ${itens.length === 1 ? 'pedido/agendamento' : 'pedidos/agendamentos'}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-xs font-medium text-slate-400">Subtotal: </span>
+                <span class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">${formatarMoeda(somaData)}</span>
+              </div>
+            </div>
+
+            <div class="relative pl-6 border-l-2 border-indigo-200 dark:border-indigo-900 space-y-4 my-2">
+              ${itens.map(p => {
+                const id = p.id;
+                const cliente = destacarTexto(getCampo(p, 'cliente', 'nome') || 'Cliente', termoBusca);
+                const servico = destacarTexto(getCampo(p, 'servico', 'serviço') || 'Serviço', termoBusca);
+                const setor = getCampo(p, 'setor') || 'Geral';
+                const status = getCampo(p, 'status') || 'Pendente';
+                const valor = getCampo(p, 'valor');
+                const telefone = getCampo(p, 'telefone');
+                const whatsUrl = linkWhatsApp(telefone, getCampo(p, 'cliente', 'nome'), getCampo(p, 'servico'));
+
+                return `
+                  <div class="relative group bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
+                    <span class="absolute -left-[31px] top-4 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-500"></span>
+
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div class="flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          onchange="toggleSelecionarPedido(${id}, event)" 
+                          ${pedidosSelecionados.has(Number(id)) ? 'checked' : ''}
+                          onclick="event.stopPropagation()"
+                          class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer"
+                        />
+                        <span class="text-xs font-bold text-slate-900 dark:text-white cursor-pointer hover:text-indigo-600" onclick="abrirModalDetalhes(${id})">${cliente}</span>
+                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">${setor}</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <select 
+                          onchange="atualizarStatusRapido(${id}, this.value)" 
+                          class="text-xs font-semibold px-2 py-0.5 rounded-full border ${badgeStatus(status)} cursor-pointer"
+                        >
+                          <option value="Pendente" ${status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                          <option value="Agendado" ${status === 'Agendado' ? 'selected' : ''}>Agendado</option>
+                          <option value="Confirmado" ${status === 'Confirmado' ? 'selected' : ''}>Confirmado</option>
+                          <option value="Em andamento" ${status === 'Em andamento' ? 'selected' : ''}>Em andamento</option>
+                          <option value="Em produção" ${status === 'Em produção' ? 'selected' : ''}>Em produção</option>
+                          <option value="Concluído" ${status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                          <option value="Cancelado" ${status === 'Cancelado' ? 'selected' : ''}>Cancelado</option>
+                        </select>
+                        <span class="font-extrabold text-sm text-slate-900 dark:text-white">${formatarMoeda(valor)}</span>
+                      </div>
+                    </div>
+
+                    <p class="text-xs text-slate-600 dark:text-slate-300">${servico}</p>
+
+                    <div class="mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between text-xs">
+                      <button onclick="abrirModalDetalhes(${id})" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline cursor-pointer">
+                        Ver Detalhes do Pedido &rarr;
+                      </button>
+                      ${whatsUrl ? `
+                        <a href="${whatsUrl}" target="_blank" rel="noopener" class="text-emerald-600 font-semibold flex items-center gap-1 hover:underline">
+                          WhatsApp
+                        </a>
+                      ` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function fecharModalDetalhes() {
@@ -2135,6 +2685,7 @@
         fecharModalDetalhes();
         fecharModalNovoPedido();
         fecharModalAtividades();
+        fecharModalFechamento();
       }
       if ((e.key === 'r' || e.key === 'R') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         carregarPedidos();
