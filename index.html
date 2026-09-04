@@ -61,6 +61,377 @@
   <!-- TOAST DE NOTIFICAÇÕES (Flutuante) -->
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+  <!-- ========================================== -->
+  <!-- TELA DE AUTENTICAÇÃO (LOGIN & REGISTRO)    -->
+  <!-- ========================================== -->
+  <section id="tela-autenticacao" class="relative min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+    
+    <!-- Elementos Decorativos de Fundo (Glow / Efeito Visual) -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-500/20 dark:bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Botão Flutuante de Tema na Tela de Login -->
+    <div class="absolute top-4 right-4 z-20">
+      <button 
+        onclick="alternarTema()"
+        title="Alternar Tema Claro / Escuro"
+        class="p-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-2xl shadow-sm hover:shadow transition active:scale-95 cursor-pointer flex items-center gap-2 text-xs font-semibold"
+      >
+        <svg class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        <svg class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+        <span class="hidden sm:inline">Tema</span>
+      </button>
+    </div>
+
+    <!-- CARD PRINCIPAL DE AUTENTICAÇÃO -->
+    <div class="relative z-10 w-full max-w-md bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl rounded-3xl p-6 sm:p-8 transition-all duration-300">
+      
+      <!-- Linha Gradiente Decorativa no Topo do Card -->
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-t-3xl"></div>
+
+      <!-- Cabeçalho do Card (Logo e Título) -->
+      <div class="text-center space-y-2 mb-6 pt-1">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Central de Pedidos</h1>
+        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Acesso Restrito ao Painel Operacional &bull; Supabase Auth</p>
+      </div>
+
+      <!-- Abas de Navegação (Entrar vs Criar Conta) -->
+      <div id="auth-tabs" class="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-6 text-xs font-bold border border-slate-200/60 dark:border-slate-700/60">
+        <button 
+          id="tab-btn-login"
+          type="button"
+          onclick="alternarAbaAuth('login')"
+          class="py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center"
+        >
+          Acessar Conta
+        </button>
+        <button 
+          id="tab-btn-registro"
+          type="button"
+          onclick="alternarAbaAuth('registro')"
+          class="py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center"
+        >
+          Criar Nova Conta
+        </button>
+      </div>
+
+      <!-- Caixa de Feedback / Alertas (Erro, Aviso ou Sucesso) -->
+      <div id="auth-alert" class="hidden mb-5 p-3.5 rounded-2xl border text-xs leading-relaxed transition-all duration-200 flex items-start gap-2.5">
+        <div id="auth-alert-icon" class="shrink-0 mt-0.5"></div>
+        <div class="flex-1">
+          <p id="auth-alert-mensagem" class="font-medium"></p>
+          <div id="auth-alert-acao" class="mt-2 hidden"></div>
+        </div>
+        <button type="button" onclick="limparFeedbackAuth()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- ===================================== -->
+      <!-- FORMULÁRIO: LOGIN (ENTRAR)           -->
+      <!-- ===================================== -->
+      <form id="form-auth-login" onsubmit="executarLogin(event)" class="space-y-4">
+        
+        <!-- Campo E-mail -->
+        <div class="space-y-1.5">
+          <label for="login-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+            Endereço de E-mail
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+              </svg>
+            </div>
+            <input 
+              id="login-email"
+              type="email" 
+              required
+              autocomplete="email"
+              placeholder="seu.email@empresa.com"
+              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+          </div>
+        </div>
+
+        <!-- Campo Senha -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="login-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              Senha de Acesso
+            </label>
+            <button 
+              type="button" 
+              onclick="alternarAbaAuth('recuperar')" 
+              class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+            >
+              Esqueceu?
+            </button>
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <input 
+              id="login-senha"
+              type="password" 
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+            <button 
+              type="button"
+              id="btn-toggle-senha-login"
+              onclick="alternarVisibilidadeSenha('login-senha', this)"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              title="Mostrar / Ocultar Senha"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Opção Lembrar E-mail -->
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
+            <input 
+              id="login-lembrar"
+              type="checkbox" 
+              class="rounded text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-700"
+            />
+            <span>Lembrar meu e-mail</span>
+          </label>
+        </div>
+
+        <!-- Botão Entrar -->
+        <button 
+          id="btn-submit-login"
+          type="submit"
+          class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/25 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span id="btn-text-login">Entrar no Painel</span>
+          <svg id="btn-spinner-login" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+
+      </form>
+
+      <!-- ===================================== -->
+      <!-- FORMULÁRIO: REGISTRO (CRIAR CONTA)   -->
+      <!-- ===================================== -->
+      <form id="form-auth-registro" onsubmit="executarRegistro(event)" class="hidden space-y-4">
+        
+        <!-- Campo Nome Completo -->
+        <div class="space-y-1.5">
+          <label for="registro-nome" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+            Seu Nome Completo
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <input 
+              id="registro-nome"
+              type="text" 
+              required
+              autocomplete="name"
+              placeholder="Ex: Matheus Henrique"
+              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+          </div>
+        </div>
+
+        <!-- Campo E-mail -->
+        <div class="space-y-1.5">
+          <label for="registro-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+            Endereço de E-mail
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+              </svg>
+            </div>
+            <input 
+              id="registro-email"
+              type="email" 
+              required
+              autocomplete="email"
+              placeholder="seu.email@empresa.com"
+              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+          </div>
+        </div>
+
+        <!-- Campo Senha -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="registro-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+              Crie uma Senha
+            </label>
+            <span class="text-[10px] text-slate-400">Mínimo 6 caracteres</span>
+          </div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <input 
+              id="registro-senha"
+              type="password" 
+              required
+              minlength="6"
+              autocomplete="new-password"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+            <button 
+              type="button"
+              id="btn-toggle-senha-registro"
+              onclick="alternarVisibilidadeSenha('registro-senha', this)"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              title="Mostrar / Ocultar Senha"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Campo Confirmar Senha -->
+        <div class="space-y-1.5">
+          <label for="registro-confirma-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+            Confirmar Senha
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <input 
+              id="registro-confirma-senha"
+              type="password" 
+              required
+              minlength="6"
+              autocomplete="new-password"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+            <button 
+              type="button"
+              id="btn-toggle-confirma-registro"
+              onclick="alternarVisibilidadeSenha('registro-confirma-senha', this)"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              title="Mostrar / Ocultar Senha"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Botão Criar Conta -->
+        <button 
+          id="btn-submit-registro"
+          type="submit"
+          class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-emerald-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span id="btn-text-registro">Criar Minha Conta</span>
+          <svg id="btn-spinner-registro" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+
+      </form>
+
+      <!-- ===================================== -->
+      <!-- FORMULÁRIO: RECUPERAR SENHA          -->
+      <!-- ===================================== -->
+      <form id="form-auth-recuperar" onsubmit="executarRecuperacao(event)" class="hidden space-y-4">
+        
+        <div class="text-left space-y-1 mb-2">
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">Recuperar Senha</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Informe seu e-mail cadastrado e enviaremos o link para redefinição de senha.</p>
+        </div>
+
+        <!-- Campo E-mail para Recuperar -->
+        <div class="space-y-1.5">
+          <label for="recuperar-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+            Endereço de E-mail
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+              </svg>
+            </div>
+            <input 
+              id="recuperar-email"
+              type="email" 
+              required
+              autocomplete="email"
+              placeholder="seu.email@empresa.com"
+              class="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+            />
+          </div>
+        </div>
+
+        <!-- Botões de Ação da Recuperação -->
+        <div class="space-y-2 pt-1">
+          <button 
+            id="btn-submit-recuperar"
+            type="submit"
+            class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span id="btn-text-recuperar">Enviar Link de Recuperação</span>
+            <svg id="btn-spinner-recuperar" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+          <button 
+            type="button" 
+            onclick="alternarAbaAuth('login')"
+            class="w-full py-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-center cursor-pointer"
+          >
+            &larr; Voltar para o Login
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Rodapé do Card -->
+      <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
+        <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Sessão protegida por criptografia de ponta a ponta
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+  <!-- ========================================== -->
+  <!-- FIM TELA DE AUTENTICAÇÃO                   -->
+  <!-- ========================================== -->
+
+  <!-- PAINEL PRINCIPAL OPERACIONAL (DASHBOARD PROTEGIDO) -->
+  <div id="app-dashboard" class="hidden min-h-full flex-col flex-1">
+
   <!-- CABEÇALHO PRINCIPAL -->
   <header class="sticky top-0 z-30 border-b border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md transition-colors duration-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -197,6 +568,35 @@
           >
             ?
           </button>
+
+          <!-- Divisor -->
+          <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
+
+          <!-- Perfil do Usuário & Logout -->
+          <div id="usuario-perfil-container" class="flex items-center gap-2 pl-1">
+            <div class="flex items-center gap-2 max-w-[180px] sm:max-w-[220px]" title="Usuário conectado">
+              <div id="avatar-usuario" class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-indigo-500/20">
+                US
+              </div>
+              <div class="hidden md:block truncate text-left leading-tight">
+                <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">Usuário</p>
+                <div class="flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span id="email-usuario-header" class="text-[10px] text-slate-400 dark:text-slate-500 truncate block">email@exemplo.com</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão Sair (Logout) -->
+            <button 
+              onclick="fazerLogout()"
+              title="Sair da Conta (Logout)"
+              class="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl transition active:scale-95 cursor-pointer ml-1"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              <span class="hidden sm:inline">Sair</span>
+            </button>
+          </div>
 
         </div>
 
@@ -1115,12 +1515,411 @@
     </div>
   </div>
 
+  </div><!-- FIM #app-dashboard -->
+
   <!-- SCRIPT OPERACIONAL -->
   <script>
     // CREDENCIAIS DO SUPABASE
     const SUPABASE_URL = 'https://pwyytcyofxtriulqesqm.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_vk-vctYaPnPRm0fWlRkcTQ_RtYigr2L';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ESTADO DE AUTENTICAÇÃO
+    let usuarioAtual = null;
+    let canalRealtime = null;
+
+    // ALTERNAR VISIBILIDADE DE SENHA
+    function alternarVisibilidadeSenha(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      
+      if (isPassword) {
+        btn.innerHTML = `<svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>`;
+      } else {
+        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
+      }
+    }
+
+    // ALTERNAR ABAS DE AUTENTICAÇÃO (LOGIN / REGISTRO / RECUPERAR)
+    function alternarAbaAuth(aba) {
+      const formLogin = document.getElementById('form-auth-login');
+      const formRegistro = document.getElementById('form-auth-registro');
+      const formRecuperar = document.getElementById('form-auth-recuperar');
+      const tabLogin = document.getElementById('tab-btn-login');
+      const tabRegistro = document.getElementById('tab-btn-registro');
+      const tabsContainer = document.getElementById('auth-tabs');
+
+      limparFeedbackAuth();
+
+      if (aba === 'login') {
+        formLogin.classList.remove('hidden');
+        formRegistro.classList.add('hidden');
+        formRecuperar.classList.add('hidden');
+        tabsContainer.classList.remove('hidden');
+
+        tabLogin.className = 'py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center';
+        tabRegistro.className = 'py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center';
+        setTimeout(() => document.getElementById('login-email')?.focus(), 100);
+      } else if (aba === 'registro') {
+        formLogin.classList.add('hidden');
+        formRegistro.classList.remove('hidden');
+        formRecuperar.classList.add('hidden');
+        tabsContainer.classList.remove('hidden');
+
+        tabRegistro.className = 'py-2.5 rounded-xl transition-all shadow-xs text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-700 font-extrabold cursor-pointer text-center';
+        tabLogin.className = 'py-2.5 rounded-xl transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer text-center';
+        setTimeout(() => document.getElementById('registro-nome')?.focus(), 100);
+      } else if (aba === 'recuperar') {
+        formLogin.classList.add('hidden');
+        formRegistro.classList.add('hidden');
+        formRecuperar.classList.remove('hidden');
+        tabsContainer.classList.add('hidden');
+        setTimeout(() => document.getElementById('recuperar-email')?.focus(), 100);
+      }
+    }
+
+    // MOSTRAR FEEDBACK / ALERTAS NA TELA DE AUTH
+    function mostrarFeedbackAuth(tipo, mensagem, htmlExtra = '') {
+      const container = document.getElementById('auth-alert');
+      const icon = document.getElementById('auth-alert-icon');
+      const msg = document.getElementById('auth-alert-mensagem');
+      const acao = document.getElementById('auth-alert-acao');
+
+      if (!container || !msg) return;
+
+      container.className = 'mb-5 p-3.5 rounded-2xl border text-xs leading-relaxed transition-all duration-200 flex items-start gap-2.5';
+
+      if (tipo === 'error') {
+        container.classList.add('bg-rose-50', 'dark:bg-rose-950/40', 'border-rose-200', 'dark:border-rose-900/60', 'text-rose-800', 'dark:text-rose-200');
+        icon.innerHTML = `<svg class="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      } else if (tipo === 'success') {
+        container.classList.add('bg-emerald-50', 'dark:bg-emerald-950/40', 'border-emerald-200', 'dark:border-emerald-900/60', 'text-emerald-800', 'dark:text-emerald-200');
+        icon.innerHTML = `<svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      } else {
+        container.classList.add('bg-indigo-50', 'dark:bg-indigo-950/40', 'border-indigo-200', 'dark:border-indigo-900/60', 'text-indigo-800', 'dark:text-indigo-200');
+        icon.innerHTML = `<svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+      }
+
+      msg.innerHTML = mensagem;
+      if (htmlExtra) {
+        acao.innerHTML = htmlExtra;
+        acao.classList.remove('hidden');
+      } else {
+        acao.innerHTML = '';
+        acao.classList.add('hidden');
+      }
+
+      container.classList.remove('hidden');
+    }
+
+    // LIMPAR FEEDBACK
+    function limparFeedbackAuth() {
+      const container = document.getElementById('auth-alert');
+      if (container) container.classList.add('hidden');
+    }
+
+    // TRADUÇÃO DE ERROS DO SUPABASE
+    function traduzirErroSupabase(msgOriginal) {
+      if (!msgOriginal) return 'Ocorreu um erro no processo de autenticação. Tente novamente.';
+      const msg = String(msgOriginal).toLowerCase();
+
+      if (msg.includes('invalid login credentials')) {
+        return 'E-mail ou senha incorretos. Verifique suas credenciais e tente novamente.';
+      }
+      if (msg.includes('email not confirmed')) {
+        return 'Este e-mail ainda não foi confirmado. Verifique sua caixa de entrada (e pasta de spam) para ativar a conta.';
+      }
+      if (msg.includes('user already registered')) {
+        return 'Já existe uma conta registrada com este e-mail. Utilize a aba "Acessar Conta" para entrar.';
+      }
+      if (msg.includes('password should be at least 6 characters')) {
+        return 'A senha deve conter no mínimo 6 caracteres.';
+      }
+      if (msg.includes('rate limit') || msg.includes('over_email_send_rate_limit')) {
+        return 'Muitas solicitações seguidas. Aguarde alguns instantes e tente novamente.';
+      }
+      if (msg.includes('network') || msg.includes('fetch')) {
+        return 'Falha de conexão com os servidores do Supabase. Verifique sua conexão com a internet.';
+      }
+      return msgOriginal;
+    }
+
+    // REENVIAR EMAIL DE CONFIRMAÇÃO
+    async function reenviarConfirmacaoEmail(email) {
+      try {
+        mostrarFeedbackAuth('info', 'Enviando novo e-mail de confirmação...');
+        const { error } = await supabaseClient.auth.resend({
+          type: 'signup',
+          email: email
+        });
+        if (error) throw error;
+        mostrarFeedbackAuth('success', `E-mail de confirmação reenviado para <b>${email}</b>! Verifique sua caixa de entrada e spam.`);
+      } catch (err) {
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+      }
+    }
+
+    // SUBMISSÃO DE LOGIN
+    async function executarLogin(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+
+      const email = document.getElementById('login-email').value.trim();
+      const senha = document.getElementById('login-senha').value;
+      const lembrar = document.getElementById('login-lembrar').checked;
+
+      const btn = document.getElementById('btn-submit-login');
+      const btnText = document.getElementById('btn-text-login');
+      const btnSpinner = document.getElementById('btn-spinner-login');
+
+      if (lembrar) {
+        localStorage.setItem('login_email_salvo', email);
+      } else {
+        localStorage.removeItem('login_email_salvo');
+      }
+
+      btn.disabled = true;
+      btnText.classList.add('hidden');
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: senha
+        });
+
+        if (error) {
+          let extra = '';
+          if (error.message.toLowerCase().includes('email not confirmed')) {
+            extra = `<button onclick="reenviarConfirmacaoEmail('${email}')" class="px-2.5 py-1 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-800 rounded-lg text-[11px] hover:underline cursor-pointer">Reenviar e-mail de confirmação</button>`;
+          }
+          mostrarFeedbackAuth('error', traduzirErroSupabase(error.message), extra);
+          btn.disabled = false;
+          btnText.classList.remove('hidden');
+          btnSpinner.classList.add('hidden');
+          return;
+        }
+
+        mostrarToast(`Bem-vindo(a) de volta! ✨`);
+        atualizarEstadoAutenticacao(data.user);
+      } catch (err) {
+        console.error('Erro de login:', err);
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+      }
+    }
+
+    // SUBMISSÃO DE REGISTRO (CRIAR CONTA)
+    async function executarRegistro(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+
+      const nome = document.getElementById('registro-nome').value.trim();
+      const email = document.getElementById('registro-email').value.trim();
+      const senha = document.getElementById('registro-senha').value;
+      const confirmaSenha = document.getElementById('registro-confirma-senha').value;
+
+      const btn = document.getElementById('btn-submit-registro');
+      const btnText = document.getElementById('btn-text-registro');
+      const btnSpinner = document.getElementById('btn-spinner-registro');
+
+      if (senha !== confirmaSenha) {
+        mostrarFeedbackAuth('error', 'As senhas informadas não coincidem. Digite novamente.');
+        document.getElementById('registro-confirma-senha').focus();
+        return;
+      }
+
+      if (senha.length < 6) {
+        mostrarFeedbackAuth('error', 'A senha precisa ter pelo menos 6 caracteres.');
+        document.getElementById('registro-senha').focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btnText.classList.add('hidden');
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: email,
+          password: senha,
+          options: {
+            data: {
+              full_name: nome
+            }
+          }
+        });
+
+        if (error) {
+          mostrarFeedbackAuth('error', traduzirErroSupabase(error.message));
+          btn.disabled = false;
+          btnText.classList.remove('hidden');
+          btnSpinner.classList.add('hidden');
+          return;
+        }
+
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+
+        if (data.session) {
+          // Sessão criada imediatamente (auto-confirm ativo no Supabase)
+          mostrarToast(`Conta criada com sucesso! Seja bem-vindo(a), ${nome}! 🎉`);
+          atualizarEstadoAutenticacao(data.user);
+        } else {
+          // Confirmação de e-mail requerida pelo Supabase
+          mostrarFeedbackAuth('success', `Conta criada com sucesso! ✉️ Enviamos um e-mail de confirmação para <b>${email}</b>.<br/>Por favor, clique no link recebido para ativar seu acesso e depois faça login.`);
+          const inputLoginEmail = document.getElementById('login-email');
+          if (inputLoginEmail) inputLoginEmail.value = email;
+          setTimeout(() => {
+            alternarAbaAuth('login');
+            mostrarFeedbackAuth('info', `Conta criada para <b>${email}</b>! Se o seu e-mail já estiver confirmado, digite sua senha para entrar.`);
+          }, 3500);
+        }
+      } catch (err) {
+        console.error('Erro de cadastro:', err);
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+      }
+    }
+
+    // SUBMISSÃO DE RECUPERAÇÃO DE SENHA
+    async function executarRecuperacao(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+
+      const email = document.getElementById('recuperar-email').value.trim();
+      const btn = document.getElementById('btn-submit-recuperar');
+      const btnText = document.getElementById('btn-text-recuperar');
+      const btnSpinner = document.getElementById('btn-spinner-recuperar');
+
+      btn.disabled = true;
+      btnText.classList.add('hidden');
+      btnSpinner.classList.remove('hidden');
+
+      try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.href
+        });
+
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+
+        if (error) {
+          mostrarFeedbackAuth('error', traduzirErroSupabase(error.message));
+          return;
+        }
+
+        mostrarFeedbackAuth('success', `Instruções enviadas! Se o e-mail <b>${email}</b> estiver cadastrado, você receberá um link para redefinir sua senha.`);
+      } catch (err) {
+        console.error('Erro ao recuperar senha:', err);
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+        btn.disabled = false;
+        btnText.classList.remove('hidden');
+        btnSpinner.classList.add('hidden');
+      }
+    }
+
+    // LOGOUT DO USUÁRIO
+    async function fazerLogout() {
+      try {
+        if (canalRealtime) {
+          supabaseClient.removeChannel(canalRealtime);
+          canalRealtime = null;
+        }
+        await supabaseClient.auth.signOut();
+        mostrarToast('Você saiu da sua conta com sucesso 👋');
+        atualizarEstadoAutenticacao(null);
+      } catch (err) {
+        console.error('Erro ao deslogar:', err);
+        atualizarEstadoAutenticacao(null);
+      }
+    }
+
+    // ATUALIZAR ESTADO DE AUTENTICAÇÃO E TRANSIÇÃO DE TELAS
+    function atualizarEstadoAutenticacao(usuario) {
+      usuarioAtual = usuario;
+      const telaAuth = document.getElementById('tela-autenticacao');
+      const appDashboard = document.getElementById('app-dashboard');
+      const nomeEl = document.getElementById('nome-usuario-header');
+      const emailEl = document.getElementById('email-usuario-header');
+      const avatarEl = document.getElementById('avatar-usuario');
+
+      if (usuario) {
+        // Usuário AUTENTICADO: Exibir Dashboard e ocultar Auth
+        telaAuth.classList.add('hidden');
+        telaAuth.classList.remove('flex');
+        appDashboard.classList.remove('hidden');
+        appDashboard.classList.add('flex');
+
+        // Preencher informações do usuário no cabeçalho
+        const email = usuario.email || '';
+        const meta = usuario.user_metadata || {};
+        const nome = meta.full_name || email.split('@')[0] || 'Usuário';
+
+        if (nomeEl) nomeEl.textContent = nome;
+        if (emailEl) {
+          emailEl.textContent = email;
+          emailEl.title = email;
+        }
+
+        if (avatarEl) {
+          const partes = nome.trim().split(/\s+/);
+          let iniciais = 'US';
+          if (partes.length > 1) {
+            iniciais = (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+          } else if (partes[0]) {
+            iniciais = partes[0].slice(0, 2).toUpperCase();
+          }
+          avatarEl.textContent = iniciais;
+        }
+
+        // Iniciar carregamento dos dados e Realtime
+        carregarPedidos();
+        iniciarRealtime();
+      } else {
+        // Usuário NÃO AUTENTICADO: Bloquear e redirecionar para tela de Login/Registro
+        appDashboard.classList.add('hidden');
+        appDashboard.classList.remove('flex');
+        telaAuth.classList.remove('hidden');
+        telaAuth.classList.add('flex');
+
+        // Limpar canal realtime e dados em memória
+        if (canalRealtime) {
+          supabaseClient.removeChannel(canalRealtime);
+          canalRealtime = null;
+        }
+        dadosOriginais = [];
+        pedidosFiltradosAtuais = [];
+        pedidoSelecionado = null;
+
+        // Resetar botões dos formulários
+        const btnLogin = document.getElementById('btn-submit-login');
+        const btnLoginText = document.getElementById('btn-text-login');
+        const btnLoginSpinner = document.getElementById('btn-spinner-login');
+        if (btnLogin) {
+          btnLogin.disabled = false;
+          btnLoginText?.classList.remove('hidden');
+          btnLoginSpinner?.classList.add('hidden');
+        }
+
+        const btnReg = document.getElementById('btn-submit-registro');
+        const btnRegText = document.getElementById('btn-text-registro');
+        const btnRegSpinner = document.getElementById('btn-spinner-registro');
+        if (btnReg) {
+          btnReg.disabled = false;
+          btnRegText?.classList.remove('hidden');
+          btnRegSpinner?.classList.add('hidden');
+        }
+      }
+    }
 
     // ESTADO DA APLICAÇÃO
     let dadosOriginais = [];
@@ -1279,15 +2078,17 @@
 
     // AUTO-SINCRONIZAÇÃO INTELIGENTE EM SEGUNDO PLANO (A CADA 3.5 SEGUNDOS COM SMART DIFF)
     setInterval(() => {
-      if (document.visibilityState === 'visible') {
+      if (usuarioAtual && document.visibilityState === 'visible') {
         carregarPedidos(true);
       }
     }, 3500);
 
     // RE-SINCRONIZAR IMEDIATAMENTE AO RETORNAR PARA A ABA
-    window.addEventListener('focus', () => carregarPedidos(true));
+    window.addEventListener('focus', () => {
+      if (usuarioAtual) carregarPedidos(true);
+    });
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') carregarPedidos(true);
+      if (usuarioAtual && document.visibilityState === 'visible') carregarPedidos(true);
     });
 
     // HELPER: NORMALIZAÇÃO DE TEXTO
@@ -1353,6 +2154,7 @@
 
     // CARREGAR DADOS DO SUPABASE
     async function carregarPedidos(emSegundoPlano = false) {
+      if (!usuarioAtual) return;
       const skeletons = document.getElementById('skeletons');
       const lista = document.getElementById('lista-pedidos');
       const tabela = document.getElementById('view-tabela');
@@ -1413,8 +2215,13 @@
 
     // SINCRONIZAÇÃO EM TEMPO REAL (SUPABASE REALTIME)
     function iniciarRealtime() {
+      if (!usuarioAtual) return;
       try {
-        const canal = supabaseClient
+        if (canalRealtime) {
+          supabaseClient.removeChannel(canalRealtime);
+          canalRealtime = null;
+        }
+        canalRealtime = supabaseClient
           .channel('pedidos-realtime-channel')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
             console.log('⚡ Supabase Realtime Evento:', payload);
@@ -3394,6 +4201,7 @@
 
     // ATALHOS DE TECLADO GLOBAIS
     window.addEventListener('keydown', e => {
+      if (!usuarioAtual) return;
       const tag = document.activeElement ? document.activeElement.tagName : '';
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) {
         if (e.key === 'Escape') {
@@ -3453,12 +4261,38 @@
     document.getElementById('filtro-ordem').addEventListener('change', filtrarEOrdenar);
 
     // INICIALIZAÇÃO NO CARREGAMENTO
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       iniciarTema();
       alternarVisualizacao(modoVisualizacao);
-      carregarPedidos();
-      iniciarRealtime();
       atualizarBadgeAtividades();
+
+      // Restaurar e-mail memorizado no formulário de login
+      const emailSalvo = localStorage.getItem('login_email_salvo');
+      if (emailSalvo) {
+        const inputLoginEmail = document.getElementById('login-email');
+        const checkLembrar = document.getElementById('login-lembrar');
+        if (inputLoginEmail) inputLoginEmail.value = emailSalvo;
+        if (checkLembrar) checkLembrar.checked = true;
+      }
+
+      // Verificar sessão inicial no Supabase Auth
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        atualizarEstadoAutenticacao(session?.user || null);
+      } catch (err) {
+        console.warn('Erro ao checar sessão inicial do Supabase:', err);
+        atualizarEstadoAutenticacao(null);
+      }
+
+      // Escutar mudanças de estado de autenticação (Login, Logout, Renovação)
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        console.log('🔄 Supabase Auth Evento:', event);
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+          atualizarEstadoAutenticacao(session?.user || null);
+        } else if (event === 'SIGNED_OUT') {
+          atualizarEstadoAutenticacao(null);
+        }
+      });
     });
   </script>
 </body>
