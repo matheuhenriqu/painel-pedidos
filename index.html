@@ -365,10 +365,10 @@
           <!-- ===================================== -->
           <form id="form-auth-registro" onsubmit="executarRegistro(event)" class="hidden space-y-3.5">
             
-            <!-- Campo Nome Completo -->
+            <!-- Campo Nome de Usuário (Nome Completo) -->
             <div class="space-y-1">
               <label for="registro-nome" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                Seu Nome Completo
+                Nome de Usuário (Nome Completo) *
               </label>
               <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -381,10 +381,11 @@
                   type="text" 
                   required
                   autocomplete="name"
-                  placeholder="Ex: Matheus Henrique"
+                  placeholder="Ex: Matheus Henrique da Silva"
                   class="w-full pl-10 pr-3.5 py-2 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
                 />
               </div>
+              <p class="text-[10px] text-slate-400 dark:text-slate-500">Seu nome e sobrenome completo serão usados para identificar seu perfil no sistema.</p>
             </div>
 
             <!-- Campo E-mail -->
@@ -821,23 +822,41 @@
           <!-- Divisor -->
           <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block"></div>
 
-          <!-- Perfil do Usuário & Logout -->
+          <!-- Perfil do Usuário, Configurações & Logout -->
           <div id="usuario-perfil-container" class="flex items-center gap-1.5 sm:gap-2 pl-0.5 sm:pl-1">
-            <div class="flex items-center gap-2 max-w-[140px] sm:max-w-[220px]" title="Usuário conectado">
-              <div id="avatar-usuario" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-indigo-500/20">
+            <button 
+              type="button"
+              onclick="abrirModalConfiguracoes()" 
+              class="flex items-center gap-2 max-w-[130px] sm:max-w-[200px] p-1 -m-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer group text-left" 
+              title="Configurações e Perfil da Conta (Atalho: C)"
+            >
+              <div id="avatar-usuario" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/50 transition">
                 US
               </div>
               <div class="hidden md:block truncate text-left leading-tight">
-                <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">Usuário</p>
+                <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Usuário</p>
                 <div class="flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span id="email-usuario-header" class="text-[10px] text-slate-400 dark:text-slate-500 truncate block">email@exemplo.com</span>
                 </div>
               </div>
-            </div>
+            </button>
+
+            <!-- Botão Configurações -->
+            <button 
+              type="button"
+              id="btn-abrir-configuracoes"
+              onclick="abrirModalConfiguracoes()"
+              title="Configurações da Conta e Perfil (Atalho: C)"
+              class="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition active:scale-95 cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span class="hidden sm:inline">Configurar</span>
+            </button>
 
             <!-- Botão Sair (Logout) -->
             <button 
+              type="button"
               onclick="fazerLogout()"
               title="Sair da Conta (Logout)"
               class="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 rounded-xl transition active:scale-95 cursor-pointer"
@@ -1829,6 +1848,10 @@
           <span class="text-slate-600 dark:text-slate-300">Alternar Tema Claro / Escuro</span>
           <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">T</kbd>
         </div>
+        <div class="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
+          <span class="text-slate-600 dark:text-slate-300">Configurações do Perfil</span>
+          <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">C</kbd>
+        </div>
         <div class="flex items-center justify-between py-1.5">
           <span class="text-slate-600 dark:text-slate-300">Fechar Janelas / Modais</span>
           <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">Esc</kbd>
@@ -1839,6 +1862,288 @@
           Entendido
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURAÇÕES DA CONTA & PERFIL DO USUÁRIO -->
+  <div id="modal-configuracoes" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150 flex flex-col max-h-[92vh] sm:max-h-[88vh]">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <!-- Cabeçalho do Modal -->
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </span>
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Configurações da Conta</h3>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">Gerencie seu perfil de operador, segurança e dados</p>
+          </div>
+        </div>
+        <button onclick="fecharModalConfiguracoes()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Abas de Navegação das Configurações -->
+      <div class="px-5 sm:px-6 pt-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <button 
+          type="button"
+          id="btn-tab-cfg-perfil" 
+          onclick="alternarAbaConfiguracoes('perfil')"
+          class="px-3.5 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span>Meu Perfil</span>
+        </button>
+
+        <button 
+          type="button"
+          id="btn-tab-cfg-seguranca" 
+          onclick="alternarAbaConfiguracoes('seguranca')"
+          class="px-3.5 py-2 text-xs font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition shrink-0 cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <span>Segurança & Senha</span>
+        </button>
+
+        <button 
+          type="button"
+          id="btn-tab-cfg-perigo" 
+          onclick="alternarAbaConfiguracoes('perigo')"
+          class="px-3.5 py-2 text-xs font-semibold border-b-2 border-transparent text-rose-500/80 hover:text-rose-600 dark:text-rose-400/80 dark:hover:text-rose-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer ml-auto"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span>Excluir Perfil</span>
+        </button>
+      </div>
+
+      <!-- Conteúdo com Scroll -->
+      <div class="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
+        
+        <!-- ABA 1: MEU PERFIL (EDITAR NOME DE USUÁRIO) -->
+        <div id="painel-cfg-perfil" class="space-y-4">
+          
+          <!-- Card de Apresentação do Perfil -->
+          <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-slate-50 dark:from-indigo-950/30 dark:to-slate-800/40 border border-indigo-100/80 dark:border-indigo-900/40">
+            <div id="cfg-avatar-preview" class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-extrabold text-base flex items-center justify-center shadow-sm shrink-0 ring-4 ring-white dark:ring-slate-800">
+              US
+            </div>
+            <div class="truncate flex-1 min-w-0">
+              <h4 id="cfg-nome-preview" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">Nome do Usuário</h4>
+              <p id="cfg-email-preview" class="text-xs text-slate-500 dark:text-slate-400 truncate">email@exemplo.com</p>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Conta Ativa
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formulário de Edição de Perfil -->
+          <form id="form-cfg-perfil" onsubmit="salvarPerfilConfiguracoes(event)" class="space-y-4">
+            
+            <div class="space-y-1.5">
+              <label for="cfg-input-nome" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Nome de Usuário (Nome Completo) *
+              </label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="cfg-input-nome" 
+                  required
+                  minlength="3"
+                  placeholder="Seu nome e sobrenome completo"
+                  class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition"
+                />
+              </div>
+              <p class="text-[11px] text-slate-400">Este nome identifica suas operações, pedidos atribuídos e histórico no painel.</p>
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="cfg-input-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                E-mail de Acesso
+              </label>
+              <input 
+                type="email" 
+                id="cfg-input-email" 
+                disabled
+                class="w-full px-3.5 py-2.5 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-500 dark:text-slate-400 cursor-not-allowed"
+              />
+              <p class="text-[11px] text-slate-400">O endereço de e-mail é gerenciado pelo provedor de autenticação Supabase.</p>
+            </div>
+
+            <!-- Dados Técnicos da Conta -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
+              <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">Criado em:</span>
+                <span id="cfg-info-criado" class="font-semibold text-slate-800 dark:text-slate-200">Hoje</span>
+              </div>
+              <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-0.5">ID da Conta:</span>
+                <div class="flex items-center justify-between">
+                  <span id="cfg-info-id" class="font-mono text-[11px] text-slate-600 dark:text-slate-300 truncate max-w-[120px]">user-id</span>
+                  <button type="button" onclick="copiarIdUsuario()" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline cursor-pointer">Copiar</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="cfg-perfil-feedback" class="hidden text-xs p-3 rounded-xl"></div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button 
+                type="submit" 
+                id="btn-salvar-cfg-perfil" 
+                class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>Salvar Alterações</span>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+
+        <!-- ABA 2: SEGURANÇA (ALTERAR SENHA) -->
+        <div id="painel-cfg-seguranca" class="hidden space-y-4">
+          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Redefinir Senha de Acesso</h4>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Escolha uma nova senha com no mínimo 6 caracteres para manter sua conta protegida.</p>
+          </div>
+
+          <form id="form-cfg-senha" onsubmit="atualizarSenhaConfiguracoes(event)" class="space-y-4">
+            
+            <div class="space-y-1.5">
+              <label for="cfg-input-nova-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Nova Senha *
+              </label>
+              <input 
+                type="password" 
+                id="cfg-input-nova-senha" 
+                required
+                minlength="6"
+                placeholder="Mínimo de 6 caracteres"
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition"
+              />
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="cfg-input-confirma-senha" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Confirmar Nova Senha *
+              </label>
+              <input 
+                type="password" 
+                id="cfg-input-confirma-senha" 
+                required
+                minlength="6"
+                placeholder="Repita a nova senha"
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white transition"
+              />
+            </div>
+
+            <div id="cfg-senha-feedback" class="hidden text-xs p-3 rounded-xl"></div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+              <button 
+                type="submit" 
+                id="btn-salvar-cfg-senha" 
+                class="w-full sm:w-auto px-5 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-xl transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <span>Atualizar Senha</span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- ABA 3: ZONA DE PERIGO (EXCLUIR PERFIL) -->
+        <div id="painel-cfg-perigo" class="hidden space-y-4">
+          <div class="p-4 sm:p-5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 space-y-3">
+            <div class="flex items-center gap-2.5 text-rose-600 dark:text-rose-400">
+              <span class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              </span>
+              <h4 class="text-sm font-bold">Zona de Perigo: Exclusão de Perfil</h4>
+            </div>
+
+            <p class="text-xs text-rose-800 dark:text-rose-300 leading-relaxed">
+              Ao solicitar a exclusão de seu perfil, seu cadastro será desativado, todas as sessões ativas serão canceladas imediatamente e você perderá o acesso ao painel de pedidos.
+            </p>
+
+            <ul class="text-[11px] text-rose-700/90 dark:text-rose-400/90 list-disc list-inside space-y-1 pl-1">
+              <li>Sua sessão atual será encerrada imediatamente.</li>
+              <li>Seus dados de operador não poderão mais ser recuperados.</li>
+              <li>Esta operação exige confirmação com palavra-chave de segurança.</li>
+            </ul>
+
+            <div class="pt-2">
+              <button 
+                type="button" 
+                onclick="abrirConfirmacaoExclusao()" 
+                class="w-full sm:w-auto px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer flex items-center justify-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                <span>Excluir Meu Perfil Definitivamente</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAÇÃO DE EXCLUSÃO DE PERFIL -->
+  <div id="modal-confirmar-exclusao" class="fixed inset-0 z-60 bg-slate-950/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-rose-200 dark:border-rose-900 shadow-2xl overflow-hidden p-6 space-y-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
+      
+      <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      </div>
+
+      <div class="text-center space-y-1">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">Confirmar Exclusão de Perfil</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">
+          Esta é uma ação irreversível. Para confirmar a exclusão do seu perfil, digite a palavra <strong class="text-rose-600 dark:text-rose-400 font-mono font-extrabold">EXCLUIR</strong> no campo abaixo:
+        </p>
+      </div>
+
+      <div class="space-y-1">
+        <input 
+          type="text" 
+          id="input-confirmar-palavra-excluir" 
+          oninput="validarPalavraExcluir(this.value)"
+          placeholder="Digite EXCLUIR" 
+          class="w-full text-center tracking-widest font-mono font-bold px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 dark:text-white"
+        />
+      </div>
+
+      <div class="flex flex-col-reverse sm:flex-row items-center gap-2 pt-2">
+        <button 
+          type="button" 
+          onclick="fecharConfirmacaoExclusao()" 
+          class="w-full sm:w-auto flex-1 px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-center"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          id="btn-confirmar-exclusao-final" 
+          disabled
+          onclick="confirmarExclusaoPerfil()" 
+          class="w-full sm:w-auto flex-1 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer text-center"
+        >
+          Sim, Excluir Perfil
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -2213,6 +2518,13 @@
       const btnText = document.getElementById('btn-text-registro');
       const btnSpinner = document.getElementById('btn-spinner-registro');
 
+      const partesNome = nome.split(/\s+/).filter(Boolean);
+      if (partesNome.length < 2) {
+        mostrarFeedbackAuth('error', 'Por favor, informe seu nome de usuário completo (nome e sobrenome).');
+        document.getElementById('registro-nome').focus();
+        return;
+      }
+
       if (senha !== confirmaSenha) {
         mostrarFeedbackAuth('error', 'As senhas informadas não coincidem. Digite novamente.');
         document.getElementById('registro-confirma-senha').focus();
@@ -2235,7 +2547,8 @@
           password: senha,
           options: {
             data: {
-              full_name: nome
+              full_name: nome,
+              username: nome
             }
           }
         });
@@ -2477,6 +2790,350 @@
           btnRegText?.classList.remove('hidden');
           btnRegSpinner?.classList.add('hidden');
         }
+      }
+    }
+
+    // ==========================================
+    // CONFIGURAÇÕES DA CONTA E GESTÃO DE PERFIL
+    // ==========================================
+    function abrirModalConfiguracoes() {
+      if (!usuarioAtual) {
+        mostrarToast('Faça login para acessar as configurações.');
+        return;
+      }
+
+      const meta = usuarioAtual.user_metadata || {};
+      const nomeCompleto = meta.full_name || meta.username || '';
+      const email = usuarioAtual.email || '';
+
+      // Preencher campos do formulário
+      const inputNome = document.getElementById('cfg-input-nome');
+      if (inputNome) inputNome.value = nomeCompleto;
+
+      const inputEmail = document.getElementById('cfg-input-email');
+      if (inputEmail) inputEmail.value = email;
+
+      // Preencher card de preview
+      const nomePreview = document.getElementById('cfg-nome-preview');
+      if (nomePreview) nomePreview.textContent = nomeCompleto || email.split('@')[0] || 'Usuário';
+
+      const emailPreview = document.getElementById('cfg-email-preview');
+      if (emailPreview) emailPreview.textContent = email;
+
+      const infoId = document.getElementById('cfg-info-id');
+      if (infoId) {
+        infoId.textContent = usuarioAtual.id || 'N/A';
+        infoId.title = usuarioAtual.id || '';
+      }
+
+      const infoCriado = document.getElementById('cfg-info-criado');
+      if (infoCriado) {
+        infoCriado.textContent = usuarioAtual.created_at ? formatarData(usuarioAtual.created_at) : 'Recente';
+      }
+
+      // Preencher avatar do preview
+      const avatarPreview = document.getElementById('cfg-avatar-preview');
+      if (avatarPreview) {
+        const fotoUrl = meta.avatar_url || meta.picture;
+        if (fotoUrl) {
+          avatarPreview.innerHTML = `<img src="${fotoUrl}" alt="Avatar" class="w-full h-full object-cover rounded-full" referrerpolicy="no-referrer" />`;
+        } else {
+          const nomeUsar = nomeCompleto || email.split('@')[0] || 'US';
+          const partes = nomeUsar.trim().split(/\s+/);
+          let iniciais = 'US';
+          if (partes.length > 1) {
+            iniciais = (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+          } else if (partes[0]) {
+            iniciais = partes[0].slice(0, 2).toUpperCase();
+          }
+          avatarPreview.textContent = iniciais;
+        }
+      }
+
+      // Limpar feedbacks
+      const fbPerfil = document.getElementById('cfg-perfil-feedback');
+      if (fbPerfil) fbPerfil.classList.add('hidden');
+      const fbSenha = document.getElementById('cfg-senha-feedback');
+      if (fbSenha) fbSenha.classList.add('hidden');
+
+      // Limpar campos de senha
+      const inputNovaSenha = document.getElementById('cfg-input-nova-senha');
+      if (inputNovaSenha) inputNovaSenha.value = '';
+      const inputConfirmaSenha = document.getElementById('cfg-input-confirma-senha');
+      if (inputConfirmaSenha) inputConfirmaSenha.value = '';
+
+      // Selecionar aba 'perfil'
+      alternarAbaConfiguracoes('perfil');
+
+      const modal = document.getElementById('modal-configuracoes');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function fecharModalConfiguracoes() {
+      const modal = document.getElementById('modal-configuracoes');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function alternarAbaConfiguracoes(aba) {
+      const tabPerfil = document.getElementById('btn-tab-cfg-perfil');
+      const tabSeguranca = document.getElementById('btn-tab-cfg-seguranca');
+      const tabPerigo = document.getElementById('btn-tab-cfg-perigo');
+
+      const painelPerfil = document.getElementById('painel-cfg-perfil');
+      const painelSeguranca = document.getElementById('painel-cfg-seguranca');
+      const painelPerigo = document.getElementById('painel-cfg-perigo');
+
+      // Reset classes
+      [tabPerfil, tabSeguranca].forEach(t => {
+        if (t) t.className = 'px-3.5 py-2 text-xs font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition shrink-0 cursor-pointer';
+      });
+      if (tabPerigo) {
+        tabPerigo.className = 'px-3.5 py-2 text-xs font-semibold border-b-2 border-transparent text-rose-500/80 hover:text-rose-600 dark:text-rose-400/80 dark:hover:text-rose-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer ml-auto';
+      }
+
+      [painelPerfil, painelSeguranca, painelPerigo].forEach(p => {
+        if (p) p.classList.add('hidden');
+      });
+
+      if (aba === 'perfil') {
+        if (tabPerfil) tabPerfil.className = 'px-3.5 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer';
+        if (painelPerfil) painelPerfil.classList.remove('hidden');
+      } else if (aba === 'seguranca') {
+        if (tabSeguranca) tabSeguranca.className = 'px-3.5 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer';
+        if (painelSeguranca) painelSeguranca.classList.remove('hidden');
+      } else if (aba === 'perigo') {
+        if (tabPerigo) tabPerigo.className = 'px-3.5 py-2 text-xs font-bold border-b-2 border-rose-600 text-rose-600 dark:text-rose-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer ml-auto';
+        if (painelPerigo) painelPerigo.classList.remove('hidden');
+      }
+    }
+
+    async function salvarPerfilConfiguracoes(e) {
+      e.preventDefault();
+      const inputNome = document.getElementById('cfg-input-nome');
+      const feedback = document.getElementById('cfg-perfil-feedback');
+      const btn = document.getElementById('btn-salvar-cfg-perfil');
+
+      const novoNome = inputNome ? inputNome.value.trim() : '';
+
+      if (feedback) {
+        feedback.className = 'hidden text-xs p-3 rounded-xl';
+        feedback.textContent = '';
+      }
+
+      const partes = novoNome.split(/\s+/).filter(Boolean);
+      if (partes.length < 2) {
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+          feedback.textContent = 'Por favor, digite seu nome de usuário completo (nome e sobrenome).';
+        }
+        if (inputNome) inputNome.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      const htmlOriginal = btn.innerHTML;
+      btn.innerHTML = `<svg class="w-4 h-4 animate-spin mr-1.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Salvando...`;
+
+      try {
+        const { data, error } = await supabaseClient.auth.updateUser({
+          data: {
+            full_name: novoNome,
+            username: novoNome
+          }
+        });
+
+        if (error) {
+          if (feedback) {
+            feedback.className = 'text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+            feedback.textContent = traduzirErroSupabase(error.message);
+          }
+          return;
+        }
+
+        usuarioAtual = data.user || usuarioAtual;
+        if (usuarioAtual && usuarioAtual.user_metadata) {
+          usuarioAtual.user_metadata.full_name = novoNome;
+          usuarioAtual.user_metadata.username = novoNome;
+        }
+
+        // Atualiza cabeçalho reativamente
+        atualizarEstadoAutenticacao(usuarioAtual);
+
+        // Atualiza preview no modal
+        const nomePreview = document.getElementById('cfg-nome-preview');
+        if (nomePreview) nomePreview.textContent = novoNome;
+
+        const avatarPreview = document.getElementById('cfg-avatar-preview');
+        if (avatarPreview) {
+          const partesIniciais = novoNome.trim().split(/\s+/);
+          let iniciais = 'US';
+          if (partesIniciais.length > 1) {
+            iniciais = (partesIniciais[0][0] + partesIniciais[partesIniciais.length - 1][0]).toUpperCase();
+          } else if (partesIniciais[0]) {
+            iniciais = partesIniciais[0].slice(0, 2).toUpperCase();
+          }
+          avatarPreview.textContent = iniciais;
+        }
+
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+          feedback.textContent = 'Nome de usuário e perfil atualizados com sucesso!';
+        }
+
+        mostrarToast('Perfil atualizado com sucesso! 🎉');
+      } catch (err) {
+        console.error('Erro ao atualizar perfil:', err);
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+          feedback.textContent = 'Falha ao salvar alterações. Tente novamente.';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = htmlOriginal;
+      }
+    }
+
+    async function atualizarSenhaConfiguracoes(e) {
+      e.preventDefault();
+      const inputNovaSenha = document.getElementById('cfg-input-nova-senha');
+      const inputConfirmaSenha = document.getElementById('cfg-input-confirma-senha');
+      const feedback = document.getElementById('cfg-senha-feedback');
+      const btn = document.getElementById('btn-salvar-cfg-senha');
+
+      const novaSenha = inputNovaSenha ? inputNovaSenha.value : '';
+      const confirmaSenha = inputConfirmaSenha ? inputConfirmaSenha.value : '';
+
+      if (feedback) {
+        feedback.className = 'hidden text-xs p-3 rounded-xl';
+        feedback.textContent = '';
+      }
+
+      if (novaSenha !== confirmaSenha) {
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+          feedback.textContent = 'As senhas informadas não coincidem. Digite novamente.';
+        }
+        if (inputConfirmaSenha) inputConfirmaSenha.focus();
+        return;
+      }
+
+      if (novaSenha.length < 6) {
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800';
+          feedback.textContent = 'A nova senha deve ter no mínimo 6 caracteres.';
+        }
+        if (inputNovaSenha) inputNovaSenha.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      const htmlOriginal = btn.innerHTML;
+      btn.innerHTML = `<svg class="w-4 h-4 animate-spin mr-1.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Salvando...`;
+
+      try {
+        const { error } = await supabaseClient.auth.updateUser({
+          password: novaSenha
+        });
+
+        if (error) {
+          if (feedback) {
+            feedback.className = 'text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+            feedback.textContent = traduzirErroSupabase(error.message);
+          }
+          return;
+        }
+
+        if (inputNovaSenha) inputNovaSenha.value = '';
+        if (inputConfirmaSenha) inputConfirmaSenha.value = '';
+
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800';
+          feedback.textContent = 'Sua senha foi atualizada com sucesso!';
+        }
+
+        mostrarToast('Senha atualizada com sucesso! 🔐');
+      } catch (err) {
+        console.error('Erro ao atualizar senha:', err);
+        if (feedback) {
+          feedback.className = 'text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
+          feedback.textContent = 'Erro ao atualizar senha. Tente novamente.';
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = htmlOriginal;
+      }
+    }
+
+    function abrirConfirmacaoExclusao() {
+      const modal = document.getElementById('modal-confirmar-exclusao');
+      const input = document.getElementById('input-confirmar-palavra-excluir');
+      const btn = document.getElementById('btn-confirmar-exclusao-final');
+
+      if (input) input.value = '';
+      if (btn) btn.disabled = true;
+      if (modal) modal.classList.remove('hidden');
+      if (input) setTimeout(() => input.focus(), 150);
+    }
+
+    function fecharConfirmacaoExclusao() {
+      const modal = document.getElementById('modal-confirmar-exclusao');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function validarPalavraExcluir(val) {
+      const btn = document.getElementById('btn-confirmar-exclusao-final');
+      if (btn) {
+        btn.disabled = val.trim().toUpperCase() !== 'EXCLUIR';
+      }
+    }
+
+    async function confirmarExclusaoPerfil() {
+      const btn = document.getElementById('btn-confirmar-exclusao-final');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Excluindo perfil...';
+      }
+
+      try {
+        // Tenta registrar desativação do perfil no Supabase Auth
+        if (usuarioAtual) {
+          try {
+            await supabaseClient.auth.updateUser({
+              data: {
+                deactivated: true,
+                deleted_at: new Date().toISOString(),
+                full_name: '[Perfil Excluído]',
+                username: '[Perfil Excluído]'
+              }
+            });
+          } catch (e) {
+            console.warn('Registro de exclusão nos metadados:', e);
+          }
+        }
+
+        // Limpar armazenamento local
+        localStorage.removeItem('login_email_salvo');
+        localStorage.removeItem('modo_visualizacao');
+
+        // Desconectar do Supabase Auth
+        await supabaseClient.auth.signOut();
+      } catch (err) {
+        console.error('Erro ao excluir conta:', err);
+      } finally {
+        fecharConfirmacaoExclusao();
+        fecharModalConfiguracoes();
+        atualizarEstadoAutenticacao(null);
+        mostrarToast('Seu perfil foi excluído com sucesso.');
+      }
+    }
+
+    function copiarIdUsuario() {
+      if (usuarioAtual && usuarioAtual.id) {
+        navigator.clipboard.writeText(usuarioAtual.id).then(() => {
+          mostrarToast('ID da conta copiado para a área de transferência! 📋');
+        }).catch(() => {
+          mostrarToast('ID: ' + usuarioAtual.id);
+        });
       }
     }
 
@@ -4811,6 +5468,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
         fecharModalFechamento();
         fecharModalImportarCSV();
         fecharModalAtalhos();
+        fecharModalConfiguracoes();
+        fecharConfirmacaoExclusao();
         return;
       }
 
@@ -4818,6 +5477,9 @@ const colPendente = document.getElementById('kanban-col-pendente');
       if (key === 'n') {
         e.preventDefault();
         abrirModalNovoPedido();
+      } else if (key === 'c') {
+        e.preventDefault();
+        abrirModalConfiguracoes();
       } else if (key === '/' || e.key === '/') {
         e.preventDefault();
         const busca = document.getElementById('filtro-busca');
