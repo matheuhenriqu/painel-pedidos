@@ -392,6 +392,36 @@
               <p class="text-[10px] text-slate-400 dark:text-slate-500">Seu nome e sobrenome completo serão usados para identificar seu perfil no sistema.</p>
             </div>
 
+            <!-- Seletor de Cargo / Tipo de Conta -->
+            <div class="space-y-1.5 pt-0.5">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Tipo de Conta (Cargo) *
+              </label>
+              <div class="grid grid-cols-2 gap-2">
+                <label id="card-cargo-opt-cliente" class="relative flex flex-col p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none shadow-xs">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Cliente
+                    </span>
+                    <input type="radio" name="registro-cargo" id="cargo-cliente" value="cliente" checked class="w-3.5 h-3.5 text-indigo-600 focus:ring-indigo-500 cursor-pointer" onchange="atualizarEstiloCargoRegistro()" />
+                  </div>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">Acesso aos meus próprios pedidos e histórico pessoal</span>
+                </label>
+                
+                <label id="card-cargo-opt-admin" class="relative flex flex-col p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                      <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                      Administrador
+                    </span>
+                    <input type="radio" name="registro-cargo" id="cargo-admin" value="admin" class="w-3.5 h-3.5 text-indigo-600 focus:ring-indigo-500 cursor-pointer" onchange="atualizarEstiloCargoRegistro()" />
+                  </div>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">Acesso global a todos os pedidos e gestão</span>
+                </label>
+              </div>
+            </div>
+
             <!-- Campo E-mail -->
             <div class="space-y-1">
               <label for="registro-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -838,12 +868,28 @@
                 US
               </div>
               <div class="hidden md:block truncate text-left leading-tight">
-                <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Usuário</p>
+                <div class="flex items-center gap-1.5">
+                  <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Usuário</p>
+                  <span id="badge-cargo-header" class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800 shrink-0">Admin</span>
+                </div>
                 <div class="flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span id="email-usuario-header" class="text-[10px] text-slate-400 dark:text-slate-500 truncate block">email@exemplo.com</span>
                 </div>
               </div>
+            </button>
+
+            <!-- Botão Gestão de Clientes (Exclusivo Administrador) -->
+            <button 
+              type="button"
+              id="btn-header-gestao-clientes"
+              onclick="abrirModalGestaoContas()"
+              title="Gerenciar Contas de Clientes (Exclusivo Administrador - Atalho: U)"
+              class="hidden items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold text-purple-700 dark:text-purple-300 bg-purple-50/80 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 rounded-xl transition active:scale-95 cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <span class="hidden sm:inline">Clientes</span>
+              <span id="badge-total-clientes-header" class="text-[9px] px-1.5 py-0.2 rounded-full bg-purple-200/80 dark:bg-purple-900 text-purple-900 dark:text-purple-200 font-bold ml-0.5">0</span>
             </button>
 
             <!-- Botão Configurações -->
@@ -905,6 +951,22 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5 sm:space-y-6">
 
+    <!-- BANNER DE FILTRO POR CLIENTE (ADMINISTRADOR) -->
+    <div id="banner-filtro-cliente" class="hidden bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3 text-purple-900 dark:text-purple-100 animate-in fade-in duration-200">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </span>
+        <div class="truncate">
+          <p class="text-xs font-bold">Filtro de Cliente Ativo: <span id="banner-nome-cliente" class="font-extrabold text-purple-700 dark:text-purple-300">Cliente</span></p>
+          <p class="text-[11px] text-purple-600 dark:text-purple-400">Exibindo apenas os pedidos atribuídos a este cliente.</p>
+        </div>
+      </div>
+      <button onclick="limparFiltroClienteAdmin()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-slate-700 border border-purple-200 dark:border-purple-700 text-xs font-bold transition shrink-0 cursor-pointer shadow-2xs">
+        Ver Todos os Pedidos
+      </button>
+    </div>
+
     <!-- CARDS DE RESUMO OPERACIONAL (KPIs Clicáveis) -->
     <section id="kpis-container" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
       
@@ -915,7 +977,7 @@
         class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Total de Pedidos</p>
+          <p id="label-kpi-total" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Total de Pedidos</p>
           <svg class="w-4 h-4 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         </div>
         <p id="kpi-total" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">0</p>
@@ -929,13 +991,13 @@
         title="Clique para ajustar a Meta Diária de Vendas"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Faturamento Total</p>
+          <p id="label-kpi-faturamento" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Faturamento Total</p>
           <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <p id="kpi-faturamento" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate">R$ 0,00</p>
         
         <!-- Barra de Progresso da Meta Diária -->
-        <div class="mt-1.5 sm:mt-2 space-y-1">
+        <div id="container-meta-diaria" class="mt-1.5 sm:mt-2 space-y-1">
           <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div id="barra-progresso-meta" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
@@ -953,7 +1015,7 @@
         class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Em Aberto / Prod.</p>
+          <p id="label-kpi-abertos" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Em Aberto / Prod.</p>
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
         </div>
         <p id="kpi-abertos" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-amber-500 dark:text-amber-400 mt-1">0</p>
@@ -967,7 +1029,7 @@
         class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-emerald-300 dark:hover:border-emerald-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
       >
         <div class="flex items-center justify-between text-slate-400 dark:text-slate-500">
-          <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Finalizados</p>
+          <p id="label-kpi-concluidos" class="text-[10px] sm:text-xs font-bold uppercase tracking-wider">Finalizados</p>
           <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <p id="kpi-concluidos" class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</p>
@@ -1557,6 +1619,12 @@
       <form id="form-novo-pedido" onsubmit="salvarPedido(event)" class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
         <input type="hidden" id="pedido-id-edicao" value="" />
         
+        <!-- Alerta de Vínculo com Conta de Cliente -->
+        <div id="novo-pedido-info-cliente" class="hidden text-xs text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 p-3 rounded-xl border border-indigo-200 dark:border-indigo-800/80 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+          <span>Este pedido será registrado diretamente na sua conta de cliente.</span>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Cliente *</label>
@@ -1957,6 +2025,9 @@
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   Conta Ativa
                 </span>
+                <span id="cfg-cargo-preview" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800">
+                  👑 Administrador
+                </span>
               </div>
             </div>
           </div>
@@ -1979,6 +2050,28 @@
                 />
               </div>
               <p class="text-[11px] text-slate-400">Este nome identifica suas operações, pedidos atribuídos e histórico no painel.</p>
+            </div>
+
+            <!-- Exibição do Cargo no Perfil -->
+            <div class="space-y-1">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">Cargo da Conta</label>
+              <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-700/80">
+                <div class="flex items-center gap-2.5">
+                  <span id="cfg-cargo-icone" class="text-xl">👑</span>
+                  <div>
+                    <p id="cfg-cargo-nome" class="text-xs font-bold text-slate-900 dark:text-white">Administrador</p>
+                    <p id="cfg-cargo-desc" class="text-[11px] text-slate-400">Acesso irrestrito a todos os pedidos e gestão de contas de clientes</p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  id="btn-cfg-ir-gestao-clientes"
+                  onclick="fecharModalConfiguracoes(); abrirModalGestaoContas();" 
+                  class="hidden text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer shrink-0"
+                >
+                  Gerenciar Clientes &rarr;
+                </button>
+              </div>
             </div>
 
             <div class="space-y-1.5">
@@ -2164,6 +2257,149 @@
     </div>
   </div>
 
+  <!-- MODAL: GESTÃO DE CONTAS DE CLIENTES (EXCLUSIVO ADMINISTRADOR) -->
+  <div id="modal-gestao-contas" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-4xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150 flex flex-col max-h-[92vh] sm:max-h-[88vh]">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <!-- Cabeçalho do Modal -->
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 shadow-xs">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </span>
+          <div class="truncate">
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Gestão de Contas de Clientes</h3>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 shrink-0">Admin</span>
+            </div>
+            <p class="text-xs text-slate-400 dark:text-slate-500 truncate">Administre contas de clientes, permissões de cargo e histórico de pedidos</p>
+          </div>
+        </div>
+        <button onclick="fecharModalGestaoContas()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Barra de Estatísticas das Contas -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-4 sm:px-6 bg-slate-50/70 dark:bg-slate-850/50 border-b border-slate-100 dark:border-slate-800 text-xs">
+        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60">
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Total de Contas</span>
+          <span id="contas-stat-total" class="text-base font-extrabold text-slate-900 dark:text-white">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60">
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Clientes</span>
+          <span id="contas-stat-clientes" class="text-base font-extrabold text-emerald-600 dark:text-emerald-400">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60">
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Administradores</span>
+          <span id="contas-stat-admins" class="text-base font-extrabold text-purple-600 dark:text-purple-400">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60">
+          <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider block">Contas Ativas</span>
+          <span id="contas-stat-ativas" class="text-base font-extrabold text-blue-600 dark:text-blue-400">0</span>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros e Busca de Clientes -->
+      <div class="p-4 sm:px-6 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="flex-1 relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </span>
+          <input 
+            type="text" 
+            id="filtro-busca-contas"
+            oninput="renderizarListaContas()" 
+            placeholder="Buscar por nome, e-mail ou telefone..."
+            class="w-full pl-9 pr-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:text-white transition"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select 
+            id="filtro-cargo-contas"
+            onchange="renderizarListaContas()"
+            class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer"
+          >
+            <option value="todos">Todos os Cargos</option>
+            <option value="cliente">Apenas Clientes</option>
+            <option value="admin">Apenas Administradores</option>
+          </select>
+
+          <button 
+            type="button" 
+            onclick="abrirModalFormCliente()" 
+            class="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shrink-0 shadow-xs"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Novo Cliente</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista / Grid de Contas -->
+      <div id="lista-contas-container" class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-3">
+        <!-- Renderizado dinamicamente por renderizarListaContas() -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR / EDITAR CONTA DE CLIENTE (ADMINISTRADOR) -->
+  <div id="modal-form-cliente" class="fixed inset-0 z-60 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <h3 id="modal-form-cliente-titulo" class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <span>👤</span> Cadastrar Nova Conta de Cliente
+        </h3>
+        <button onclick="fecharModalFormCliente()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="form-salvar-cliente-admin" onsubmit="salvarContaClienteAdmin(event)" class="space-y-3.5">
+        <input type="hidden" id="form-cliente-id" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nome Completo *</label>
+          <input type="text" id="form-cliente-nome" required placeholder="Ex: Ana Souza Silva" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:text-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">E-mail *</label>
+          <input type="email" id="form-cliente-email" required placeholder="ana.souza@cliente.com" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:text-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Telefone / WhatsApp</label>
+          <input type="text" id="form-cliente-telefone" placeholder="(11) 99876-1234" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:text-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Cargo no Sistema</label>
+          <select id="form-cliente-cargo" class="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-purple-500 dark:text-white cursor-pointer">
+            <option value="cliente">Cliente (Acesso apenas aos próprios pedidos)</option>
+            <option value="admin">Administrador (Gestão de todos os pedidos e clientes)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="fecharModalFormCliente()" class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+            Salvar Conta
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
   </div><!-- FIM #app-dashboard -->
 
   <!-- SCRIPT OPERACIONAL -->
@@ -2173,9 +2409,613 @@
     const SUPABASE_KEY = 'sb_publishable_vk-vctYaPnPRm0fWlRkcTQ_RtYigr2L';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ESTADO DE AUTENTICAÇÃO
+    // ESTADO DE AUTENTICAÇÃO E CARGOS (RBAC)
     let usuarioAtual = null;
     let canalRealtime = null;
+    let usuarioCargo = 'cliente'; // 'administrador' ou 'cliente'
+    let registroContasUsuarios = []; // Lista de contas cadastradas para administração
+    let filtroClienteAtivoAdmin = null; // Filtro ativo quando admin inspeciona cliente específico: { id, nome }
+
+    // ATUALIZAR ESTILO VISUAL DO SELETOR DE CARGO NO REGISTRO
+    function atualizarEstiloCargoRegistro() {
+      const radioCliente = document.getElementById('cargo-cliente');
+      const cardCliente = document.getElementById('card-cargo-opt-cliente');
+      const cardAdmin = document.getElementById('card-cargo-opt-admin');
+
+      if (!cardCliente || !cardAdmin || !radioCliente) return;
+
+      if (radioCliente.checked) {
+        cardCliente.className = 'relative flex flex-col p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none shadow-xs';
+        cardAdmin.className = 'relative flex flex-col p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none';
+      } else {
+        cardCliente.className = 'relative flex flex-col p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none';
+        cardAdmin.className = 'relative flex flex-col p-2.5 rounded-xl border-2 border-purple-600 bg-purple-50/70 dark:bg-purple-950/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none shadow-xs';
+      }
+    }
+
+    // INICIALIZAR REGISTRO DE CONTAS (LOCALSTORAGE + FALLBACK)
+    function inicializarRegistroContas() {
+      try {
+        const dadosLocais = localStorage.getItem('sistema_contas_usuarios');
+        if (dadosLocais) {
+          registroContasUsuarios = JSON.parse(dadosLocais);
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar contas locais:', e);
+      }
+      if (!Array.isArray(registroContasUsuarios)) {
+        registroContasUsuarios = [];
+      }
+      atualizarBadgeTotalClientes();
+    }
+
+    // SINCRONIZAR CONTAS VINDAS DO SUPABASE (__sistema_contas__)
+    function sincronizarContasRemotas(contasRemotas) {
+      if (!Array.isArray(contasRemotas)) return;
+      contasRemotas.forEach(remota => {
+        const idx = registroContasUsuarios.findIndex(c => c.id === remota.id || (c.email && remota.email && c.email.toLowerCase() === remota.email.toLowerCase()));
+        if (idx !== -1) {
+          registroContasUsuarios[idx] = { ...registroContasUsuarios[idx], ...remota };
+        } else {
+          registroContasUsuarios.push(remota);
+        }
+      });
+      localStorage.setItem('sistema_contas_usuarios', JSON.stringify(registroContasUsuarios));
+      atualizarBadgeTotalClientes();
+      if (usuarioAtual) {
+        atualizarEstadoCargo();
+      }
+    }
+
+    // SALVAR REGISTRO DE CONTAS NO SUPABASE E LOCALSTORAGE
+    async function salvarRegistroContasSupabase() {
+      localStorage.setItem('sistema_contas_usuarios', JSON.stringify(registroContasUsuarios));
+      atualizarBadgeTotalClientes();
+      try {
+        const jsonContas = JSON.stringify(registroContasUsuarios);
+        const { data: existente } = await supabaseClient
+          .from('pedidos')
+          .select('id')
+          .eq('setor', '__sistema_contas__')
+          .maybeSingle();
+
+        if (existente && existente.id) {
+          await supabaseClient
+            .from('pedidos')
+            .update({
+              observacoes: jsonContas,
+              data_pedido: new Date().toISOString().split('T')[0]
+            })
+            .eq('id', existente.id);
+        } else {
+          await supabaseClient
+            .from('pedidos')
+            .insert([{
+              setor: '__sistema_contas__',
+              cliente: 'Sistema Contas',
+              servico: 'Registro de Usuários e Cargos',
+              valor: 0,
+              status: 'Concluído',
+              observacoes: jsonContas,
+              data_pedido: new Date().toISOString().split('T')[0]
+            }]);
+        }
+      } catch (err) {
+        console.warn('Erro ao persistir contas no Supabase:', err);
+      }
+    }
+
+    // SINCRONIZAR PERFIL DO USUÁRIO LOGADO NO REGISTRO DE CONTAS
+    function sincronizarPerfilUsuario(usuario) {
+      if (!usuario) return;
+      const email = (usuario.email || '').toLowerCase();
+      const meta = usuario.user_metadata || {};
+      const nome = meta.full_name || meta.username || email.split('@')[0] || 'Usuário';
+      const rawCargo = meta.role || meta.cargo || (email.includes('admin') ? 'administrador' : 'cliente');
+      const cargoPadrao = (rawCargo === 'admin' || rawCargo === 'administrador') ? 'administrador' : 'cliente';
+
+      const idx = registroContasUsuarios.findIndex(c => c.id === usuario.id || (c.email && c.email.toLowerCase() === email));
+      if (idx !== -1) {
+        registroContasUsuarios[idx].id = usuario.id;
+        registroContasUsuarios[idx].email = email;
+        registroContasUsuarios[idx].full_name = nome;
+        registroContasUsuarios[idx].ultima_sessao = new Date().toISOString();
+        if (!registroContasUsuarios[idx].status) registroContasUsuarios[idx].status = 'ativo';
+      } else {
+        registroContasUsuarios.push({
+          id: usuario.id,
+          email: email,
+          full_name: nome,
+          role: cargoPadrao,
+          status: 'ativo',
+          created_at: usuario.created_at || new Date().toISOString(),
+          ultima_sessao: new Date().toISOString()
+        });
+      }
+
+      localStorage.setItem('sistema_contas_usuarios', JSON.stringify(registroContasUsuarios));
+      atualizarBadgeTotalClientes();
+    }
+
+    // DETERMINAR E ATUALIZAR CARGO DO USUÁRIO ATUAL
+    function atualizarEstadoCargo() {
+      if (!usuarioAtual) {
+        usuarioCargo = 'cliente';
+        aplicarPermissoesCargoNaUI();
+        return;
+      }
+
+      const email = (usuarioAtual.email || '').toLowerCase();
+      const conta = registroContasUsuarios.find(c => c.id === usuarioAtual.id || (c.email && c.email.toLowerCase() === email));
+
+      if (conta && conta.role) {
+        usuarioCargo = (conta.role === 'admin' || conta.role === 'administrador') ? 'administrador' : 'cliente';
+      } else {
+        const metaRole = usuarioAtual.user_metadata?.role || usuarioAtual.user_metadata?.cargo;
+        if (metaRole === 'admin' || metaRole === 'administrador' || email.includes('admin')) {
+          usuarioCargo = 'administrador';
+        } else {
+          usuarioCargo = 'cliente';
+        }
+      }
+
+      aplicarPermissoesCargoNaUI();
+    }
+
+    // APLICAR PERMISSÕES E VISUAIS CONFORME O CARGO NA INTERFACE
+    function aplicarPermissoesCargoNaUI() {
+      const isAdmin = usuarioCargo === 'administrador';
+
+      // Badge no Header
+      const badgeCargo = document.getElementById('badge-cargo-header');
+      if (badgeCargo) {
+        if (isAdmin) {
+          badgeCargo.textContent = 'Admin';
+          badgeCargo.className = 'text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800 shrink-0';
+        } else {
+          badgeCargo.textContent = 'Cliente';
+          badgeCargo.className = 'text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0';
+        }
+      }
+
+      // Botão de Gestão de Clientes no Header (Exclusivo Administrador)
+      const btnGestaoClientes = document.getElementById('btn-header-gestao-clientes');
+      if (btnGestaoClientes) {
+        if (isAdmin) {
+          btnGestaoClientes.classList.remove('hidden');
+          btnGestaoClientes.classList.add('inline-flex');
+        } else {
+          btnGestaoClientes.classList.add('hidden');
+          btnGestaoClientes.classList.remove('inline-flex');
+        }
+      }
+
+      // Preview do Cargo no Modal de Configurações
+      const cfgCargoNome = document.getElementById('cfg-cargo-nome');
+      const cfgCargoDesc = document.getElementById('cfg-cargo-desc');
+      const cfgCargoIcone = document.getElementById('cfg-cargo-icone');
+      const btnCfgIrGestao = document.getElementById('btn-cfg-ir-gestao-clientes');
+
+      if (cfgCargoNome) {
+        cfgCargoNome.textContent = isAdmin ? 'Administrador' : 'Cliente';
+      }
+      if (cfgCargoDesc) {
+        cfgCargoDesc.textContent = isAdmin 
+          ? 'Acesso irrestrito a todos os pedidos e gestão de contas de clientes' 
+          : 'Acesso seguro restrito aos seus próprios pedidos e histórico pessoal';
+      }
+      if (cfgCargoIcone) {
+        cfgCargoIcone.textContent = isAdmin ? '👑' : '👤';
+      }
+      if (btnCfgIrGestao) {
+        btnCfgIrGestao.classList.toggle('hidden', !isAdmin);
+      }
+
+      // Banner de Filtro de Cliente (apenas admin pode ter ativo)
+      if (!isAdmin && filtroClienteAtivoAdmin) {
+        limparFiltroClienteAdmin();
+      }
+
+      // Ajuste das labels de KPIs para clientes
+      const labelKpiTotal = document.getElementById('label-kpi-total');
+      const labelKpiFaturamento = document.getElementById('label-kpi-faturamento');
+      const containerMetaDiaria = document.getElementById('container-meta-diaria');
+
+      if (!isAdmin) {
+        if (labelKpiTotal) labelKpiTotal.textContent = 'Meus Pedidos';
+        if (labelKpiFaturamento) labelKpiFaturamento.textContent = 'Meu Total Gasto';
+        if (containerMetaDiaria) containerMetaDiaria.classList.add('hidden');
+      } else {
+        if (labelKpiTotal) labelKpiTotal.textContent = 'Total de Pedidos';
+        if (labelKpiFaturamento) labelKpiFaturamento.textContent = 'Faturamento Bruto';
+        if (containerMetaDiaria) containerMetaDiaria.classList.remove('hidden');
+      }
+
+      atualizarBadgeTotalClientes();
+    }
+
+    // ATUALIZAR CONTADORES DE CLIENTES
+    function atualizarBadgeTotalClientes() {
+      const badgeHeader = document.getElementById('badge-total-clientes-header');
+      const clientes = registroContasUsuarios.filter(c => c.role === 'cliente');
+      const totalClientes = clientes.length;
+
+      if (badgeHeader) {
+        badgeHeader.textContent = totalClientes;
+      }
+
+      const statTotal = document.getElementById('contas-stat-total');
+      const statClientes = document.getElementById('contas-stat-clientes');
+      const statAdmins = document.getElementById('contas-stat-admins');
+      const statAtivas = document.getElementById('contas-stat-ativas');
+
+      if (statTotal) statTotal.textContent = registroContasUsuarios.length;
+      if (statClientes) statClientes.textContent = totalClientes;
+      if (statAdmins) statAdmins.textContent = registroContasUsuarios.filter(c => c.role === 'admin' || c.role === 'administrador').length;
+      if (statAtivas) statAtivas.textContent = registroContasUsuarios.filter(c => c.status !== 'suspenso').length;
+    }
+
+    // VERIFICAR SE O PEDIDO PERTENCE AO USUÁRIO
+    function pedidoPertenceAoUsuario(pedido, usuario) {
+      if (!pedido || !usuario) return false;
+      // 1. Verificação direta por user_id
+      if (pedido.user_id && String(pedido.user_id) === String(usuario.id)) {
+        return true;
+      }
+      // 2. Verificação por nome do cliente ou e-mail nos metadados
+      const meta = usuario.user_metadata || {};
+      const nomeCompleto = removerAcentos(meta.full_name || meta.username || '');
+      const emailNome = removerAcentos((usuario.email || '').split('@')[0] || '');
+      const clientePedido = removerAcentos(getCampo(pedido, 'cliente', 'nome', 'nome_cliente'));
+
+      if (clientePedido && (clientePedido === nomeCompleto || clientePedido.includes(nomeCompleto) || (nomeCompleto && nomeCompleto.includes(clientePedido)) || clientePedido === emailNome)) {
+        return true;
+      }
+
+      return false;
+    }
+
+    // RETORNAR BASE DE PEDIDOS CONFORME CARGO E FILTRO DO ADMIN
+    function obterPedidosBaseUsuario() {
+      // Filtrar apenas pedidos reais (remover flags de sistema)
+      const pedidosValidos = dadosOriginais.filter(p => !p.setor || !p.setor.startsWith('__'));
+
+      if (usuarioCargo === 'administrador') {
+        // Administrador visualiza TODOS os pedidos do sistema
+        if (filtroClienteAtivoAdmin && filtroClienteAtivoAdmin.nome) {
+          const termo = removerAcentos(filtroClienteAtivoAdmin.nome);
+          return pedidosValidos.filter(p => {
+            if (filtroClienteAtivoAdmin.id && p.user_id && String(p.user_id) === String(filtroClienteAtivoAdmin.id)) {
+              return true;
+            }
+            const cli = removerAcentos(getCampo(p, 'cliente', 'nome', 'nome_cliente'));
+            return cli.includes(termo) || termo.includes(cli);
+          });
+        }
+        return pedidosValidos;
+      }
+
+      // Cliente: visualiza APENAS seus próprios pedidos
+      if (!usuarioAtual) return [];
+      return pedidosValidos.filter(p => pedidoPertenceAoUsuario(p, usuarioAtual));
+    }
+
+    // ==========================================
+    // GESTÃO DE CONTAS DE CLIENTES (ADMINISTRADOR)
+    // ==========================================
+    function abrirModalGestaoContas() {
+      if (usuarioCargo !== 'administrador') {
+        mostrarToast('Acesso restrito a administradores.');
+        return;
+      }
+      renderizarListaContas();
+      const modal = document.getElementById('modal-gestao-contas');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function fecharModalGestaoContas() {
+      const modal = document.getElementById('modal-gestao-contas');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderizarListaContas() {
+      const container = document.getElementById('lista-contas-container');
+      if (!container) return;
+
+      const termo = removerAcentos(document.getElementById('filtro-busca-contas')?.value || '');
+      const cargoFiltro = document.getElementById('filtro-cargo-contas')?.value || 'todos';
+
+      atualizarBadgeTotalClientes();
+
+      let contas = [...registroContasUsuarios];
+
+      if (cargoFiltro !== 'todos') {
+        contas = contas.filter(c => {
+          const roleNorm = (c.role === 'admin' || c.role === 'administrador') ? 'admin' : 'cliente';
+          return roleNorm === cargoFiltro;
+        });
+      }
+
+      if (termo) {
+        contas = contas.filter(c => {
+          const n = removerAcentos(c.full_name || '');
+          const e = removerAcentos(c.email || '');
+          const t = removerAcentos(c.phone || c.telefone || '');
+          return n.includes(termo) || e.includes(termo) || t.includes(termo);
+        });
+      }
+
+      if (contas.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 px-4 space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 mx-auto flex items-center justify-center text-xl">
+              👥
+            </div>
+            <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Nenhuma conta encontrada</p>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Tente ajustar os termos de busca ou filtros, ou cadastre um novo cliente pelo botão acima.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = contas.map(c => {
+        const isAdmin = c.role === 'admin' || c.role === 'administrador';
+        const isSuspenso = c.status === 'suspenso';
+        const isEuMesmo = usuarioAtual && (c.id === usuarioAtual.id || (c.email && c.email.toLowerCase() === usuarioAtual.email?.toLowerCase()));
+        
+        // Contar quantos pedidos este cliente possui
+        const termoNome = removerAcentos(c.full_name || '');
+        const qtdPedidos = dadosOriginais.filter(p => {
+          if (p.setor && p.setor.startsWith('__')) return false;
+          if (c.id && p.user_id && String(p.user_id) === String(c.id)) return true;
+          const cli = removerAcentos(getCampo(p, 'cliente', 'nome'));
+          return termoNome && (cli === termoNome || cli.includes(termoNome));
+        }).length;
+
+        const iniciais = (c.full_name || 'US').split(/\s+/).filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'US';
+
+        return `
+          <div class="bg-white dark:bg-slate-850 p-3.5 sm:p-4 rounded-2xl border ${isEuMesmo ? 'border-indigo-400 dark:border-indigo-600 ring-1 ring-indigo-400/30' : 'border-slate-200/70 dark:border-slate-800'} shadow-2xs hover:shadow-md transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl ${isAdmin ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'} font-bold text-xs flex items-center justify-center shrink-0">
+                ${iniciais}
+              </div>
+              <div class="truncate">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">${c.full_name || 'Usuário Sem Nome'}</span>
+                  ${isAdmin 
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800">Administrador</span>' 
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Cliente</span>'}
+                  ${isSuspenso 
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-800">Suspenso</span>' 
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800">Ativo</span>'}
+                  ${isEuMesmo ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-indigo-600 text-white">Você</span>' : ''}
+                </div>
+                <div class="flex items-center gap-3 text-[11px] text-slate-400 mt-0.5 flex-wrap">
+                  <span>${c.email || 'Sem e-mail'}</span>
+                  ${c.phone || c.telefone ? `<span>• ${c.phone || c.telefone}</span>` : ''}
+                  <span>• <b class="text-slate-700 dark:text-slate-300">${qtdPedidos}</b> ${qtdPedidos === 1 ? 'pedido' : 'pedidos'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0 flex-wrap">
+              <button 
+                onclick="verPedidosDoCliente('${(c.full_name || '').replace(/'/g, "\\'")}', '${c.id || ''}')"
+                class="px-2.5 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                title="Filtrar pedidos deste cliente no painel"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>Pedidos</span>
+              </button>
+
+              <button 
+                onclick="alternarCargoUsuario('${c.id}')"
+                class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold transition cursor-pointer"
+                title="${isAdmin ? 'Tornar Cliente' : 'Tornar Administrador'}"
+              >
+                ${isAdmin ? 'Tornar Cliente' : 'Tornar Admin'}
+              </button>
+
+              <button 
+                onclick="alternarStatusUsuario('${c.id}')"
+                class="p-1.5 rounded-xl ${isSuspenso ? 'text-emerald-600 hover:bg-emerald-50' : 'text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/40'} transition cursor-pointer"
+                title="${isSuspenso ? 'Ativar Conta' : 'Suspender Conta'}"
+              >
+                ${isSuspenso 
+                  ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' 
+                  : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>'}
+              </button>
+
+              <button 
+                onclick="abrirModalFormCliente('${c.id}')"
+                class="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Editar dados cadastrais"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+
+              ${!isEuMesmo ? `
+                <button 
+                  onclick="excluirContaUsuario('${c.id}')"
+                  class="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                  title="Remover conta do sistema"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ALTERNAR CARGO DE UM USUÁRIO (ADMIN <-> CLIENTE)
+    async function alternarCargoUsuario(id) {
+      const conta = registroContasUsuarios.find(c => c.id === id);
+      if (!conta) return;
+
+      const novoCargo = (conta.role === 'admin' || conta.role === 'administrador') ? 'cliente' : 'administrador';
+      const confirmacao = confirm(`Deseja alterar o cargo de "${conta.full_name}" para ${novoCargo.toUpperCase()}?`);
+      if (!confirmacao) return;
+
+      conta.role = novoCargo;
+      await salvarRegistroContasSupabase();
+      renderizarListaContas();
+
+      if (usuarioAtual && usuarioAtual.id === id) {
+        atualizarEstadoCargo();
+        mostrarToast(`Seu cargo foi alterado para ${novoCargo}! 👑`);
+      } else {
+        mostrarToast(`Cargo de ${conta.full_name} atualizado para ${novoCargo}!`);
+      }
+      registrarAtividade('Cargo Alterado', `${conta.full_name} alterado para cargo ${novoCargo}`);
+    }
+
+    // ALTERNAR STATUS DE UMA CONTA (ATIVO <-> SUSPENSO)
+    async function alternarStatusUsuario(id) {
+      const conta = registroContasUsuarios.find(c => c.id === id);
+      if (!conta) return;
+
+      const novoStatus = conta.status === 'suspenso' ? 'ativo' : 'suspenso';
+      conta.status = novoStatus;
+      await salvarRegistroContasSupabase();
+      renderizarListaContas();
+      mostrarToast(`Conta de ${conta.full_name} agora está ${novoStatus}!`);
+      registrarAtividade('Status Conta', `${conta.full_name} marcado como ${novoStatus}`);
+    }
+
+    // EXCLUIR CONTA DE USUÁRIO
+    async function excluirContaUsuario(id) {
+      const conta = registroContasUsuarios.find(c => c.id === id);
+      if (!conta) return;
+
+      if (!confirm(`Tem certeza de que deseja remover a conta de "${conta.full_name}" (${conta.email})?`)) return;
+
+      registroContasUsuarios = registroContasUsuarios.filter(c => c.id !== id);
+      await salvarRegistroContasSupabase();
+      renderizarListaContas();
+      mostrarToast('Conta removida com sucesso.');
+      registrarAtividade('Conta Removida', `Conta de ${conta.full_name} foi excluída`);
+    }
+
+    // VER PEDIDOS DE UM CLIENTE ESPECÍFICO (ADMIN)
+    function verPedidosDoCliente(nomeCliente, clienteId) {
+      filtroClienteAtivoAdmin = { id: clienteId, nome: nomeCliente };
+      fecharModalGestaoContas();
+
+      const banner = document.getElementById('banner-filtro-cliente');
+      const bannerNome = document.getElementById('banner-nome-cliente');
+      if (banner && bannerNome) {
+        bannerNome.textContent = nomeCliente;
+        banner.classList.remove('hidden');
+      }
+
+      const base = obterPedidosBaseUsuario();
+      preencherFiltrosDinamicos(base);
+      atualizarKPIs(base);
+      renderizarAnalyticsSetores(base);
+      filtrarEOrdenar();
+
+      mostrarToast(`Visualizando pedidos de "${nomeCliente}" 👁️`);
+    }
+
+    // LIMPAR FILTRO DE CLIENTE NO MODO ADMIN
+    function limparFiltroClienteAdmin() {
+      filtroClienteAtivoAdmin = null;
+      const banner = document.getElementById('banner-filtro-cliente');
+      if (banner) banner.classList.add('hidden');
+
+      const base = obterPedidosBaseUsuario();
+      preencherFiltrosDinamicos(base);
+      atualizarKPIs(base);
+      renderizarAnalyticsSetores(base);
+      filtrarEOrdenar();
+
+      mostrarToast('Visualização de todos os pedidos restaurada.');
+    }
+
+    // MODAL DE CADASTRO / EDIÇÃO DE CLIENTE (ADMIN)
+    function abrirModalFormCliente(id = null) {
+      const form = document.getElementById('form-salvar-cliente-admin');
+      const titulo = document.getElementById('modal-form-cliente-titulo');
+      const inputId = document.getElementById('form-cliente-id');
+      const inputNome = document.getElementById('form-cliente-nome');
+      const inputEmail = document.getElementById('form-cliente-email');
+      const inputTelefone = document.getElementById('form-cliente-telefone');
+      const selectCargo = document.getElementById('form-cliente-cargo');
+
+      if (form) form.reset();
+
+      if (id) {
+        const c = registroContasUsuarios.find(item => item.id === id);
+        if (!c) return;
+        if (titulo) titulo.innerHTML = `<span>✏️</span> Editar Conta: ${c.full_name}`;
+        if (inputId) inputId.value = c.id;
+        if (inputNome) inputNome.value = c.full_name || '';
+        if (inputEmail) inputEmail.value = c.email || '';
+        if (inputTelefone) inputTelefone.value = c.phone || c.telefone || '';
+        if (selectCargo) selectCargo.value = (c.role === 'admin' || c.role === 'administrador') ? 'admin' : 'cliente';
+      } else {
+        if (titulo) titulo.innerHTML = `<span>👤</span> Cadastrar Nova Conta de Cliente`;
+        if (inputId) inputId.value = '';
+        if (selectCargo) selectCargo.value = 'cliente';
+      }
+
+      const modal = document.getElementById('modal-form-cliente');
+      if (modal) modal.classList.remove('hidden');
+      setTimeout(() => inputNome?.focus(), 50);
+    }
+
+    function fecharModalFormCliente() {
+      const modal = document.getElementById('modal-form-cliente');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function salvarContaClienteAdmin(e) {
+      e.preventDefault();
+      const id = document.getElementById('form-cliente-id').value;
+      const nome = document.getElementById('form-cliente-nome').value.trim();
+      const email = document.getElementById('form-cliente-email').value.trim().toLowerCase();
+      const telefone = document.getElementById('form-cliente-telefone').value.trim();
+      const cargo = document.getElementById('form-cliente-cargo').value;
+
+      if (!nome || !email) {
+        mostrarToast('Preencha nome e e-mail.');
+        return;
+      }
+
+      if (id) {
+        const c = registroContasUsuarios.find(item => item.id === id);
+        if (c) {
+          c.full_name = nome;
+          c.email = email;
+          c.phone = telefone;
+          c.telefone = telefone;
+          c.role = cargo;
+        }
+        mostrarToast('Conta atualizada com sucesso! ✨');
+        registrarAtividade('Conta Editada', `Dados de ${nome} atualizados`);
+      } else {
+        const novoId = 'cli_' + Date.now();
+        registroContasUsuarios.push({
+          id: novoId,
+          full_name: nome,
+          email: email,
+          phone: telefone,
+          telefone: telefone,
+          role: cargo,
+          status: 'ativo',
+          created_at: new Date().toISOString()
+        });
+        mostrarToast(`Conta para ${nome} cadastrada com sucesso! 🎉`);
+        registrarAtividade('Nova Conta', `Cliente ${nome} cadastrado pelo Administrador`);
+      }
+
+      await salvarRegistroContasSupabase();
+      fecharModalFormCliente();
+      renderizarListaContas();
+    }
 
     // ALTERNAR VISIBILIDADE DE SENHA
     function alternarVisibilidadeSenha(inputId, btn) {
@@ -2531,6 +3371,9 @@
       const senha = document.getElementById('registro-senha').value;
       const confirmaSenha = document.getElementById('registro-confirma-senha').value;
 
+      const cargoSelecionado = document.querySelector('input[name="registro-cargo"]:checked')?.value || 'cliente';
+      const roleFinal = (cargoSelecionado === 'admin' || cargoSelecionado === 'administrador') ? 'administrador' : 'cliente';
+
       const btn = document.getElementById('btn-submit-registro');
       const btnText = document.getElementById('btn-text-registro');
       const btnSpinner = document.getElementById('btn-spinner-registro');
@@ -2565,7 +3408,8 @@
           options: {
             data: {
               full_name: nome,
-              username: nome
+              username: nome,
+              role: roleFinal
             }
           }
         });
@@ -2576,6 +3420,12 @@
           btnText.classList.remove('hidden');
           btnSpinner.classList.add('hidden');
           return;
+        }
+
+        // Salvar imediatamente no registro local de contas
+        if (data.user) {
+          sincronizarPerfilUsuario(data.user);
+          salvarRegistroContasSupabase();
         }
 
         btn.disabled = false;
@@ -2770,6 +3620,10 @@
           }
         }
 
+        // Sincronizar dados de perfil e aplicar cargo RBAC
+        sincronizarPerfilUsuario(usuario);
+        atualizarEstadoCargo();
+
         // Iniciar carregamento dos dados e Realtime
         carregarPedidos();
         iniciarRealtime();
@@ -2779,6 +3633,14 @@
         appDashboard.classList.remove('flex');
         telaAuth.classList.remove('hidden');
         telaAuth.classList.add('flex');
+
+        usuarioCargo = 'cliente';
+        filtroClienteAtivoAdmin = null;
+        if (typeof limparFiltroClienteAdmin === 'function') {
+          const banner = document.getElementById('banner-filtro-cliente');
+          if (banner) banner.classList.add('hidden');
+        }
+        aplicarPermissoesCargoNaUI();
 
         // Limpar canal realtime e dados em memória
         if (canalRealtime) {
@@ -3416,15 +4278,30 @@
 
         if (error) throw error;
 
-        const novosDados = data || [];
+        // Extrair registro de contas se presente no Supabase (__sistema_contas__)
+        const registroContasRemoto = (data || []).find(p => p.setor === '__sistema_contas__');
+        if (registroContasRemoto && registroContasRemoto.observacoes) {
+          try {
+            const contasRemotas = JSON.parse(registroContasRemoto.observacoes);
+            if (Array.isArray(contasRemotas) && contasRemotas.length > 0) {
+              sincronizarContasRemotas(contasRemotas);
+            }
+          } catch (e) {
+            console.warn('Erro ao ler registro de contas remoto:', e);
+          }
+        }
+
+        // Apenas pedidos reais (ignora registros de sistema __*)
+        const novosDados = (data || []).filter(p => !p.setor || !p.setor.startsWith('__'));
         const mudou = JSON.stringify(novosDados) !== JSON.stringify(dadosOriginais);
 
         if (!emSegundoPlano || mudou) {
           dadosOriginais = novosDados;
           segundosDesdeSync = 0;
-          preencherFiltrosDinamicos(dadosOriginais);
-          atualizarKPIs(dadosOriginais);
-          renderizarAnalyticsSetores(dadosOriginais);
+          const pedidosVisiveis = obterPedidosBaseUsuario();
+          preencherFiltrosDinamicos(pedidosVisiveis);
+          atualizarKPIs(pedidosVisiveis);
+          renderizarAnalyticsSetores(pedidosVisiveis);
           filtrarEOrdenar();
           if (emSegundoPlano && mudou) {
             console.log('⚡ Sincronização em tempo real: novos dados renderizados.');
@@ -3650,7 +4527,8 @@
         tagFiltroAtivo.classList.add('hidden');
       }
 
-      let filtrados = dadosOriginais.filter(p => {
+      const basePedidos = obterPedidosBaseUsuario();
+      let filtrados = basePedidos.filter(p => {
         const cliente = removerAcentos(getCampo(p, 'cliente', 'nome', 'nome_cliente'));
         const servico = removerAcentos(getCampo(p, 'servico', 'serviço', 'descricao', 'descrição', 'produto'));
         const telefone = removerAcentos(getCampo(p, 'telefone', 'contato', 'celular', 'whatsapp'));
@@ -5045,8 +5923,39 @@ const colPendente = document.getElementById('kanban-col-pendente');
       document.getElementById('btn-salvar-pedido').textContent = 'Salvar Pedido';
       document.getElementById('btn-excluir-pedido').classList.add('hidden');
       document.getElementById('novo-pedido-erro').classList.add('hidden');
+
+      const inputCliente = document.getElementById('novo-cliente');
+      const alertaCliente = document.getElementById('novo-pedido-info-cliente');
+
+      if (usuarioCargo === 'cliente' && usuarioAtual) {
+        const meta = usuarioAtual.user_metadata || {};
+        const nomeCliente = meta.full_name || meta.username || (usuarioAtual.email ? usuarioAtual.email.split('@')[0] : 'Cliente');
+        if (inputCliente) {
+          inputCliente.value = nomeCliente;
+          inputCliente.readOnly = true;
+          inputCliente.classList.add('bg-slate-100', 'dark:bg-slate-800/80', 'cursor-not-allowed', 'text-slate-500');
+        }
+        if (alertaCliente) {
+          alertaCliente.innerHTML = `
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span>Este pedido será registrado diretamente na sua conta de Cliente (<b>${nomeCliente}</b>).</span>
+          `;
+          alertaCliente.classList.remove('hidden');
+        }
+      } else {
+        if (inputCliente) {
+          inputCliente.readOnly = false;
+          inputCliente.classList.remove('bg-slate-100', 'dark:bg-slate-800/80', 'cursor-not-allowed', 'text-slate-500');
+        }
+        if (alertaCliente) alertaCliente.classList.add('hidden');
+      }
+
       document.getElementById('modal-novo').classList.remove('hidden');
-      document.getElementById('novo-cliente').focus();
+      if (usuarioCargo === 'cliente') {
+        document.getElementById('novo-servico')?.focus();
+      } else {
+        document.getElementById('novo-cliente')?.focus();
+      }
     }
 
     function abrirModalEdicao(id = null) {
@@ -5061,7 +5970,17 @@ const colPendente = document.getElementById('kanban-col-pendente');
       fecharModalDetalhes();
 
       document.getElementById('pedido-id-edicao').value = p.id || '';
-      document.getElementById('novo-cliente').value = getCampo(p, 'cliente', 'nome') || '';
+      const inputCliente = document.getElementById('novo-cliente');
+      if (inputCliente) {
+        inputCliente.value = getCampo(p, 'cliente', 'nome') || '';
+        if (usuarioCargo === 'cliente') {
+          inputCliente.readOnly = true;
+          inputCliente.classList.add('bg-slate-100', 'dark:bg-slate-800/80', 'cursor-not-allowed', 'text-slate-500');
+        } else {
+          inputCliente.readOnly = false;
+          inputCliente.classList.remove('bg-slate-100', 'dark:bg-slate-800/80', 'cursor-not-allowed', 'text-slate-500');
+        }
+      }
       document.getElementById('novo-telefone').value = getCampo(p, 'telefone', 'contato') || '';
       document.getElementById('novo-setor').value = getCampo(p, 'setor', 'categoria') || '';
       document.getElementById('novo-status').value = getCampo(p, 'status') || 'Pendente';
@@ -5069,6 +5988,9 @@ const colPendente = document.getElementById('kanban-col-pendente');
       document.getElementById('novo-valor').value = extrairNumero(getCampo(p, 'valor', 'preco')) || '';
       document.getElementById('novo-data').value = getCampo(p, 'data_pedido', 'data') || '';
       document.getElementById('novo-obs').value = getCampo(p, 'observacoes', 'obs') || '';
+
+      const alertaCliente = document.getElementById('novo-pedido-info-cliente');
+      if (alertaCliente) alertaCliente.classList.add('hidden');
 
       document.getElementById('modal-form-titulo').innerHTML = `
         <span class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
@@ -5080,7 +6002,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
       document.getElementById('btn-excluir-pedido').classList.remove('hidden');
       document.getElementById('novo-pedido-erro').classList.add('hidden');
       document.getElementById('modal-novo').classList.remove('hidden');
-      setTimeout(() => document.getElementById('novo-cliente').focus(), 50);
+      setTimeout(() => document.getElementById('novo-servico')?.focus(), 50);
     }
 
     function abrirModalEditar(id = null, e = null) {
@@ -5111,7 +6033,17 @@ const colPendente = document.getElementById('kanban-col-pendente');
       btnSalvar.disabled = true;
       btnSalvar.textContent = 'Salvando...';
 
-      const payload = { cliente, telefone, setor, status, servico, valor, data_pedido, observacoes };
+      const payload = { 
+        cliente, 
+        telefone, 
+        setor, 
+        status, 
+        servico, 
+        valor, 
+        data_pedido, 
+        observacoes,
+        user_id: usuarioAtual ? usuarioAtual.id : null
+      };
 
       try {
         if (idEdicao) {
@@ -5500,6 +6432,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
         fecharModalAtalhos();
         fecharModalConfiguracoes();
         fecharConfirmacaoExclusao();
+        fecharModalGestaoContas();
+        fecharModalFormCliente();
         return;
       }
 
@@ -5510,6 +6444,9 @@ const colPendente = document.getElementById('kanban-col-pendente');
       } else if (key === 'c') {
         e.preventDefault();
         abrirModalConfiguracoes();
+      } else if (key === 'u' && usuarioCargo === 'administrador') {
+        e.preventDefault();
+        abrirModalGestaoContas();
       } else if (key === '/' || e.key === '/') {
         e.preventDefault();
         const busca = document.getElementById('filtro-busca');
@@ -5549,6 +6486,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
     // INICIALIZAÇÃO NO CARREGAMENTO
     window.addEventListener('DOMContentLoaded', async () => {
       iniciarTema();
+      inicializarRegistroContas();
       alternarVisualizacao(modoVisualizacao);
       atualizarBadgeAtividades();
 
