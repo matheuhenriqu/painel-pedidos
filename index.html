@@ -69,6 +69,29 @@
       animation: authShake 0.4s ease-in-out;
     }
 
+    /* Efeitos Visuais Premium & Glassmorphism */
+    .glass-surface {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .dark .glass-surface {
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.45); }
+      50% { box-shadow: 0 0 0 7px rgba(99, 102, 241, 0); }
+    }
+    .pulse-glow { animation: pulseGlow 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+
+    /* Barra de Navegação Dock Mobile Inferior */
+    #mobile-dock-nav {
+      padding-bottom: max(0.6rem, env(safe-area-inset-bottom));
+    }
+
     /* Otimizações Responsivas Mobile */
     @media (max-width: 640px) {
       .modal-mobile-bottomsheet {
@@ -788,6 +811,39 @@
             <span id="badge-atividades-count" class="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center">0</span>
           </button>
 
+          <!-- Central de Notificações & Alertas em Tempo Real (Dropdown Interativo) -->
+          <div class="relative">
+            <button 
+              id="btn-notificacoes-header"
+              onclick="alternarDropdownNotificacoes()"
+              class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer relative"
+              title="Central de Avisos e Notificações"
+            >
+              <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span id="badge-notificacoes-count" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[9px] font-bold flex items-center justify-center animate-pulse">0</span>
+            </button>
+
+            <!-- Dropdown Flutuante de Notificações -->
+            <div id="painel-notificacoes-dropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+              <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-850/70">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Avisos em Tempo Real</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button onclick="marcarTodasNotificacoesLidas()" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">Lidas</button>
+                  <span class="text-slate-300 dark:text-slate-700">&bull;</span>
+                  <button onclick="limparNotificacoes()" class="text-[10px] font-bold text-rose-500 hover:underline cursor-pointer">Limpar</button>
+                </div>
+              </div>
+              <div id="lista-notificacoes-conteudo" class="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60 p-1">
+                <div class="p-6 text-center text-xs text-slate-400">
+                  <p>Nenhuma notificação nova no momento</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Botão Novo Pedido -->
           <button 
             onclick="abrirModalNovoPedido()"
@@ -893,6 +949,19 @@
               <span id="badge-total-clientes-header" class="text-[9px] px-1.5 py-0.2 rounded-full bg-purple-200/80 dark:bg-purple-900 text-purple-900 dark:text-purple-200 font-bold ml-0.5">0</span>
             </button>
 
+            <!-- Botão Modo Auditoria (Simular Visão do Cliente sem Faturamento) -->
+            <button 
+              type="button"
+              id="btn-modo-auditoria"
+              onclick="alternarModoAuditoria()"
+              title="Auditar tela: Simular visualização restrita sem faturamento exatamente como um cliente"
+              class="hidden items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold rounded-xl border transition active:scale-95 cursor-pointer text-amber-700 dark:text-amber-300 bg-amber-50/80 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border-amber-200 dark:border-amber-800"
+            >
+              <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              <span class="hidden lg:inline">Auditoria</span>
+              <span id="badge-auditoria-status" class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-200 ml-0.5 hidden">Ativa</span>
+            </button>
+
             <!-- Botão Configurações -->
             <button 
               type="button"
@@ -950,7 +1019,23 @@
   </header>
 
   <!-- CONTEÚDO PRINCIPAL -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5 sm:space-y-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-24 sm:pb-8 space-y-5 sm:space-y-6">
+
+    <!-- BANNER DE MODO AUDITORIA ATIVO (VISÃO CLIENTE SIMULADA) -->
+    <div id="banner-modo-auditoria" class="hidden bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3 text-amber-900 dark:text-amber-100 animate-in fade-in duration-200">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </span>
+        <div class="truncate">
+          <p class="text-xs font-bold text-amber-900 dark:text-amber-200">Modo de Auditoria Ativo &bull; Visão do Cliente</p>
+          <p class="text-[11px] text-amber-700 dark:text-amber-400">Você está simulando a tela exata de um cliente: faturamento total, gráficos financeiros e fechamento de caixa estão bloqueados e ocultos.</p>
+        </div>
+      </div>
+      <button onclick="alternarModoAuditoria()" class="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-slate-700 border border-amber-300 dark:border-amber-700 text-xs font-bold transition shrink-0 cursor-pointer shadow-2xs">
+        Sair da Auditoria
+      </button>
+    </div>
 
     <!-- BANNER DE FILTRO POR CLIENTE (ADMINISTRADOR) -->
     <div id="banner-filtro-cliente" class="hidden bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3 text-purple-900 dark:text-purple-100 animate-in fade-in duration-200">
@@ -1008,6 +1093,17 @@
             <span id="pct-meta-faturamento" class="font-bold text-indigo-600 dark:text-indigo-400 shrink-0">0%</span>
           </div>
         </div>
+
+        <!-- Mini Gráfico Sparkline de Barras dos Últimos 7 Dias (Exclusivo Administrador) -->
+        <div id="container-grafico-faturamento-7dias" class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+          <div class="flex items-center justify-between text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <span>Últimos 7 dias</span>
+            <span id="label-media-faturamento" class="text-indigo-600 dark:text-indigo-400 font-extrabold normal-case">Média: R$ 0,00</span>
+          </div>
+          <div id="barras-faturamento-7dias" class="flex items-end justify-between gap-1 h-7 pt-1 px-0.5" title="Faturamento diário nos últimos 7 dias">
+            <!-- Gerado dinamicamente via JS -->
+          </div>
+        </div>
       </div>
 
       <!-- KPI Em Aberto -->
@@ -1063,6 +1159,33 @@
 
     <!-- BARRA DE FILTROS, BUSCA E CONTROLES -->
     <section id="barra-filtros" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs p-4 sm:p-5 space-y-4 transition-colors">
+      
+      <!-- Chips Rápidos de Status em 1 Toque -->
+      <div id="chips-status-rapido" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 border-b border-slate-100 dark:border-slate-800/80">
+        <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          Status:
+        </span>
+        <button type="button" onclick="filtrarStatusRapido('')" id="chip-status-todos" class="shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer bg-indigo-600 text-white flex items-center gap-1.5">
+          <span>Todos</span>
+          <span id="chip-count-todos" class="text-[10px] px-1.5 py-0.2 rounded-full bg-white/20">0</span>
+        </button>
+        <button type="button" onclick="filtrarStatusRapido('Pendente')" id="chip-status-pendente" class="shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Pendentes</span>
+          <span id="chip-count-pendente" class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700">0</span>
+        </button>
+        <button type="button" onclick="filtrarStatusRapido('Em produção')" id="chip-status-producao" class="shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+          <span>Em Produção</span>
+          <span id="chip-count-producao" class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700">0</span>
+        </button>
+        <button type="button" onclick="filtrarStatusRapido('Concluído')" id="chip-status-concluido" class="shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Concluídos</span>
+          <span id="chip-count-concluido" class="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700">0</span>
+        </button>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
         <!-- Campo de Busca em Tempo Real -->
@@ -1447,14 +1570,41 @@
 
       <div class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
         
-        <!-- STEPPER / LINHA DO TEMPO DO STATUS INTERATIVA -->
-        <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-3.5 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Linha do Tempo / Avançar Etapa:</span>
+        <!-- RASTREADOR VISUAL DE STATUS DO PEDIDO (ORDER TRACKING STEPPER) -->
+        <div class="bg-gradient-to-br from-slate-50 to-indigo-50/40 dark:from-slate-850 dark:to-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+              </span>
+              Rastreador de Status &bull; Avançar Fase
+            </span>
+            <span id="tracker-etapa-indicador" class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Fase 1 de 4</span>
+          </div>
+
+          <!-- Barra de progresso da linha do tempo -->
+          <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+            <div id="tracker-barra-progresso" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-500 rounded-full" style="width: 25%"></div>
+          </div>
+
           <div class="grid grid-cols-4 gap-1 sm:gap-1.5 text-center">
-            <button onclick="avancarStatusModal('Pendente')" id="step-pendente" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">1. Pendente</button>
-            <button onclick="avancarStatusModal('Confirmado')" id="step-confirmado" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">2. Confirmado</button>
-            <button onclick="avancarStatusModal('Em produção')" id="step-producao" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">3. Produção</button>
-            <button onclick="avancarStatusModal('Concluído')" id="step-concluido" class="py-1.5 px-0.5 sm:px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition cursor-pointer truncate">4. Concluído</button>
+            <button type="button" onclick="avancarStatusModal('Pendente')" id="step-pendente" class="py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5">
+              <span class="text-xs">⏳</span>
+              <span class="truncate">1. Pendente</span>
+            </button>
+            <button type="button" onclick="avancarStatusModal('Confirmado')" id="step-confirmado" class="py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5">
+              <span class="text-xs">📌</span>
+              <span class="truncate">2. Confirmado</span>
+            </button>
+            <button type="button" onclick="avancarStatusModal('Em produção')" id="step-producao" class="py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5">
+              <span class="text-xs">⚙️</span>
+              <span class="truncate">3. Produção</span>
+            </button>
+            <button type="button" onclick="avancarStatusModal('Concluído')" id="step-concluido" class="py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-bold border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5">
+              <span class="text-xs">✅</span>
+              <span class="truncate">4. Concluído</span>
+            </button>
           </div>
         </div>
 
@@ -1575,6 +1725,10 @@
           <button onclick="imprimirComprovanteIndividual()" class="text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 flex items-center gap-1 cursor-pointer shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
             Comprovante
+          </button>
+          <button onclick="abrirReciboDigitalModal()" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 flex items-center gap-1 cursor-pointer shrink-0" title="Ver Recibo Digital formatado com QR Code">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Recibo
           </button>
         </div>
         <div class="flex items-center gap-2 justify-end">
@@ -2402,6 +2556,149 @@
     </div>
   </div>
 
+  <!-- MODAL: RECIBO DIGITAL & COMPROVANTE ELETRÔNICO DO PEDIDO -->
+  <div id="modal-recibo-pedido" class="fixed inset-0 z-60 bg-slate-950/75 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[90vh] animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
+      
+      <!-- Alça de Toque Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <div class="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">
+            🧾
+          </span>
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">Recibo Digital do Pedido</h3>
+            <p class="text-[10px] text-slate-400">Comprovante de atendimento operacional</p>
+          </div>
+        </div>
+        <button onclick="fecharModalRecibo()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Área do Recibo Imprimível -->
+      <div class="p-5 overflow-y-auto flex-1 space-y-4">
+        <div id="area-recibo-conteudo" class="bg-slate-50 dark:bg-slate-950 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-4 font-mono text-xs text-slate-800 dark:text-slate-200 shadow-inner">
+          
+          <!-- Cabeçalho do Recibo -->
+          <div class="text-center pb-3 border-b border-dashed border-slate-300 dark:border-slate-700 space-y-1">
+            <h4 class="font-black text-sm tracking-wide text-slate-900 dark:text-white uppercase font-sans">CENTRAL DE ATENDIMENTO</h4>
+            <p class="text-[10px] text-slate-400 font-sans">Sistema de Pedidos e Gestão Operacional</p>
+            <div class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold mt-1 uppercase" id="recibo-badge-status">
+              STATUS
+            </div>
+          </div>
+
+          <!-- Metadados do Pedido -->
+          <div class="space-y-1.5 text-[11px]">
+            <div class="flex justify-between">
+              <span class="text-slate-400">PEDIDO N°:</span>
+              <span id="recibo-numero" class="font-bold text-slate-900 dark:text-white">#000</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">EMISSÃO:</span>
+              <span id="recibo-data" class="font-semibold">00/00/0000 00:00</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">SETOR:</span>
+              <span id="recibo-setor" class="font-semibold">Geral</span>
+            </div>
+          </div>
+
+          <!-- Dados do Cliente -->
+          <div class="pt-2 border-t border-dashed border-slate-300 dark:border-slate-700 space-y-1 text-[11px]">
+            <p class="text-slate-400 text-[10px] uppercase font-bold">DADOS DO CLIENTE:</p>
+            <p id="recibo-cliente" class="font-bold text-slate-900 dark:text-white text-xs">Nome do Cliente</p>
+            <p id="recibo-contato" class="text-slate-500 dark:text-slate-400">Contato: ---</p>
+          </div>
+
+          <!-- Descrição do Serviço / Produto -->
+          <div class="pt-2 border-t border-dashed border-slate-300 dark:border-slate-700 space-y-1 text-[11px]">
+            <p class="text-slate-400 text-[10px] uppercase font-bold">DISCRIMINAÇÃO DO SERVIÇO:</p>
+            <p id="recibo-servico" class="font-semibold text-slate-800 dark:text-slate-200">Descrição do serviço</p>
+          </div>
+
+          <!-- Total Financeiro -->
+          <div class="pt-3 pb-2 border-t-2 border-slate-900 dark:border-slate-100 flex items-center justify-between">
+            <span class="font-bold text-xs uppercase font-sans">VALOR TOTAL:</span>
+            <span id="recibo-valor" class="text-lg font-black text-emerald-600 dark:text-emerald-400">R$ 0,00</span>
+          </div>
+
+          <!-- Informações de Pagamento PIX -->
+          <div class="pt-3 border-t border-dashed border-slate-300 dark:border-slate-700 text-center space-y-2">
+            <p class="text-[10px] text-slate-400 uppercase font-bold">PAGAMENTO VIA PIX:</p>
+            <p id="recibo-chave-pix" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 break-all select-all">chave@pix.com</p>
+            <div class="p-2 bg-white inline-block rounded-xl border border-slate-200 shadow-xs">
+              <img id="recibo-qrcode-img" src="" alt="QR Code PIX" class="w-28 h-28 mx-auto object-contain" />
+            </div>
+            <p class="text-[9px] text-slate-400 font-sans">Escaneie o QR Code acima pelo app do seu banco</p>
+          </div>
+
+          <!-- Rodapé de Autenticidade -->
+          <div class="pt-2 border-t border-dashed border-slate-300 dark:border-slate-700 text-center text-[9px] text-slate-400 font-sans">
+            <p>Documento de controle operacional interno.</p>
+            <p id="recibo-codigo-autenticacao" class="font-mono mt-0.5 text-slate-500">AUT: 0000-0000-0000</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Ações do Recibo -->
+      <div class="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+        <button onclick="copiarTextoRecibo()" class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Copiar
+        </button>
+        <button onclick="imprimirReciboDigital()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-xs">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          Imprimir
+        </button>
+        <button onclick="fecharModalRecibo()" class="px-3 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DOCK DE NAVEGAÇÃO MOBILE INFERIOR (RESPONSIVIDADE EXTREMA PARA SMARTPHONES) -->
+  <nav id="mobile-dock-nav" class="sm:hidden fixed bottom-0 inset-x-0 z-45 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 px-3 py-1.5 flex items-center justify-around text-slate-500 dark:text-slate-400 shadow-2xl transition-colors">
+    <!-- Tab Início -->
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'}); filtrarStatusRapido('');" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl hover:text-indigo-600 dark:hover:text-indigo-400 active:scale-95 transition cursor-pointer" title="Início">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="text-[9px] font-bold">Início</span>
+    </button>
+
+    <!-- Tab Filtros -->
+    <button onclick="focarBuscaMobile()" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl hover:text-indigo-600 dark:hover:text-indigo-400 active:scale-95 transition cursor-pointer" title="Buscar">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <span class="text-[9px] font-bold">Busca</span>
+    </button>
+
+    <!-- Botão Central: Novo Pedido (+) -->
+    <button onclick="abrirModalNovoPedido()" class="flex flex-col items-center -mt-5 group cursor-pointer" title="Criar Novo Pedido">
+      <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/40 group-active:scale-90 transition-transform ring-4 ring-white dark:ring-slate-900">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+      </div>
+      <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">Novo</span>
+    </button>
+
+    <!-- Tab Notificações -->
+    <button onclick="alternarDropdownNotificacoes()" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl hover:text-indigo-600 dark:hover:text-indigo-400 active:scale-95 transition cursor-pointer relative" title="Notificações">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+      <span id="dock-notificacoes-badge" class="hidden absolute top-0.5 right-2 w-2.5 h-2.5 bg-rose-500 rounded-full"></span>
+      <span class="text-[9px] font-bold">Avisos</span>
+    </button>
+
+    <!-- Tab Perfil / Conta -->
+    <button onclick="abrirModalConfiguracoes()" class="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-xl hover:text-indigo-600 dark:hover:text-indigo-400 active:scale-95 transition cursor-pointer" title="Minha Conta">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+      <span class="text-[9px] font-bold">Perfil</span>
+    </button>
+  </nav>
+
   </div><!-- FIM #app-dashboard -->
 
   <!-- SCRIPT OPERACIONAL -->
@@ -2417,6 +2714,8 @@
     let usuarioCargo = 'cliente'; // 'administrador' ou 'cliente'
     let registroContasUsuarios = []; // Lista de contas cadastradas para administração
     let filtroClienteAtivoAdmin = null; // Filtro ativo quando admin inspeciona cliente específico: { id, nome }
+    let modoAuditoriaClienteAtivo = false; // Modo Auditoria (Administrador simula visão de cliente sem faturamento)
+    let listaNotificacoes = []; // Central de Notificações em Tempo Real
 
     // ATUALIZAR ESTILO VISUAL DO SELETOR DE CARGO NO REGISTRO
     function atualizarEstiloCargoRegistro() {
@@ -2566,14 +2865,17 @@
 
     // APLICAR PERMISSÕES E VISUAIS CONFORME O CARGO NA INTERFACE
     function aplicarPermissoesCargoNaUI() {
-      const isAdmin = usuarioCargo === 'administrador';
+      const isAdminReal = usuarioCargo === 'administrador';
+      const isAdmin = isAdminReal && !modoAuditoriaClienteAtivo;
 
       // Badge no Header
       const badgeCargo = document.getElementById('badge-cargo-header');
       if (badgeCargo) {
-        if (isAdmin) {
-          badgeCargo.textContent = 'Admin';
-          badgeCargo.className = 'text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800 shrink-0';
+        if (isAdminReal) {
+          badgeCargo.textContent = modoAuditoriaClienteAtivo ? 'Auditando' : 'Admin';
+          badgeCargo.className = modoAuditoriaClienteAtivo 
+            ? 'text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-800 shrink-0 animate-pulse'
+            : 'text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800 shrink-0';
         } else {
           badgeCargo.textContent = 'Cliente';
           badgeCargo.className = 'text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0';
@@ -2583,13 +2885,39 @@
       // Botão de Gestão de Clientes no Header (Exclusivo Administrador)
       const btnGestaoClientes = document.getElementById('btn-header-gestao-clientes');
       if (btnGestaoClientes) {
-        if (isAdmin) {
+        if (isAdminReal && !modoAuditoriaClienteAtivo) {
           btnGestaoClientes.classList.remove('hidden');
           btnGestaoClientes.classList.add('inline-flex');
         } else {
           btnGestaoClientes.classList.add('hidden');
           btnGestaoClientes.classList.remove('inline-flex');
         }
+      }
+
+      // Botão Modo Auditoria (Disponível apenas para Administrador real)
+      const btnModoAuditoria = document.getElementById('btn-modo-auditoria');
+      const badgeAuditoria = document.getElementById('badge-auditoria-status');
+      const bannerModoAuditoria = document.getElementById('banner-modo-auditoria');
+
+      if (btnModoAuditoria) {
+        if (isAdminReal) {
+          btnModoAuditoria.classList.remove('hidden');
+          btnModoAuditoria.classList.add('inline-flex');
+          if (modoAuditoriaClienteAtivo) {
+            btnModoAuditoria.className = 'inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-bold rounded-xl border transition active:scale-95 cursor-pointer text-amber-900 dark:text-amber-100 bg-amber-400 dark:bg-amber-600 border-amber-500 shadow-xs ring-2 ring-amber-400/40';
+            if (badgeAuditoria) badgeAuditoria.classList.remove('hidden');
+          } else {
+            btnModoAuditoria.className = 'inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold rounded-xl border transition active:scale-95 cursor-pointer text-amber-700 dark:text-amber-300 bg-amber-50/80 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 border-amber-200 dark:border-amber-800';
+            if (badgeAuditoria) badgeAuditoria.classList.add('hidden');
+          }
+        } else {
+          btnModoAuditoria.classList.add('hidden');
+          btnModoAuditoria.classList.remove('inline-flex');
+        }
+      }
+
+      if (bannerModoAuditoria) {
+        bannerModoAuditoria.classList.toggle('hidden', !modoAuditoriaClienteAtivo);
       }
 
       // Preview do Cargo no Modal de Configurações
@@ -2599,18 +2927,20 @@
       const btnCfgIrGestao = document.getElementById('btn-cfg-ir-gestao-clientes');
 
       if (cfgCargoNome) {
-        cfgCargoNome.textContent = isAdmin ? 'Administrador' : 'Cliente';
+        cfgCargoNome.textContent = isAdminReal ? (modoAuditoriaClienteAtivo ? 'Administrador (Modo Auditoria Ativo)' : 'Administrador') : 'Cliente';
       }
       if (cfgCargoDesc) {
         cfgCargoDesc.textContent = isAdmin 
           ? 'Acesso irrestrito a todos os pedidos e gestão de contas de clientes' 
-          : 'Acesso seguro restrito aos seus próprios pedidos e histórico pessoal';
+          : (modoAuditoriaClienteAtivo 
+              ? 'Simulando com sucesso a visão protegida do cliente (sem métricas financeiras)' 
+              : 'Acesso seguro restrito aos seus próprios pedidos e histórico pessoal');
       }
       if (cfgCargoIcone) {
-        cfgCargoIcone.textContent = isAdmin ? '👑' : '👤';
+        cfgCargoIcone.textContent = isAdmin ? '👑' : (modoAuditoriaClienteAtivo ? '👁️' : '👤');
       }
       if (btnCfgIrGestao) {
-        btnCfgIrGestao.classList.toggle('hidden', !isAdmin);
+        btnCfgIrGestao.classList.toggle('hidden', !isAdminReal || modoAuditoriaClienteAtivo);
       }
 
       // Banner de Filtro de Cliente (apenas admin pode ter ativo)
@@ -2618,7 +2948,7 @@
         limparFiltroClienteAdmin();
       }
 
-      // Ajuste de Faturamento, Métricas e Relatórios (CLIENTES NÃO TÊM ACESSO AO FATURAMENTO)
+      // Ajuste de Faturamento, Métricas e Relatórios (CLIENTES E AUDITORIA NÃO TÊM ACESSO AO FATURAMENTO)
       const cardKpiFaturamento = document.getElementById('card-kpi-faturamento');
       const kpisContainer = document.getElementById('kpis-container');
       const painelAnalytics = document.getElementById('painel-analytics');
@@ -2635,7 +2965,7 @@
         }
         if (painelAnalytics) painelAnalytics.classList.add('hidden');
         if (btnFechamento) btnFechamento.classList.add('hidden');
-        if (labelKpiTotal) labelKpiTotal.textContent = 'Meus Pedidos';
+        if (labelKpiTotal) labelKpiTotal.textContent = modoAuditoriaClienteAtivo ? 'Pedidos do Cliente' : 'Meus Pedidos';
         if (containerMetaDiaria) containerMetaDiaria.classList.add('hidden');
       } else {
         // ADMINISTRADOR: Exibir faturamento total, meta diária, analytics e fechamento
@@ -2651,6 +2981,179 @@
       }
 
       atualizarBadgeTotalClientes();
+    }
+
+    // ALTERNAR MODO AUDITORIA (SIMULAR VISÃO DO CLIENTE EM TEMPO REAL)
+    function alternarModoAuditoria() {
+      if (usuarioCargo !== 'administrador') return;
+      modoAuditoriaClienteAtivo = !modoAuditoriaClienteAtivo;
+      aplicarPermissoesCargoNaUI();
+      if (modoAuditoriaClienteAtivo) {
+        mostrarToast('👁️ Modo Auditoria Ativado: Visualizando como Cliente (faturamento bloqueado)');
+      } else {
+        mostrarToast('👑 Modo Auditoria Desativado: Painel de Administrador Completo');
+      }
+      carregarPedidos(true);
+    }
+
+    // CENTRAL DE NOTIFICAÇÕES EM TEMPO REAL
+    function adicionarNotificacao(titulo, mensagem, tipo = 'info', idPedido = null) {
+      const notif = {
+        id: Date.now() + Math.random().toString(36).substr(2, 4),
+        titulo,
+        mensagem,
+        tipo,
+        idPedido,
+        data: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        lida: false
+      };
+      listaNotificacoes.unshift(notif);
+      if (listaNotificacoes.length > 25) listaNotificacoes.pop();
+      atualizarContadorNotificacoes();
+      renderizarDropdownNotificacoes();
+    }
+
+    function atualizarContadorNotificacoes() {
+      const naoLidas = listaNotificacoes.filter(n => !n.lida).length;
+      const badge = document.getElementById('badge-notificacoes-count');
+      const badgeDock = document.getElementById('dock-notificacoes-badge');
+
+      if (badge) {
+        if (naoLidas > 0) {
+          badge.textContent = naoLidas > 9 ? '9+' : naoLidas;
+          badge.classList.remove('hidden');
+          badge.classList.add('flex');
+        } else {
+          badge.classList.add('hidden');
+          badge.classList.remove('flex');
+        }
+      }
+      if (badgeDock) {
+        badgeDock.classList.toggle('hidden', naoLidas === 0);
+      }
+    }
+
+    function alternarDropdownNotificacoes() {
+      const drop = document.getElementById('painel-notificacoes-dropdown');
+      if (!drop) return;
+      const estaOculto = drop.classList.contains('hidden');
+      drop.classList.toggle('hidden');
+      if (estaOculto) {
+        renderizarDropdownNotificacoes();
+      }
+    }
+
+    function renderizarDropdownNotificacoes() {
+      const container = document.getElementById('lista-notificacoes-conteudo');
+      if (!container) return;
+
+      if (listaNotificacoes.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-xs text-slate-400 space-y-1">
+            <span class="text-xl block">🔔</span>
+            <p class="font-medium">Nenhum aviso no momento</p>
+            <p class="text-[10px] text-slate-500">Novos pedidos e atualizações em tempo real aparecerão aqui.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = listaNotificacoes.map(n => `
+        <div class="p-3 rounded-xl transition ${n.lida ? 'opacity-60 bg-transparent' : 'bg-indigo-50/50 dark:bg-indigo-950/30'} hover:bg-slate-50 dark:hover:bg-slate-800/60 flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-lg ${n.tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300' : (n.tipo === 'alerta' ? 'bg-amber-100 text-amber-600 dark:bg-amber-950' : 'bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300')} flex items-center justify-center shrink-0 text-xs font-bold">
+            ${n.tipo === 'sucesso' ? '✓' : (n.tipo === 'alerta' ? '!' : '★')}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-1">
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${n.titulo}</p>
+              <span class="text-[10px] text-slate-400 shrink-0">${n.data}</span>
+            </div>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">${n.mensagem}</p>
+            ${n.idPedido ? `
+              <button onclick="abrirModalDetalhes(${n.idPedido}); alternarDropdownNotificacoes();" class="mt-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
+                Ver pedido #${n.idPedido} &rarr;
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function marcarTodasNotificacoesLidas() {
+      listaNotificacoes.forEach(n => n.lida = true);
+      atualizarContadorNotificacoes();
+      renderizarDropdownNotificacoes();
+      mostrarToast('Todas as notificações foram marcadas como lidas');
+    }
+
+    function limparNotificacoes() {
+      listaNotificacoes = [];
+      atualizarContadorNotificacoes();
+      renderizarDropdownNotificacoes();
+      mostrarToast('Central de notificações limpa');
+    }
+
+    // FILTRAGEM RÁPIDA POR CHIP DE STATUS EM 1 TOQUE
+    function filtrarStatusRapido(status) {
+      const selectStatus = document.getElementById('filtro-status');
+      if (selectStatus) {
+        selectStatus.value = status;
+      }
+      atualizarEstiloChipsStatus(status);
+      aplicarFiltrosEOrdenacao();
+    }
+
+    function atualizarEstiloChipsStatus(statusAtivo = '') {
+      const chips = [
+        { id: 'chip-status-todos', valor: '' },
+        { id: 'chip-status-pendente', valor: 'Pendente' },
+        { id: 'chip-status-producao', valor: 'Em produção' },
+        { id: 'chip-status-concluido', valor: 'Concluído' }
+      ];
+
+      chips.forEach(c => {
+        const el = document.getElementById(c.id);
+        if (!el) return;
+        if (c.valor === statusAtivo) {
+          el.className = 'shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer bg-indigo-600 text-white flex items-center gap-1.5';
+        } else {
+          el.className = 'shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1.5';
+        }
+      });
+    }
+
+    function atualizarContadoresChips(pedidos) {
+      const base = pedidos || dadosOriginais;
+      let total = base.length;
+      let pendentes = 0;
+      let producao = 0;
+      let concluidos = 0;
+
+      base.forEach(p => {
+        const st = removerAcentos(getCampo(p, 'status', 'situacao'));
+        if (st.includes('pend')) pendentes++;
+        else if (st.includes('produ') || st.includes('andamento')) producao++;
+        else if (st.includes('conclu') || st.includes('finaliz') || st.includes('pago')) concluidos++;
+      });
+
+      const elTodos = document.getElementById('chip-count-todos');
+      const elPend = document.getElementById('chip-count-pendente');
+      const elProd = document.getElementById('chip-count-producao');
+      const elConc = document.getElementById('chip-count-concluido');
+
+      if (elTodos) elTodos.textContent = total;
+      if (elPend) elPend.textContent = pendentes;
+      if (elProd) elProd.textContent = producao;
+      if (elConc) elConc.textContent = concluidos;
+    }
+
+    // FOCO EM BUSCA MOBILE
+    function focarBuscaMobile() {
+      const input = document.getElementById('filtro-busca');
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => input.focus(), 300);
+      }
     }
 
     // ATUALIZAR CONTADORES DE CLIENTES
@@ -4361,13 +4864,16 @@
               const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
               mostrarToast(`Novo pedido recebido: ${cli} ✨`);
               registrarAtividade('Novo Pedido', `Pedido recebido para ${cli}`);
+              adicionarNotificacao('Novo Pedido Recebido', `Pedido #${payload.new.id} de ${cli} entrou no sistema`, 'sucesso', payload.new.id);
             } else if (payload.eventType === 'UPDATE') {
               const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
               mostrarToast(`Pedido atualizado: ${cli} 🔄`);
               registrarAtividade('Atualização', `Pedido #${payload.new.id} de ${cli} atualizado`);
+              adicionarNotificacao('Status Atualizado', `Pedido #${payload.new.id} de ${cli}: "${payload.new.status || 'Atualizado'}"`, 'info', payload.new.id);
             } else if (payload.eventType === 'DELETE') {
               mostrarToast(`Pedido #${payload.old?.id || ''} removido 🗑️`);
               registrarAtividade('Exclusão', `Pedido #${payload.old?.id || ''} excluído`);
+              adicionarNotificacao('Pedido Excluído', `Pedido #${payload.old?.id || ''} foi removido`, 'alerta');
             }
             carregarPedidos(true);
           })
@@ -4382,6 +4888,72 @@
       } catch (e) {
         console.warn('Realtime subscription not active:', e);
       }
+    }
+
+    // GRÁFICO SPARKLINE DE FATURAMENTO SEMANAL (EXCLUSIVO ADMINISTRADOR)
+    function atualizarGraficoFaturamentoSemanal(pedidos) {
+      const container = document.getElementById('barras-faturamento-7dias');
+      const labelMedia = document.getElementById('label-media-faturamento');
+      if (!container) return;
+
+      const isAdmin = (usuarioCargo === 'administrador') && !modoAuditoriaClienteAtivo;
+      if (!isAdmin) {
+        container.innerHTML = '';
+        return;
+      }
+
+      // 7 dias anteriores até hoje
+      const hoje = new Date();
+      const dias = [];
+      const diasNomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(hoje);
+        d.setDate(hoje.getDate() - i);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dia = String(d.getDate()).padStart(2, '0');
+        const iso = `${y}-${m}-${dia}`;
+        dias.push({
+          dataISO: iso,
+          rotulo: diasNomes[d.getDay()],
+          diaNum: dia,
+          faturamento: 0,
+          pedidosQtd: 0
+        });
+      }
+
+      const base = pedidos || dadosOriginais;
+      base.forEach(p => {
+        const dataRaw = getCampo(p, 'data_pedido', 'data', 'criado_em');
+        if (!dataRaw) return;
+        const val = extrairNumero(getCampo(p, 'valor', 'preco'));
+        const strData = String(dataRaw).substring(0, 10);
+        const itemDia = dias.find(d => strData.startsWith(d.dataISO));
+        if (itemDia) {
+          itemDia.faturamento += val;
+          itemDia.pedidosQtd++;
+        }
+      });
+
+      const maxFat = Math.max(...dias.map(d => d.faturamento), 1);
+      const soma7Dias = dias.reduce((acc, d) => acc + d.faturamento, 0);
+      const media = soma7Dias / 7;
+
+      if (labelMedia) {
+        labelMedia.textContent = `Média: ${formatarMoeda(media)}`;
+      }
+
+      container.innerHTML = dias.map((d, idx) => {
+        const pct = Math.max(12, Math.round((d.faturamento / maxFat) * 100));
+        const ehHoje = idx === 6;
+        return `
+          <div class="flex-1 flex flex-col items-center gap-0.5 group relative h-full justify-end cursor-pointer" title="${d.diaNum} (${d.rotulo}): ${formatarMoeda(d.faturamento)} (${d.pedidosQtd} pedidos)">
+            <div class="w-full ${ehHoje ? 'bg-indigo-600 dark:bg-indigo-500 shadow-2xs' : 'bg-slate-200 dark:bg-slate-700 hover:bg-indigo-400'} rounded-t transition-all duration-300" style="height: ${pct}%"></div>
+            <span class="text-[8px] font-bold ${ehHoje ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}">${d.rotulo}</span>
+          </div>
+        `;
+      }).join('');
     }
 
     // MÉTRICAS / KPIS NO TOPO
@@ -4407,7 +4979,10 @@
       const pctMeta = metaDiaria > 0 ? Math.min(100, Math.round((soma / metaDiaria) * 100)) : 0;
 
       document.getElementById('kpi-total').textContent = total;
-      if (usuarioCargo === 'administrador') {
+      
+      const isAdmin = (usuarioCargo === 'administrador') && !modoAuditoriaClienteAtivo;
+
+      if (isAdmin) {
         const kpiFat = document.getElementById('kpi-faturamento');
         if (kpiFat) kpiFat.textContent = formatarMoeda(soma);
         const barraMeta = document.getElementById('barra-progresso-meta');
@@ -4416,13 +4991,19 @@
         if (labelMeta) labelMeta.textContent = `Meta: ${formatarMoeda(metaDiaria)}`;
         const pctMetaEl = document.getElementById('pct-meta-faturamento');
         if (pctMetaEl) pctMetaEl.textContent = `${pctMeta}% atingida`;
+        atualizarGraficoFaturamentoSemanal(pedidos);
       } else {
         const kpiFat = document.getElementById('kpi-faturamento');
         if (kpiFat) kpiFat.textContent = '---';
+        const barra7Dias = document.getElementById('barras-faturamento-7dias');
+        if (barra7Dias) barra7Dias.innerHTML = '';
       }
+
       document.getElementById('kpi-abertos').textContent = abertos;
       document.getElementById('kpi-concluidos').textContent = concluidos;
       document.getElementById('kpi-taxa-sucesso').textContent = `${taxaConclusao}% de conclusão`;
+
+      atualizarContadoresChips(pedidos);
     }
 
     // ANALYTICS / BARRAS DE DISTRIBUIÇÃO POR SETOR (EXCLUSIVO ADMINISTRADOR)
@@ -5308,21 +5889,52 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
     function atualizarStepperVisual(status) {
       const s = removerAcentos(status);
+      let etapaIdx = 0;
+
+      if (s.includes('conclu') || s.includes('finaliz') || s.includes('pago')) {
+        etapaIdx = 3;
+      } else if (s.includes('produ') || s.includes('andamento')) {
+        etapaIdx = 2;
+      } else if (s.includes('agend') || s.includes('confirm')) {
+        etapaIdx = 1;
+      } else {
+        etapaIdx = 0;
+      }
+
+      const indicadorEtapa = document.getElementById('tracker-etapa-indicador');
+      const barraProgresso = document.getElementById('tracker-barra-progresso');
+
+      if (indicadorEtapa) {
+        indicadorEtapa.textContent = `Fase ${etapaIdx + 1} de 4`;
+      }
+      if (barraProgresso) {
+        const pcts = [25, 50, 75, 100];
+        barraProgresso.style.width = `${pcts[etapaIdx]}%`;
+      }
+
       const steps = [
-        { id: 'step-pendente', ativo: s.includes('pendente') },
-        { id: 'step-confirmado', ativo: s.includes('agend') || s.includes('confirm') },
-        { id: 'step-producao', ativo: s.includes('produ') || s.includes('andamento') },
-        { id: 'step-concluido', ativo: s.includes('conclu') || s.includes('finaliz') || s.includes('pago') }
+        { id: 'step-pendente', idx: 0, icone: '⏳', label: 'Pendente' },
+        { id: 'step-confirmado', idx: 1, icone: '📌', label: 'Confirmado' },
+        { id: 'step-producao', idx: 2, icone: '⚙️', label: 'Produção' },
+        { id: 'step-concluido', idx: 3, icone: '✅', label: 'Concluído' }
       ];
 
       steps.forEach(st => {
         const el = document.getElementById(st.id);
-        if (el) {
-          if (st.ativo) {
-            el.className = 'py-1.5 px-1 rounded-xl text-[11px] font-extrabold bg-indigo-600 text-white border-indigo-600 shadow-xs cursor-pointer';
-          } else {
-            el.className = 'py-1.5 px-1 rounded-xl text-[11px] font-medium bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:bg-slate-100 cursor-pointer';
-          }
+        if (!el) return;
+
+        if (st.idx === etapaIdx) {
+          // Fase atual ativa: estilo com pulse e anel de foco
+          el.className = 'py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-extrabold bg-indigo-600 text-white border-indigo-600 shadow-md ring-2 ring-indigo-400/50 cursor-pointer flex flex-col items-center justify-center gap-0.5';
+          el.innerHTML = `<span class="text-xs animate-bounce">${st.icone}</span><span class="truncate">${st.idx + 1}. ${st.label}</span>`;
+        } else if (st.idx < etapaIdx) {
+          // Fase já completada: estilo verde com check
+          el.className = 'py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800 cursor-pointer flex flex-col items-center justify-center gap-0.5';
+          el.innerHTML = `<span class="text-xs">✓</span><span class="truncate">${st.idx + 1}. ${st.label}</span>`;
+        } else {
+          // Fase futura
+          el.className = 'py-2 px-1 rounded-xl text-[10px] sm:text-[11px] font-medium bg-white dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer flex flex-col items-center justify-center gap-0.5';
+          el.innerHTML = `<span class="text-xs opacity-60">${st.icone}</span><span class="truncate">${st.idx + 1}. ${st.label}</span>`;
         }
       });
     }
@@ -5333,6 +5945,108 @@ const colPendente = document.getElementById('kanban-col-pendente');
       document.getElementById('modal-det-status').textContent = novoStatus;
       document.getElementById('modal-det-status').className = `px-2.5 py-0.5 text-xs font-semibold rounded-full border ${badgeStatus(novoStatus)}`;
       atualizarStepperVisual(novoStatus);
+    }
+
+    // MODAL DE RECIBO DIGITAL & COMPROVANTE ELETRÔNICO
+    function abrirReciboDigitalModal() {
+      if (!pedidoSelecionado) return;
+
+      const p = pedidoSelecionado;
+      const cliente = getCampo(p, 'cliente', 'nome', 'nome_cliente') || 'Consumidor';
+      const contato = getCampo(p, 'telefone', 'contato', 'celular') || 'Não informado';
+      const servico = getCampo(p, 'servico', 'serviço', 'descricao') || 'Serviço prestado';
+      const setor = getCampo(p, 'setor', 'categoria') || 'Geral';
+      const status = getCampo(p, 'status', 'situacao') || 'Pendente';
+      const valor = extrairNumero(getCampo(p, 'valor', 'preco', 'total'));
+      const data = getCampo(p, 'data_pedido', 'data', 'criado_em');
+      const id = p.id || '000';
+
+      document.getElementById('recibo-numero').textContent = `#${id}`;
+      document.getElementById('recibo-data').textContent = formatarData(data);
+      document.getElementById('recibo-setor').textContent = setor;
+      document.getElementById('recibo-cliente').textContent = cliente;
+      document.getElementById('recibo-contato').textContent = `Contato: ${contato}`;
+      document.getElementById('recibo-servico').textContent = servico;
+      document.getElementById('recibo-valor').textContent = formatarMoeda(valor);
+      document.getElementById('recibo-chave-pix').textContent = chavePixPadrao;
+
+      const badge = document.getElementById('recibo-badge-status');
+      if (badge) {
+        badge.textContent = status;
+        badge.className = `inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold mt-1 uppercase border ${badgeStatus(status)}`;
+      }
+
+      // Hash de autenticação único
+      const authCode = `AUT-${String(id).padStart(4, '0')}-${new Date().getTime().toString(36).toUpperCase()}`;
+      document.getElementById('recibo-codigo-autenticacao').textContent = authCode;
+
+      // QR Code PIX
+      const imgQr = document.getElementById('recibo-qrcode-img');
+      if (imgQr) {
+        const payloadPix = `Chave: ${chavePixPadrao} | Valor: R$ ${valor.toFixed(2)} | Pedido #${id} | Cliente: ${cliente}`;
+        imgQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payloadPix)}`;
+      }
+
+      document.getElementById('modal-recibo-pedido').classList.remove('hidden');
+    }
+
+    function fecharModalRecibo() {
+      const modal = document.getElementById('modal-recibo-pedido');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function imprimirReciboDigital() {
+      const conteudo = document.getElementById('area-recibo-conteudo');
+      if (!conteudo) return;
+      const janelaPrint = window.open('', '_blank', 'width=450,height=650');
+      janelaPrint.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Recibo Digital</title>
+          <style>
+            body { font-family: monospace; padding: 20px; color: #111; font-size: 12px; }
+            .border-b { border-bottom: 1px dashed #999; padding-bottom: 8px; margin-bottom: 8px; }
+            .text-center { text-align: center; }
+            .font-bold { font-weight: bold; }
+            .flex-between { display: flex; justify-content: space-between; margin: 4px 0; }
+            .valor-total { font-size: 16px; font-weight: 900; margin: 10px 0; border-top: 2px solid #000; padding-top: 8px; }
+            img { max-width: 120px; display: block; margin: 8px auto; }
+          </style>
+        </head>
+        <body>
+          ${conteudo.innerHTML}
+          <script>window.onload = function() { window.print(); }<\/script>
+        </body>
+        </html>
+      `);
+      janelaPrint.document.close();
+    }
+
+    function copiarTextoRecibo() {
+      if (!pedidoSelecionado) return;
+      const p = pedidoSelecionado;
+      const cliente = getCampo(p, 'cliente', 'nome') || 'Cliente';
+      const servico = getCampo(p, 'servico', 'serviço') || 'Serviço';
+      const valor = formatarMoeda(getCampo(p, 'valor', 'preco'));
+      const status = getCampo(p, 'status', 'situacao') || 'Pendente';
+      const data = formatarData(getCampo(p, 'data_pedido', 'data'));
+
+      const texto = `🧾 *RECIBO DIGITAL DE PEDIDO #${p.id}*\n` +
+        `Data: ${data}\n` +
+        `Cliente: ${cliente}\n` +
+        `Serviço: ${servico}\n` +
+        `Status: ${status}\n` +
+        `Valor Total: ${valor}\n` +
+        `Chave PIX: ${chavePixPadrao}\n\n` +
+        `Central de Pedidos - Comprovante Operacional`;
+
+      navigator.clipboard.writeText(texto).then(() => {
+        mostrarToast('Texto do recibo copiado com sucesso! 📋');
+      }).catch(() => {
+        mostrarToast('Erro ao copiar texto do recibo');
+      });
     }
 
     function copiarChavePIX() {
@@ -5650,7 +6364,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
     // RELATÓRIO EXECUTIVO E FECHAMENTO DO DIA (EXCLUSIVO ADMINISTRADOR)
     function abrirModalFechamento() {
-      if (usuarioCargo !== 'administrador') {
+      if (usuarioCargo !== 'administrador' || modoAuditoriaClienteAtivo) {
         mostrarToast('Acesso restrito ao administrador.');
         return;
       }
