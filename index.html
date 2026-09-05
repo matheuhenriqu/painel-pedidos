@@ -82,6 +82,10 @@
         width: 100% !important;
         padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
       }
+      /* Prevenir zoom indesejado em formulários móveis */
+      input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -170,7 +174,7 @@
 
       <!-- COLUNA DIREITA: CARD PRINCIPAL DE AUTENTICAÇÃO -->
       <div class="lg:col-span-6 xl:col-span-5 w-full">
-        <div id="card-auth-container" class="relative w-full max-w-md mx-auto bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl rounded-3xl p-6 sm:p-8 transition-all duration-300">
+        <div id="card-auth-container" class="relative w-full max-w-md mx-auto bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl rounded-3xl p-4 sm:p-8 transition-all duration-300">
           
           <!-- Linha Gradiente Decorativa no Topo do Card -->
           <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-t-3xl"></div>
@@ -696,7 +700,7 @@
           </div>
           <div class="truncate">
             <div class="flex items-center gap-2">
-              <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">Central de Pedidos</h1>
+              <h1 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">Central de Pedidos</h1>
               <span id="badge-realtime" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 Ao Vivo
@@ -737,7 +741,7 @@
           <!-- Botão Fechamento do Dia -->
           <button 
             onclick="abrirModalFechamento()"
-            class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
+            class="hidden sm:inline-flex p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
             title="Relatório Executivo & Fechamento do Dia"
           >
             <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -768,7 +772,7 @@
             id="btn-som"
             onclick="alternarSom()"
             title="Alternar Som de Notificação"
-            class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
+            class="hidden sm:inline-flex p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
           >
             <svg id="icon-som-on" class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             <svg id="icon-som-off" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
@@ -848,7 +852,7 @@
               id="btn-abrir-configuracoes"
               onclick="abrirModalConfiguracoes()"
               title="Configurações da Conta e Perfil (Atalho: C)"
-              class="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition active:scale-95 cursor-pointer"
+              class="hidden md:inline-flex items-center gap-1 px-2 sm:px-2.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition active:scale-95 cursor-pointer"
             >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
               <span class="hidden sm:inline">Configurar</span>
@@ -1167,7 +1171,7 @@
     <!-- VIEW 2: TABELA COMPACTA -->
     <section id="view-tabela" class="hidden bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
+        <table class="w-full min-w-[750px] text-left text-sm">
           <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="px-3 py-3.5 w-10 text-center">
@@ -1341,6 +1345,19 @@
       </div>
     </div>
   </div>
+
+  <!-- BOTÃO FLUTUANTE (FAB) PARA NOVO PEDIDO EM TELAS MÓVEIS -->
+  <button 
+    id="fab-novo-pedido-mobile"
+    onclick="abrirModalNovoPedido()"
+    class="sm:hidden fixed bottom-5 right-4 z-35 w-13 h-13 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-600/40 flex items-center justify-center active:scale-90 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-4 focus:ring-indigo-400/30"
+    title="Novo Pedido"
+    aria-label="Novo Pedido"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+    </svg>
+  </button>
 
   <!-- RODAPÉ -->
   <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 text-center text-xs text-slate-400 dark:text-slate-500 transition-colors">
@@ -1914,7 +1931,7 @@
           type="button"
           id="btn-tab-cfg-perigo" 
           onclick="alternarAbaConfiguracoes('perigo')"
-          class="px-3.5 py-2 text-xs font-semibold border-b-2 border-transparent text-rose-500/80 hover:text-rose-600 dark:text-rose-400/80 dark:hover:text-rose-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer ml-auto"
+          class="px-3.5 py-2 text-xs font-semibold border-b-2 border-transparent text-rose-500/80 hover:text-rose-600 dark:text-rose-400/80 dark:hover:text-rose-400 flex items-center gap-1.5 transition shrink-0 cursor-pointer sm:ml-auto"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
           <span>Excluir Perfil</span>
@@ -3898,7 +3915,7 @@
         const observacoes = destacarTexto(observacoesRaw, termoBusca);
 
         return `
-          <article class="card-pedido group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 p-5 flex flex-col justify-between relative overflow-hidden">
+          <article class="card-pedido group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
             <div>
@@ -4234,20 +4251,20 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
         return `
           <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
-            <div class="px-5 py-4 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div class="px-4 sm:px-5 py-3.5 sm:py-4 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div class="flex items-center gap-2.5">
-                <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
                 <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${s}</h3>
-                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shrink-0">
                   ${itens.length} ${itens.length === 1 ? 'pedido' : 'pedidos'}
                 </span>
               </div>
-              <div class="text-right">
+              <div class="text-left sm:text-right">
                 <span class="text-xs font-medium text-slate-400">Total do Setor: </span>
                 <span class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">${formatarMoeda(soma)}</span>
               </div>
             </div>
-            <div class="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="p-3.5 sm:p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               ${itens.map(p => {
                 const id = p.id;
                 const cliente = destacarTexto(getCampo(p, 'cliente', 'nome') || 'Cliente', termoBusca);
@@ -4535,11 +4552,19 @@ const colPendente = document.getElementById('kanban-col-pendente');
           }
         });
         somaEl.textContent = formatarMoeda(soma);
-        barra.classList.remove('translate-y-32');
+        barra.classList.remove('translate-y-32', 'translate-y-36');
         barra.classList.add('translate-y-0');
       } else {
         barra.classList.remove('translate-y-0');
-        barra.classList.add('translate-y-32');
+        barra.classList.add('translate-y-36');
+      }
+      const fabMobile = document.getElementById('fab-novo-pedido-mobile');
+      if (fabMobile) {
+        if (count > 0) {
+          fabMobile.classList.add('opacity-0', 'pointer-events-none', 'scale-75');
+        } else {
+          fabMobile.classList.remove('opacity-0', 'pointer-events-none', 'scale-75');
+        }
       }
     }
 
@@ -4797,10 +4822,10 @@ const colPendente = document.getElementById('kanban-col-pendente');
         const somaData = itens.reduce((acc, p) => acc + extrairNumero(getCampo(p, 'valor', 'preco')), 0);
 
         return `
-          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-5 space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-3.5 sm:p-5 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
               <div class="flex items-center gap-2.5">
-                <span class="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+                <span class="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </span>
                 <div>
@@ -4808,13 +4833,13 @@ const colPendente = document.getElementById('kanban-col-pendente');
                   <p class="text-[11px] text-slate-400">${itens.length} ${itens.length === 1 ? 'pedido/agendamento' : 'pedidos/agendamentos'}</p>
                 </div>
               </div>
-              <div class="text-right">
+              <div class="text-left sm:text-right">
                 <span class="text-xs font-medium text-slate-400">Subtotal: </span>
                 <span class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">${formatarMoeda(somaData)}</span>
               </div>
             </div>
 
-            <div class="relative pl-6 border-l-2 border-indigo-200 dark:border-indigo-900 space-y-4 my-2">
+            <div class="relative pl-4 sm:pl-6 border-l-2 border-indigo-200 dark:border-indigo-900 space-y-4 my-2">
               ${itens.map(p => {
                 const id = p.id;
                 const cliente = destacarTexto(getCampo(p, 'cliente', 'nome') || 'Cliente', termoBusca);
@@ -4826,8 +4851,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
                 const whatsUrl = linkWhatsApp(telefone, getCampo(p, 'cliente', 'nome'), getCampo(p, 'servico'));
 
                 return `
-                  <div class="relative group bg-slate-50/70 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
-                    <span class="absolute -left-[31px] top-4 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-500"></span>
+                  <div class="relative group bg-slate-50/70 dark:bg-slate-800/40 p-3.5 sm:p-4 rounded-xl border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
+                    <span class="absolute -left-[23px] sm:-left-[31px] top-4 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 bg-indigo-500"></span>
 
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
                       <div class="flex items-center gap-2">
@@ -5056,6 +5081,11 @@ const colPendente = document.getElementById('kanban-col-pendente');
       document.getElementById('novo-pedido-erro').classList.add('hidden');
       document.getElementById('modal-novo').classList.remove('hidden');
       setTimeout(() => document.getElementById('novo-cliente').focus(), 50);
+    }
+
+    function abrirModalEditar(id = null, e = null) {
+      if (e && e.stopPropagation) e.stopPropagation();
+      abrirModalEdicao(id);
     }
 
     function fecharModalNovoPedido() {
