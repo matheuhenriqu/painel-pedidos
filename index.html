@@ -768,8 +768,9 @@
             </button>
           </div>
 
-          <!-- Botão Fechamento do Dia -->
+          <!-- Botão Fechamento do Dia (Exclusivo Administrador) -->
           <button 
+            id="btn-fechamento-caixa"
             onclick="abrirModalFechamento()"
             class="hidden sm:inline-flex p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
             title="Relatório Executivo & Fechamento do Dia"
@@ -984,8 +985,9 @@
         <p class="text-[10px] sm:text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5 sm:mt-1 truncate">Clique para ver todos</p>
       </div>
 
-      <!-- KPI Faturamento & Meta Diária -->
+      <!-- KPI Faturamento & Meta Diária (Exclusivo Administrador) -->
       <div 
+        id="card-kpi-faturamento"
         onclick="editarMetaDiaria()"
         class="group bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition active:scale-[0.98] cursor-pointer relative overflow-hidden"
         title="Clique para ajustar a Meta Diária de Vendas"
@@ -1039,7 +1041,7 @@
     </section>
 
     <!-- PAINEL DE ANALYTICS / DISTRIBUIÇÃO POR SETOR (EXPANSÍVEL) -->
-    <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden transition-colors">
+    <section id="painel-analytics" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs overflow-hidden transition-colors">
       <button 
         onclick="alternarAnalytics()" 
         class="w-full px-5 py-3.5 flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer"
@@ -2616,18 +2618,35 @@
         limparFiltroClienteAdmin();
       }
 
-      // Ajuste das labels de KPIs para clientes
+      // Ajuste de Faturamento, Métricas e Relatórios (CLIENTES NÃO TÊM ACESSO AO FATURAMENTO)
+      const cardKpiFaturamento = document.getElementById('card-kpi-faturamento');
+      const kpisContainer = document.getElementById('kpis-container');
+      const painelAnalytics = document.getElementById('painel-analytics');
+      const btnFechamento = document.getElementById('btn-fechamento-caixa');
       const labelKpiTotal = document.getElementById('label-kpi-total');
       const labelKpiFaturamento = document.getElementById('label-kpi-faturamento');
       const containerMetaDiaria = document.getElementById('container-meta-diaria');
 
       if (!isAdmin) {
+        // CLIENTE: Ocultar faturamento total, meta diária, analytics de faturamento e fechamento de caixa
+        if (cardKpiFaturamento) cardKpiFaturamento.classList.add('hidden');
+        if (kpisContainer) {
+          kpisContainer.className = 'grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4';
+        }
+        if (painelAnalytics) painelAnalytics.classList.add('hidden');
+        if (btnFechamento) btnFechamento.classList.add('hidden');
         if (labelKpiTotal) labelKpiTotal.textContent = 'Meus Pedidos';
-        if (labelKpiFaturamento) labelKpiFaturamento.textContent = 'Meu Total Gasto';
         if (containerMetaDiaria) containerMetaDiaria.classList.add('hidden');
       } else {
+        // ADMINISTRADOR: Exibir faturamento total, meta diária, analytics e fechamento
+        if (cardKpiFaturamento) cardKpiFaturamento.classList.remove('hidden');
+        if (kpisContainer) {
+          kpisContainer.className = 'grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4';
+        }
+        if (painelAnalytics) painelAnalytics.classList.remove('hidden');
+        if (btnFechamento) btnFechamento.classList.remove('hidden');
         if (labelKpiTotal) labelKpiTotal.textContent = 'Total de Pedidos';
-        if (labelKpiFaturamento) labelKpiFaturamento.textContent = 'Faturamento Bruto';
+        if (labelKpiFaturamento) labelKpiFaturamento.textContent = 'Faturamento Total';
         if (containerMetaDiaria) containerMetaDiaria.classList.remove('hidden');
       }
 
@@ -4099,14 +4118,16 @@
       mostrarToast('Registro de atividades limpo.');
     }
 
-    // AJUSTAR META DIÁRIA
+    // AJUSTAR META DIÁRIA (EXCLUSIVO ADMINISTRADOR)
     function editarMetaDiaria() {
+      if (usuarioCargo !== 'administrador') return;
       const valorAtual = metaDiaria;
       const novo = prompt('Definir nova Meta Diária de Faturamento (R$):', valorAtual);
       if (novo !== null && !isNaN(parseFloat(novo)) && parseFloat(novo) > 0) {
         metaDiaria = parseFloat(novo);
         localStorage.setItem('meta_diaria', metaDiaria);
-        atualizarKPIs(dadosOriginais);
+        const base = obterPedidosBaseUsuario();
+        atualizarKPIs(base);
         mostrarToast(`Meta diária atualizada para ${formatarMoeda(metaDiaria)} 🎯`);
       }
     }
@@ -4386,21 +4407,33 @@
       const pctMeta = metaDiaria > 0 ? Math.min(100, Math.round((soma / metaDiaria) * 100)) : 0;
 
       document.getElementById('kpi-total').textContent = total;
-      document.getElementById('kpi-faturamento').textContent = formatarMoeda(soma);
+      if (usuarioCargo === 'administrador') {
+        const kpiFat = document.getElementById('kpi-faturamento');
+        if (kpiFat) kpiFat.textContent = formatarMoeda(soma);
+        const barraMeta = document.getElementById('barra-progresso-meta');
+        if (barraMeta) barraMeta.style.width = `${pctMeta}%`;
+        const labelMeta = document.getElementById('label-meta-faturamento');
+        if (labelMeta) labelMeta.textContent = `Meta: ${formatarMoeda(metaDiaria)}`;
+        const pctMetaEl = document.getElementById('pct-meta-faturamento');
+        if (pctMetaEl) pctMetaEl.textContent = `${pctMeta}% atingida`;
+      } else {
+        const kpiFat = document.getElementById('kpi-faturamento');
+        if (kpiFat) kpiFat.textContent = '---';
+      }
       document.getElementById('kpi-abertos').textContent = abertos;
       document.getElementById('kpi-concluidos').textContent = concluidos;
       document.getElementById('kpi-taxa-sucesso').textContent = `${taxaConclusao}% de conclusão`;
-
-      // Barra da Meta Diária
-      document.getElementById('barra-progresso-meta').style.width = `${pctMeta}%`;
-      document.getElementById('label-meta-faturamento').textContent = `Meta: ${formatarMoeda(metaDiaria)}`;
-      document.getElementById('pct-meta-faturamento').textContent = `${pctMeta}% atingida`;
     }
 
-    // ANALYTICS / BARRAS DE DISTRIBUIÇÃO POR SETOR
+    // ANALYTICS / BARRAS DE DISTRIBUIÇÃO POR SETOR (EXCLUSIVO ADMINISTRADOR)
     function renderizarAnalyticsSetores(pedidos) {
       const container = document.getElementById('corpo-analytics');
       if (!container) return;
+
+      if (usuarioCargo !== 'administrador') {
+        container.innerHTML = '';
+        return;
+      }
 
       const faturamentoSetor = {};
       const pedidosSetor = {};
@@ -5490,7 +5523,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
         mostrarToast('Nenhum pedido selecionado.');
         return;
       }
-      const selecionados = dadosOriginais.filter(p => pedidosSelecionados.has(Number(p.id)));
+      const base = obterPedidosBaseUsuario();
+      const selecionados = base.filter(p => pedidosSelecionados.has(Number(p.id)));
       
       const cabecalhos = ['ID', 'Cliente', 'Telefone', 'Setor', 'Serviço', 'Data/Horário', 'Status', 'Valor', 'Observações'];
       const linhas = selecionados.map(p => [
@@ -5614,8 +5648,12 @@ const colPendente = document.getElementById('kanban-col-pendente');
       win.document.close();
     }
 
-    // RELATÓRIO EXECUTIVO E FECHAMENTO DO DIA
+    // RELATÓRIO EXECUTIVO E FECHAMENTO DO DIA (EXCLUSIVO ADMINISTRADOR)
     function abrirModalFechamento() {
+      if (usuarioCargo !== 'administrador') {
+        mostrarToast('Acesso restrito ao administrador.');
+        return;
+      }
       const total = dadosOriginais.length;
       let faturamento = 0;
       let concluidos = 0;
@@ -6164,13 +6202,14 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
     // EXPORTAÇÃO CSV PARA EXCEL
     function exportarCSV() {
-      if (!dadosOriginais || dadosOriginais.length === 0) {
+      const base = obterPedidosBaseUsuario();
+      if (!base || base.length === 0) {
         mostrarToast('Nenhum dado para exportar.');
         return;
       }
 
       const cabecalhos = ['ID', 'Cliente', 'Telefone', 'Setor', 'Serviço', 'Data/Horário', 'Status', 'Valor', 'Observações'];
-      const linhas = dadosOriginais.map(p => [
+      const linhas = base.map(p => [
         p.id || '',
         `"${(getCampo(p, 'cliente', 'nome') || '').replace(/"/g, '""')}"`,
         `"${(getCampo(p, 'telefone', 'contato') || '').replace(/"/g, '""')}"`,
@@ -6457,7 +6496,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
       } else if (key === 'r') {
         e.preventDefault();
         carregarPedidos();
-      } else if (key === 'f') {
+      } else if (key === 'f' && usuarioCargo === 'administrador') {
         e.preventDefault();
         abrirModalFechamento();
       } else if (key === 'h') {
