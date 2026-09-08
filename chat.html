@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
   <title>Atendimento &amp; Novos Pedidos &bull; Assistente Virtual IA</title>
   <meta name="description" content="Faça seu pedido ou solicite um orçamento de forma rápida e inteligente com nosso assistente virtual com IA integrado ao sistema de pedidos." />
 
@@ -42,6 +42,17 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
+    /* Altura Dinâmica e Safe-Area Insets para Mobile */
+    html, body {
+      min-height: 100%;
+      min-height: 100dvh;
+    }
+    @supports (-webkit-touch-callout: none) {
+      .h-dvh { height: 100dvh; }
+    }
+    .safe-area-bottom {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
     /* Estilização da barra de rolagem */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -128,47 +139,48 @@
   <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
   <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-violet-500/15 dark:bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
-  <!-- CONTAINER PRINCIPAL DO CHATBOT -->
-  <div class="relative z-10 flex flex-col h-full max-w-3xl w-full mx-auto shadow-2xl sm:my-3 sm:h-[calc(100vh-1.5rem)] sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-hidden">
+  <!-- CONTAINER PRINCIPAL DO CHATBOT (100dvh sem saltos no mobile) -->
+  <div class="relative z-10 flex flex-col h-[100dvh] max-w-3xl w-full mx-auto shadow-2xl sm:my-3 sm:h-[calc(100dvh-1.5rem)] sm:rounded-3xl border-x-0 sm:border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-hidden">
     
-    <!-- CABEÇALHO DO CHATBOT -->
-    <header class="glass-surface border-b border-slate-200/80 dark:border-slate-800/80 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between shrink-0 z-20">
-      <div class="flex items-center gap-3">
+    <!-- CABEÇALHO DO CHATBOT (ADAPTATIVO PARA TELAS ESTREITAS) -->
+    <header class="glass-surface border-b border-slate-200/80 dark:border-slate-800/80 px-3.5 py-2.5 sm:px-6 sm:py-3.5 flex items-center justify-between shrink-0 z-20 gap-2">
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <!-- Avatar IA com Indicador de Status -->
-        <div class="relative">
-          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
-            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="relative shrink-0">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
+            <svg class="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
           </div>
-          <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+          <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
         </div>
 
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 id="chat-empresa-titulo" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <div class="min-w-0 truncate">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <h1 id="chat-empresa-titulo" class="text-xs sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
               Atendimento Inteligente
             </h1>
-            <span class="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-300/60 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-xs">
+            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-300/60 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-xs shrink-0">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-              Qwen 3.8 27B &bull; Groq LPU (Máximo Raciocínio)
+              <span class="hidden sm:inline">Qwen 3.8 27B &bull; Groq LPU</span>
+              <span class="sm:hidden">Qwen 3.8</span>
             </span>
           </div>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            Online &bull; Solicitação Rápida de Pedidos
+          <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 sm:gap-1.5 truncate">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span class="truncate">Online &bull; Pedidos 24/7 com IA</span>
           </p>
         </div>
       </div>
 
       <!-- Ações do Cabeçalho -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         <!-- Alternador de Som -->
         <button 
           id="btn-toggle-som"
           onclick="alternarSomChat()"
           title="Alternar Som de Notificação"
-          class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
+          class="p-1.5 sm:p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
         >
           <svg id="icon-som-on" class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
@@ -182,7 +194,7 @@
         <button 
           onclick="alternarTema()"
           title="Alternar Tema Claro / Escuro"
-          class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
+          class="p-1.5 sm:p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
         >
           <svg class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
           <svg class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
@@ -192,7 +204,7 @@
         <button 
           onclick="reiniciarConversa()"
           title="Reiniciar Conversa"
-          class="p-2 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
+          class="p-1.5 sm:p-2 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
@@ -201,7 +213,7 @@
         <a 
           href="index.html"
           title="Acessar Painel do Lojista / Login"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition ml-1"
+          class="inline-flex items-center gap-1 px-2 py-1.5 sm:px-2.5 sm:py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition"
         >
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           <span class="hidden sm:inline">Painel</span>
@@ -212,7 +224,7 @@
     <!-- ÁREA DE MENSAGENS DO CHAT -->
     <div 
       id="chat-mensagens-container" 
-      class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-sm"
+      class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 text-sm overscroll-contain"
     >
       <!-- As mensagens serão injetadas dinamicamente aqui -->
     </div>
@@ -230,16 +242,16 @@
       <span>Assistente digitando...</span>
     </div>
 
-    <!-- BARRA INFERIOR DE ENVIO DE MENSAGEM -->
-    <footer class="p-3 sm:p-4 bg-white/80 dark:bg-slate-900/80 border-t border-slate-200/80 dark:border-slate-800/80 shrink-0">
-      <form id="form-chat-envio" onsubmit="enviarMensagemUsuario(event)" class="flex items-center gap-2">
+    <!-- BARRA INFERIOR DE ENVIO DE MENSAGEM (COM SAFE AREA PARA IPHONES/ANDROID) -->
+    <footer class="p-2.5 sm:p-4 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800/80 shrink-0 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
+      <form id="form-chat-envio" onsubmit="enviarMensagemUsuario(event)" class="flex items-center gap-1.5 sm:gap-2">
         <div class="relative flex-1">
           <input 
             type="text" 
             id="chat-input-texto"
             placeholder="Digite sua mensagem ou descreva o pedido..."
             autocomplete="off"
-            class="w-full pl-4 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition shadow-inner"
+            class="w-full pl-3.5 sm:pl-4 pr-9 sm:pr-10 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition shadow-inner"
           />
           <button 
             type="button" 
@@ -255,7 +267,7 @@
         <button 
           type="submit" 
           id="btn-enviar-msg"
-          class="h-11 px-4 sm:px-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-2xl shadow-md shadow-indigo-500/25 transition active:scale-95 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+          class="h-10 sm:h-11 px-3.5 sm:px-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-2xl shadow-md shadow-indigo-500/25 transition active:scale-95 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           title="Enviar mensagem"
         >
           <span class="hidden sm:inline text-xs">Enviar</span>
@@ -265,9 +277,10 @@
         </button>
       </form>
 
-      <div class="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-400 dark:text-slate-500">
-        <span>Seu pedido é enviado diretamente para o sistema com confirmação instantânea.</span>
-        <span class="font-medium text-indigo-500 dark:text-indigo-400 flex items-center gap-1">
+      <div class="flex items-center justify-between mt-1.5 sm:mt-2 px-1 text-[10px] text-slate-400 dark:text-slate-500 gap-2">
+        <span class="hidden sm:inline truncate">Seu pedido é enviado diretamente para o sistema com confirmação instantânea.</span>
+        <span class="sm:hidden truncate">Confirmação em tempo real</span>
+        <span class="font-medium text-indigo-500 dark:text-indigo-400 flex items-center gap-1 shrink-0">
           <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
           Ambiente Seguro
         </span>
@@ -458,8 +471,8 @@
           <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
-          <div class="max-w-[85%] sm:max-w-[78%] space-y-1">
-            <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl rounded-tl-sm p-3.5 sm:p-4 text-slate-800 dark:text-slate-100 shadow-sm space-y-2">
+          <div class="max-w-[92%] sm:max-w-[80%] space-y-1">
+            <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl rounded-tl-sm p-3 sm:p-4 text-slate-800 dark:text-slate-100 shadow-sm space-y-2">
               <div class="leading-relaxed">${conteudoHtml}</div>
             </div>
             <div class="text-[10px] text-slate-400 dark:text-slate-500 pl-1">${hora} &bull; Assistente IA</div>
@@ -468,8 +481,8 @@
         emitirSom('msg');
       } else {
         divMsg.innerHTML = `
-          <div class="max-w-[85%] sm:max-w-[78%] space-y-1 flex flex-col items-end">
-            <div class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-md shadow-indigo-600/20 leading-relaxed break-words">
+          <div class="max-w-[92%] sm:max-w-[80%] space-y-1 flex flex-col items-end">
+            <div class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl rounded-tr-sm p-3 sm:p-4 shadow-md shadow-indigo-600/20 leading-relaxed break-words">
               ${escapeHtml(conteudoHtml)}
             </div>
             <div class="text-[10px] text-slate-400 dark:text-slate-500 pr-1">${hora} &bull; Você</div>

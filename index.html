@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="h-full">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Central de Pedidos &bull; Painel Operacional</title>
   <meta name="description" content="Painel operacional em tempo real para acompanhamento, gestão e atendimento de pedidos integrado ao Supabase." />
 
@@ -101,13 +101,19 @@
       .modal-mobile-bottomsheet > div {
         border-bottom-left-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
-        max-height: 92vh !important;
+        max-height: 92dvh !important;
         width: 100% !important;
-        padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(0.75rem, env(safe-area-inset-bottom)) !important;
+        overscroll-behavior: contain;
       }
-      /* Prevenir zoom indesejado em formulários móveis */
+      /* Prevenir zoom indesejado em formulários móveis no iOS */
       input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-        font-size: 16px;
+        font-size: 16px !important;
+      }
+      /* Posicionar barra de ações em lote acima do dock mobile */
+      #barra-acoes-lote {
+        bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)) !important;
+        z-index: 48 !important;
       }
     }
   </style>
@@ -128,23 +134,24 @@
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <!-- Botões Flutuantes no Topo da Tela de Login -->
-    <div class="absolute top-4 right-4 z-30 flex items-center gap-2">
+    <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
       <a 
         href="chat.html"
         title="Fazer Pedido Online com Assistente IA"
-        class="py-2 px-3 sm:px-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-2xl shadow-md shadow-indigo-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5 sm:gap-2 text-xs font-bold"
+        class="py-1.5 px-2.5 sm:py-2 sm:px-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-2xl shadow-md shadow-indigo-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5 text-xs font-bold"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-        <span>Fazer Pedido com IA ✨</span>
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        <span class="hidden xs:inline sm:inline">Fazer Pedido com IA ✨</span>
+        <span class="xs:hidden">Chatbot IA ✨</span>
       </a>
 
       <button 
         onclick="alternarTema()"
         title="Alternar Tema Claro / Escuro"
-        class="p-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-2xl shadow-sm hover:shadow transition active:scale-95 cursor-pointer flex items-center gap-2 text-xs font-semibold"
+        class="p-2 sm:p-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-2xl shadow-sm hover:shadow transition active:scale-95 cursor-pointer flex items-center gap-1.5 sm:gap-2 text-xs font-semibold"
       >
-        <svg class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-        <svg class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
         <span class="hidden sm:inline">Tema</span>
       </button>
     </div>
@@ -776,22 +783,22 @@
       <div class="flex items-center justify-between h-18 py-3.5 gap-3">
         
         <!-- Logo & Título -->
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 sm:flex-initial">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <div class="truncate">
-            <div class="flex items-center gap-2">
-              <h1 class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">Central de Pedidos</h1>
-              <span id="badge-realtime" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0">
+          <div class="truncate min-w-0">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <h1 class="text-xs sm:text-base md:text-lg font-bold text-slate-900 dark:text-white tracking-tight leading-tight truncate">Central de Pedidos</h1>
+              <span id="badge-realtime" class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Ao Vivo
+                <span class="hidden xs:inline">Ao Vivo</span>
               </span>
               <span id="label-ultima-sync" class="hidden xl:inline text-[10px] text-slate-400 font-medium">Sincronizado</span>
             </div>
-            <p class="text-xs font-medium text-slate-400 dark:text-slate-500 hidden sm:block truncate">Acompanhamento e Gestão Operacional de Vendas e Serviços</p>
+            <p class="text-xs font-medium text-slate-400 dark:text-slate-500 hidden md:block truncate">Acompanhamento e Gestão Operacional de Vendas e Serviços</p>
           </div>
         </div>
 
@@ -972,7 +979,7 @@
             id="btn-recarregar"
             onclick="carregarPedidos()"
             title="Atualizar dados (Atalho: R)"
-            class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
+            class="hidden sm:inline-flex p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition active:scale-95 cursor-pointer"
           >
             <svg id="icon-refresh" class="w-4 h-4 text-slate-500 dark:text-slate-400 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -1354,17 +1361,17 @@
       </div>
 
       <!-- Rodapé dos Filtros com Contador e Ações -->
-      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
+      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
         <div class="flex items-center gap-2 flex-wrap">
           <span id="contador-resultado">Carregando registros...</span>
           <span id="filtro-ativo-tag" class="hidden px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800 text-[11px] font-semibold"></span>
         </div>
 
-        <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+        <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto">
           <!-- Botão Selecionar Todos -->
           <button 
             onclick="selecionarTodosFiltrados()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer shrink-0"
             title="Selecionar ou desmarcar todos os pedidos da listagem"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
@@ -1374,7 +1381,7 @@
           <!-- Botão Importar CSV -->
           <button 
             onclick="abrirModalImportarCSV()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer shrink-0"
             title="Importar pedidos em massa via arquivo CSV / Excel"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
@@ -1384,7 +1391,7 @@
           <!-- Botão Exportar CSV -->
           <button 
             onclick="exportarCSV()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer shrink-0"
             title="Exportar dados filtrados para planilha Excel/CSV"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -1394,7 +1401,7 @@
           <!-- Botão Imprimir / Relatório -->
           <button 
             onclick="window.print()" 
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition font-semibold cursor-pointer shrink-0"
             title="Imprimir relatório da listagem atual"
           >
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
@@ -1402,7 +1409,7 @@
           </button>
 
           <!-- Botão Limpar Filtros -->
-          <button id="btn-limpar-filtros" onclick="limparTodosFiltros()" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold hidden cursor-pointer px-1.5 py-1">
+          <button id="btn-limpar-filtros" onclick="limparTodosFiltros()" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-bold hidden cursor-pointer px-1.5 py-1 shrink-0">
             Limpar filtros
           </button>
         </div>
@@ -1587,7 +1594,7 @@
   </main>
 
   <!-- BARRA FLUTUANTE DE AÇÕES EM LOTE (BULK ACTIONS DOCK RESPONSIVO) -->
-  <div id="barra-acoes-lote" class="fixed bottom-4 sm:bottom-6 inset-x-0 mx-auto max-w-2xl px-3 sm:px-4 z-40 transition-all duration-300 transform translate-y-36 pointer-events-none">
+  <div id="barra-acoes-lote" class="fixed bottom-20 sm:bottom-6 inset-x-0 mx-auto max-w-2xl px-3 sm:px-4 z-48 transition-all duration-300 transform translate-y-36 pointer-events-none">
     <div class="pointer-events-auto bg-slate-900/95 dark:bg-slate-850/95 backdrop-blur-md text-white p-3 sm:p-4 rounded-2xl shadow-2xl border border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
       <div class="flex items-center justify-between sm:justify-start gap-3">
         <div class="flex items-center gap-2">
@@ -1805,7 +1812,7 @@
 
       </div>
 
-      <div class="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div class="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
           <button onclick="copiarResumoPedido()" class="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer shrink-0">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -1824,18 +1831,18 @@
             Recibo
           </button>
         </div>
-        <div class="flex items-center gap-2 justify-end">
+        <div class="flex items-center gap-1.5 sm:gap-2 justify-end flex-wrap sm:flex-nowrap">
           <button onclick="excluirPedido(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-2.5 sm:px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition cursor-pointer flex items-center gap-1" title="Excluir este pedido permanentemente">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            <span class="hidden xs:inline">Excluir</span>
+            <span>Excluir</span>
           </button>
           <button onclick="duplicarPedidoAtual()" class="px-2.5 sm:px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition cursor-pointer flex items-center gap-1" title="Duplicar este pedido para um novo cadastro">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
-            <span class="hidden xs:inline">Duplicar</span>
+            <span>Duplicar</span>
           </button>
           <button onclick="abrirModalEdicao(pedidoSelecionado ? pedidoSelecionado.id : null)" class="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition cursor-pointer flex items-center gap-1">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            Editar
+            <span>Editar</span>
           </button>
           <button onclick="fecharModalDetalhes()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white rounded-xl text-xs font-bold transition cursor-pointer">
             Fechar
@@ -2461,7 +2468,7 @@
 
   <!-- MODAL: CONFIRMAÇÃO DE EXCLUSÃO DE PERFIL -->
   <div id="modal-confirmar-exclusao" class="fixed inset-0 z-60 bg-slate-950/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
-    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-rose-200 dark:border-rose-900 shadow-2xl overflow-hidden p-6 space-y-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-rose-200 dark:border-rose-900 shadow-2xl overflow-y-auto max-h-[92dvh] sm:max-h-[85vh] p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
       
       <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -2739,7 +2746,7 @@
 
   <!-- MODAL: CADASTRAR / EDITAR CONTA DE CLIENTE (ADMINISTRADOR) -->
   <div id="modal-form-cliente" class="fixed inset-0 z-60 bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
-    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-y-auto max-h-[92dvh] sm:max-h-[85vh] p-5 sm:p-6 space-y-4 animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150">
       
       <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
         <h3 id="modal-form-cliente-titulo" class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -6102,8 +6109,21 @@ const colPendente = document.getElementById('kanban-col-pendente');
               <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-3">
                 ${realcarTermo(servico, termoBusca)}
               </p>
-              <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs">
+              <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-700/60 text-xs gap-1.5">
                 <div class="flex items-center gap-1">
+                  <!-- Seletor Rápido de Status no Card (Mobile-friendly para Touch) -->
+                  <select 
+                    onclick="event.stopPropagation()" 
+                    onchange="event.stopPropagation(); atualizarStatusRapido(${id}, this.value)" 
+                    class="md:hidden text-[10px] py-1 px-1.5 bg-slate-100 dark:bg-slate-700 rounded-lg border-0 font-bold text-slate-700 dark:text-slate-200 cursor-pointer focus:ring-1 focus:ring-indigo-500"
+                    title="Mover status do pedido"
+                  >
+                    <option value="Pendente" ${statusDestino === 'Pendente' ? 'selected' : ''}>⏳ Pendente</option>
+                    <option value="Agendado" ${statusDestino === 'Agendado' ? 'selected' : ''}>📌 Agendado</option>
+                    <option value="Em produção" ${statusDestino === 'Em produção' ? 'selected' : ''}>⚙️ Produção</option>
+                    <option value="Concluído" ${statusDestino === 'Concluído' ? 'selected' : ''}>✅ Concluído</option>
+                  </select>
+
                   <button onclick="abrirModalEditar(${id}, event)" class="p-1 text-slate-400 hover:text-indigo-600 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer" title="Editar pedido">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                   </button>
@@ -6111,7 +6131,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                   </button>
                 </div>
-                <span class="font-extrabold text-slate-900 dark:text-white">${formatarMoeda(valor)}</span>
+                <span class="font-extrabold text-slate-900 dark:text-white shrink-0">${formatarMoeda(valor)}</span>
               </div>
             </div>
           `;
