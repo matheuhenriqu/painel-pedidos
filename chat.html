@@ -149,9 +149,9 @@
             <h1 id="chat-empresa-titulo" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
               Atendimento Inteligente
             </h1>
-            <span class="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/60 dark:to-indigo-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 shadow-xs">
-              <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-              Gemini 3.8 Flash &bull; Raciocínio Máximo
+            <span class="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-300/60 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+              Qwen 3.8 27B &bull; Groq LPU (Máximo Raciocínio)
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -301,7 +301,8 @@
     let somHabilitado = true;
     let configuracaoChat = {
       nomeEmpresa: 'Nossa Empresa',
-      geminiApiKey: 'AQ.Ab8RN6LvvE-i_k0iWAdQm_X2JVLQQh_Ezs9hp1Fggz-tP4VyBw',
+      groqApiKey: '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',
+      modeloIa: 'qwen/qwen3.8-27b',
       setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']
     };
 
@@ -329,10 +330,15 @@
           configuracaoChat = { ...configuracaoChat, ...parse };
         }
 
-        // Chave Gemini via URL param se fornecida
+        // Chave Groq via URL param se fornecida (ou chave customizada)
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('gemini_key')) {
-          configuracaoChat.geminiApiKey = urlParams.get('gemini_key');
+        if (urlParams.has('groq_key')) {
+          configuracaoChat.groqApiKey = urlParams.get('groq_key');
+        } else if (urlParams.has('gemini_key') && !configuracaoChat.groqApiKey) {
+          configuracaoChat.groqApiKey = urlParams.get('gemini_key');
+        }
+        if (urlParams.has('model')) {
+          configuracaoChat.modeloIa = urlParams.get('model');
         }
 
         if (configuracaoChat.nomeEmpresa && configuracaoChat.nomeEmpresa !== 'Nossa Empresa') {
@@ -525,7 +531,7 @@
     }
 
     // ==============================================================================
-    // MOTOR DE IA CONVERSACIONAL INTELIGENTE (NLP + GEMINI)
+    // MOTOR DE IA CONVERSACIONAL INTELIGENTE (NLP + GROQ QWEN 3.8 27B)
     // ==============================================================================
 
     // Extração inteligente de entidades via Regex / Padrões comuns em Português
@@ -691,10 +697,10 @@
       const textoLower = texto.toLowerCase();
       const entidades = extrairEntidadesTexto(texto);
 
-      // Se a IA tiver chave do Gemini configurada, pode chamar Gemini API para enriquecimento
-      if (configuracaoChat.geminiApiKey && configuracaoChat.geminiApiKey.trim().length > 10) {
-        const chamadaGemini = await tentarProcessarComGemini(texto);
-        if (chamadaGemini) {
+      // Se a IA tiver chave do Groq configurada, processar com Qwen 3.8 27B em nível máximo de raciocínio
+      if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.trim().length > 10) {
+        const chamadaGroq = await tentarProcessarComGroqQwen(texto);
+        if (chamadaGroq) {
           return;
         }
       }
@@ -1026,17 +1032,17 @@
     }
 
     // ==============================================================================
-    // INTEGRAÇÃO COM GOOGLE GEMINI API (MÁXIMO RACIOCÍNIO - GEMINI 3.8 FLASH)
+    // INTEGRAÇÃO COM GROQ API (QWEN 3.8 27B - MÁXIMO NÍVEL DE RACIOCÍNIO)
     // ==============================================================================
-    async function tentarProcessarComGemini(textoUsuario) {
-      if (!configuracaoChat.geminiApiKey) return false;
+    async function tentarProcessarComGroqQwen(textoUsuario) {
+      if (!configuracaoChat.groqApiKey) return false;
 
-      // Modelos em ordem de máxima capacidade e raciocínio analítico
-      const modelos = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.6-flash'];
+      // Modelos em ordem de máxima capacidade analítica no Groq
+      const modelos = [configuracaoChat.modeloIa || 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b'];
 
       const promptSistema = `
-Você é o assistente virtual de inteligência artificial da empresa "${configuracaoChat.nomeEmpresa}", operando com MÁXIMA CAPACIDADE DE RACIOCÍNIO ANALÍTICO E EMPATIA.
-Seu objetivo é conduzir um atendimento excepcional, ágil e resolutivo para coletar e estruturar todos os dados necessários para o registro de um novo pedido:
+Você é o assistente virtual de inteligência artificial de alta performance da empresa "${configuracaoChat.nomeEmpresa}", operando via Groq LPU com o modelo Qwen 3.8 27B no MÁXIMO NÍVEL DE RACIOCÍNIO ANALÍTICO E EMPATIA.
+Seu objetivo é conduzir um atendimento excepcional, ágil e resolutivo para coletar e estruturar todos os dados necessários para o registro de um novo pedido no sistema:
 - Nome do cliente
 - Telefone / WhatsApp para contato
 - Descrição do Serviço ou Produto solicitado
@@ -1050,15 +1056,16 @@ ${JSON.stringify(dadosPedidoEmConstrucao)}
 
 Mensagem recebida do cliente agora: "${textoUsuario}".
 
-DIRETRIZES DE MÁXIMO RACIOCÍNIO:
-1. Analise o contexto da conversa, deduza informações implícitas (ex: se o cliente cita "pastilhas de freio", o setor é Oficina; se cita "vacina ou tosa", Pet Shop; se cita "formatação", Informática).
+DIRETRIZES DE MÁXIMO RACIOCÍNIO ANALÍTICO:
+1. Analise o contexto da conversa e deduza informações implícitas (ex: se o cliente cita "pastilhas de freio", "troca de óleo" ou "alinhamento", o setor é Oficina; se cita "vacina", "ração" ou "tosa", Pet Shop; se cita "formatação" ou "computador", Informática).
 2. Se o cliente tiver dúvidas sobre prazos, formas de pagamento ou detalhes técnicos, responda de forma prestativa, transparente e acolhedora.
-3. Se o cliente estiver confirmando o pedido (ex: "sim", "pode confirmar", "está certo", "ok", "enviar pedido"), defina "clienteConfirmou": true.
-4. Se Nome, Telefone e Serviço já foram identificados, defina "prontoParaConfirmar": true.
+3. Se o cliente estiver confirmando o pedido (ex: "sim", "pode confirmar", "está certo", "ok", "enviar pedido", "pode agendar"), defina "clienteConfirmou": true.
+4. Se Nome, Telefone e Serviço já foram identificados ou informados agora, defina "prontoParaConfirmar": true.
 
 Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e sem texto antes ou depois) no formato:
 {
-  "mensagem": "Sua resposta altamente profissional, empática e inteligente em português brasileiro para o cliente",
+  "raciocinio": "Resumo do raciocínio analítico sobre as necessidades do cliente",
+  "mensagem": "Sua resposta altamente profissional, empática e acolhedora para o cliente",
   "dadosAtualizados": {
     "cliente": "Nome do cliente",
     "telefone": "Telefone/WhatsApp",
@@ -1075,32 +1082,37 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
 
       for (const modelo of modelos) {
         try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${configuracaoChat.geminiApiKey}`;
-          const res = await fetch(url, {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Authorization': `Bearer ${configuracaoChat.groqApiKey}`,
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-              contents: [{
-                parts: [{ text: promptSistema }]
-              }],
-              generationConfig: {
-                temperature: 0.15,
-                thinkingConfig: {
-                  thinkingBudget: 2048
-                }
-              }
+              model: modelo,
+              reasoning_effort: 'high',
+              messages: [
+                { role: 'system', content: promptSistema },
+                { role: 'user', content: textoUsuario }
+              ],
+              temperature: 0.15
             })
           });
 
           if (!res.ok) {
-            console.warn(`Modelo ${modelo} retornou status ${res.status}, tentando próximo...`);
+            console.warn(`Modelo Groq ${modelo} retornou status ${res.status}, tentando próximo...`);
             continue;
           }
 
           const json = await res.json();
-          const contentPart = json.candidates?.[0]?.content?.parts?.find(p => !p.thought) || json.candidates?.[0]?.content?.parts?.[0];
-          const rawText = contentPart?.text;
+          const choice = json.choices?.[0]?.message;
+          const rawText = choice?.content;
           if (!rawText) continue;
+
+          // Registro do raciocínio analítico gerado pelo Qwen 3.8
+          if (choice.reasoning) {
+            console.info(`[Qwen 3.8 27B Reasoning]:`, choice.reasoning);
+          }
 
           let respostaObj = null;
           try {
@@ -1116,7 +1128,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
           }
 
           if (respostaObj && respostaObj.mensagem) {
-            // Mescla dados estruturados extraídos pelo raciocínio do Gemini
+            // Mescla dados estruturados extraídos pelo raciocínio do Qwen 3.8
             if (respostaObj.dadosAtualizados) {
               const d = respostaObj.dadosAtualizados;
               if (d.cliente && d.cliente.trim() && d.cliente !== 'Não informado') dadosPedidoEmConstrucao.cliente = d.cliente.trim();
@@ -1128,20 +1140,20 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
               if (d.observacoes && d.observacoes.trim()) dadosPedidoEmConstrucao.observacoes = d.observacoes.trim();
             }
 
-            // Fallback de segurança com o extrator nativo
+            // Fallback de segurança com o extrator local
             const entidadesLocais = extrairEntidadesTexto(textoUsuario);
             if (entidadesLocais.cliente && !dadosPedidoEmConstrucao.cliente) dadosPedidoEmConstrucao.cliente = entidadesLocais.cliente;
             if (entidadesLocais.telefone && !dadosPedidoEmConstrucao.telefone) dadosPedidoEmConstrucao.telefone = entidadesLocais.telefone;
             if (entidadesLocais.data_pedido && !dadosPedidoEmConstrucao.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidadesLocais.data_pedido;
             if (entidadesLocais.setor && dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = entidadesLocais.setor;
 
-            // Se o cliente confirmou o pedido via raciocínio do Gemini
+            // Se o cliente confirmou o pedido via raciocínio analítico
             if (respostaObj.clienteConfirmou) {
               await confirmarECriarPedidoNoSupabase();
               return true;
             }
 
-            // Renderiza a resposta refinada do Gemini
+            // Renderiza a resposta refinada do Qwen
             adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
 
             // Se estiver pronto para confirmação ou tiver os 3 dados vitais
@@ -1153,7 +1165,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
             return true;
           }
         } catch (errModelo) {
-          console.warn(`Erro no modelo ${modelo}:`, errModelo);
+          console.warn(`Erro no modelo Groq ${modelo}:`, errModelo);
         }
       }
       return false;
