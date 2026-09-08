@@ -67,3 +67,13 @@ WITH CHECK (
   AND (user_id IS NULL)
 );
 
+-- 8. POLÍTICA DE CONSULTA PÚBLICA DE PEDIDOS (SELECT PARA AUTOATENDIMENTO E RASTREAMENTO):
+-- - Permite que visitantes e clientes consultem o andamento e status de seus pedidos
+--   no Chatbot pelo número do pedido (ID) ou telefone de contato.
+DROP POLICY IF EXISTS "pedidos_chatbot_anon_select_policy" ON pedidos;
+CREATE POLICY "pedidos_chatbot_anon_select_policy" ON pedidos
+FOR SELECT
+TO anon
+USING (true);
+
+

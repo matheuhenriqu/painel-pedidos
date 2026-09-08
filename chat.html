@@ -322,7 +322,7 @@
     // ==============================================================================
     // INICIALIZAÇÃO DO TEMA E CONFIGURAÇÕES
     // ==============================================================================
-    function carregarConfiguracoes() {
+    async function carregarConfiguracoes() {
       try {
         const temaSalvo = localStorage.getItem('tema_preferido');
         if (temaSalvo === 'dark' || (!temaSalvo && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -358,10 +358,37 @@
           const tit = document.getElementById('chat-empresa-titulo');
           if (tit) tit.textContent = configuracaoChat.nomeEmpresa;
         }
+
+        // Sincronização remota automática com configurações salvas no painel Supabase
+        try {
+          const { data: configRemota } = await supabaseClient
+            .from('pedidos')
+            .select('observacoes')
+            .eq('setor', '__sistema_config__')
+            .maybeSingle();
+
+          if (configRemota && configRemota.observacoes) {
+            const remParsed = JSON.parse(configRemota.observacoes);
+            if (remParsed.nomeEmpresa && remParsed.nomeEmpresa !== 'Nossa Empresa') {
+              configuracaoChat.nomeEmpresa = remParsed.nomeEmpresa;
+              const tit = document.getElementById('chat-empresa-titulo');
+              if (tit) tit.textContent = remParsed.nomeEmpresa;
+            }
+            if (Array.isArray(remParsed.setoresDisponiveis) && remParsed.setoresDisponiveis.length) {
+              configuracaoChat.setoresDisponiveis = remParsed.setoresDisponiveis;
+            }
+            if (remParsed.groqApiKey && (!configuracaoChat.groqApiKey || configuracaoChat.groqApiKey.length < 15)) {
+              configuracaoChat.groqApiKey = remParsed.groqApiKey;
+            }
+          }
+        } catch (eSync) {
+          // Continua normalmente caso offline ou sem permissão
+        }
       } catch (e) {
         console.warn('Erro ao carregar configurações do chat:', e);
       }
     }
+
 
     function alternarTema() {
       const isDark = document.documentElement.classList.toggle('dark');
@@ -462,6 +489,18 @@
       const container = document.getElementById('chat-mensagens-container');
       if (!container) return;
 
+      // Salva no histórico de memória multi-turn (texto limpo de tags HTML)
+      const textoPlano = String(conteudoHtml).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      if (textoPlano) {
+        historicoMensagens.push({
+          role: remetente === 'bot' ? 'assistant' : 'user',
+          content: textoPlano.slice(0, 350)
+        });
+        if (historicoMensagens.length > 16) {
+          historicoMensagens = historicoMensagens.slice(-16);
+        }
+      }
+
       const hora = formatarHoraAtual();
       const divMsg = document.createElement('div');
       divMsg.className = `flex gap-2.5 sm:gap-3 animate-msg ${remetente === 'usuario' ? 'justify-end' : 'justify-start'}`;
@@ -496,6 +535,7 @@
       container.appendChild(divMsg);
       rolarParaFim();
     }
+
 
     function exibirDigitando(visivel) {
       const el = document.getElementById('chat-digitando');
@@ -605,22 +645,30 @@
     function iniciarConversa() {
       const container = document.getElementById('chat-mensagens-container');
       if (container) container.innerHTML = '';
+      historicoMensagens = [];
 
+      const nomeEmpresa = configuracaoChat.nomeEmpresa || 'Nossa Central de Pedidos';
       const saudacao = `
-        <p class="font-bold text-base text-slate-900 dark:text-white">Olá! Seja muito bem-vindo(a)! 👋✨</p>
-        <p>Sou o seu <strong>Assistente Virtual com Inteligência Artificial</strong>. Estou aqui para ajudar você a registrar um <strong>novo pedido</strong> ou solicitar um orçamento de forma rápida e descomplicada.</p>
-        <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Para começarmos, qual é o seu <strong>nome completo</strong>?</p>
+        <p class="font-bold text-base text-slate-900 dark:text-white">Olá! Seja muito bem-vindo(a) à <strong>${escapeHtml(nomeEmpresa)}</strong>! 👋✨</p>
+        <p>Sou o seu <strong>Assistente Virtual com Inteligência Artificial</strong>, conectado em tempo real à nossa Central de Pedidos.</p>
+        <p class="text-xs text-slate-600 dark:text-slate-300 pt-1 leading-relaxed">
+          Estou aqui para agilizar seu atendimento: posso <strong>fazer um novo pedido</strong>, <strong>solicitar um orçamento rápido</strong>, <strong>rastrear o andamento de um pedido existente</strong> ou esclarecer dúvidas sobre nossos serviços, prazos e formas de pagamento.
+        </p>
+        <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold pt-1">Como posso te ajudar hoje?</p>
       `;
 
       adicionarMensagem('bot', saudacao);
-      etapaColetaAtual = 'nome';
+      etapaColetaAtual = 'inicio';
 
       atualizarSugestoes([
-        { texto: 'Fazer um novo pedido', icone: '🛍️' },
-        { texto: 'Ver serviços disponíveis', icone: '📋' },
-        { texto: 'Solicitar orçamento rápido', icone: '💡' }
+        { texto: 'Fazer Novo Pedido', valor: 'Quero fazer um novo pedido', icone: '🛍️' },
+        { texto: 'Rastrear meu Pedido', valor: 'Quero consultar o status de um pedido', icone: '🔍' },
+        { texto: 'Solicitar Orçamento', valor: 'Gostaria de solicitar um orçamento rápido', icone: '💰' },
+        { texto: 'Formas de Pagamento', valor: 'Quais formas de pagamento vocês aceitam?', icone: '💳' },
+        { texto: 'Horários de Atendimento', valor: 'Qual o horário de funcionamento de vocês?', icone: '🕒' }
       ]);
     }
+
 
     function reiniciarConversa() {
       if (confirm('Deseja reiniciar a conversa do atendimento?')) {
@@ -725,6 +773,73 @@
         reiniciarConversa();
         return;
       }
+
+      // INTENÇÃO: Consulta ou Rastreamento de Pedido Existente
+      const matchConsulta = textoLower.match(/(?:consultar|rastrear|status|andamento|acompanhar|onde est[aá]|como est[aá]|meu pedido|pedido\s*#?\s*(\d+))/i);
+      if (matchConsulta) {
+        const matchNumero = texto.match(/#?(\d+)/);
+        if (matchNumero && matchNumero[1] && matchNumero[1].length <= 6) {
+          adicionarMensagem('bot', `Localizando o andamento do seu pedido <strong>#${matchNumero[1]}</strong> na nossa Central... ⏳`);
+          await consultarPedidoNoSupabase(matchNumero[1]);
+          return;
+        } else if (entidades.telefone) {
+          adicionarMensagem('bot', `Localizando pedidos vinculados ao WhatsApp <strong>${entidades.telefone}</strong>... ⏳`);
+          await consultarPedidoNoSupabase(entidades.telefone);
+          return;
+        } else {
+          adicionarMensagem('bot', `
+            Com certeza! Para consultar o andamento e status do seu pedido, por favor me informe o <strong>número do pedido (ex: #38)</strong> ou o seu <strong>número de WhatsApp com DDD</strong>.
+          `);
+          atualizarSugestoes([
+            { texto: 'Informar meu WhatsApp', valor: 'Meu telefone é ' },
+            { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
+          ]);
+          return;
+        }
+      }
+
+      // INTENÇÃO: Dúvidas Institucionais & FAQ (Formas de Pagamento)
+      if (textoLower.includes('pagamento') || textoLower.includes('pix') || textoLower.includes('cartão') || textoLower.includes('cartao') || textoLower.includes('parcela')) {
+        adicionarMensagem('bot', `
+          💳 <strong>Formas de Pagamento Aceitas:</strong><br/>
+          Aceitamos <strong>PIX instantâneo</strong> (com desconto especial), <strong>Cartões de Crédito</strong> em até 12x, <strong>Cartões de Débito</strong>, <strong>Boleto Bancário</strong> e <strong>Dinheiro</strong> na retirada/entrega.
+        `);
+        atualizarSugestoes([
+          { texto: '🛍️ Fazer Pedido Agora', valor: 'Quero fazer um novo pedido' },
+          { texto: '💰 Solicitar Orçamento', valor: 'Quero solicitar um orçamento' },
+          { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' }
+        ]);
+        return;
+      }
+
+      // INTENÇÃO: Dúvidas Institucionais & FAQ (Horários de Atendimento)
+      if (textoLower.includes('horário') || textoLower.includes('horario') || textoLower.includes('aberto') || textoLower.includes('sábado') || textoLower.includes('sabado') || textoLower.includes('funciona')) {
+        adicionarMensagem('bot', `
+          🕒 <strong>Horário de Funcionamento:</strong><br/>
+          Nossa Central atende de <strong>Segunda a Sexta das 08h às 18h</strong> e aos <strong>Sábados das 08h às 12h</strong>.<br/>
+          Nosso assistente virtual opera <strong>24 horas por dia</strong> para você registrar novos pedidos a qualquer momento!
+        `);
+        atualizarSugestoes([
+          { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
+          { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' }
+        ]);
+        return;
+      }
+
+      // INTENÇÃO: Dúvidas Institucionais & FAQ (Garantia & Prazos)
+      if (textoLower.includes('garantia') || textoLower.includes('prazo') || textoLower.includes('quanto tempo')) {
+        adicionarMensagem('bot', `
+          🛡️ <strong>Garantia & Prazos:</strong><br/>
+          Todos os nossos serviços possuem <strong>garantia de 90 dias</strong> com suporte direto pelo painel.<br/>
+          O prazo padrão varia entre <strong>24h e 48h úteis</strong> conforme a fila da oficina/setor, e você pode acompanhar cada etapa pelo nosso rastreador!
+        `);
+        atualizarSugestoes([
+          { texto: '🛍️ Iniciar Pedido', valor: 'Quero fazer um novo pedido' },
+          { texto: '💰 Solicitar Orçamento', valor: 'Quero solicitar um orçamento' }
+        ]);
+        return;
+      }
+
 
       // Coleta em Estágios
       if (etapaColetaAtual === 'inicio' || etapaColetaAtual === 'nome') {
@@ -946,6 +1061,198 @@
     }
 
     // ==============================================================================
+    // CONSULTA E RASTREAMENTO EM TEMPO REAL DE PEDIDOS NO SUPABASE
+    // ==============================================================================
+    function renderizarCardStatusPedido(pedido) {
+      const id = pedido.id;
+      const cliente = pedido.cliente || 'Cliente';
+      const servico = pedido.servico || 'Serviço solicitado';
+      const setor = pedido.setor || 'Geral';
+      const dataPedido = pedido.data_pedido || 'A definir';
+      const statusRaw = (pedido.status || 'Pendente').trim();
+      const statusLower = statusRaw.toLowerCase();
+      const valor = parseFloat(pedido.valor) || 0;
+
+      // Determina o estágio no Stepper (1 a 4)
+      let estagio = 1;
+      let statusClasseBadge = 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700';
+      let statusDot = 'bg-amber-500';
+
+      if (statusLower.includes('conclu') || statusLower.includes('finaliz') || statusLower.includes('entreg') || statusLower.includes('pago')) {
+        estagio = 4;
+        statusClasseBadge = 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700';
+        statusDot = 'bg-emerald-500';
+      } else if (statusLower.includes('produ') || statusLower.includes('andamento') || statusLower.includes('prepar')) {
+        estagio = 3;
+        statusClasseBadge = 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700';
+        statusDot = 'bg-indigo-500';
+      } else if (statusLower.includes('agend') || statusLower.includes('confirm')) {
+        estagio = 2;
+        statusClasseBadge = 'bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-700';
+        statusDot = 'bg-sky-500';
+      } else if (statusLower.includes('cancel')) {
+        estagio = 0;
+        statusClasseBadge = 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-700';
+        statusDot = 'bg-rose-500';
+      }
+
+      // Etapas do Stepper de Produção
+      const passos = [
+        { num: 1, label: 'Pendente', desc: 'Triagem & Fila' },
+        { num: 2, label: 'Agendado', desc: 'Confirmado' },
+        { num: 3, label: 'Produção', desc: 'Em Execução' },
+        { num: 4, label: 'Concluído', desc: 'Pronto / Entregue' }
+      ];
+
+      const stepperHtml = passos.map((p) => {
+        const ativo = estagio >= p.num;
+        const atual = estagio === p.num;
+        return `
+          <div class="flex-1 flex flex-col items-center relative z-10 text-center">
+            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition ${
+              atual 
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/40 ring-4 ring-indigo-100 dark:ring-indigo-950/80 scale-110' 
+                : ativo 
+                  ? 'bg-emerald-500 text-white' 
+                  : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500'
+            }">
+              ${ativo && !atual ? '✓' : p.num}
+            </div>
+            <span class="text-[10px] sm:text-[11px] font-bold mt-1.5 leading-tight ${atual ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400'}">${p.label}</span>
+            <span class="text-[8px] sm:text-[9px] text-slate-400 hidden xs:inline">${p.desc}</span>
+          </div>
+        `;
+      }).join('');
+
+      const pctProgresso = estagio === 0 ? 0 : Math.min(100, Math.round(((estagio - 1) / 3) * 100));
+      const valorFormatado = valor > 0 ? valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'A confirmar';
+
+      return `
+        <div class="space-y-3.5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Rastreamento Operacional</span>
+              <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span>Pedido #${id}</span>
+                <span class="text-xs font-normal text-slate-500">(${escapeHtml(setor)})</span>
+              </h3>
+            </div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold border ${statusClasseBadge}">
+              <span class="w-2 h-2 rounded-full ${statusDot} animate-pulse"></span>
+              <span>${escapeHtml(statusRaw)}</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-900/80 p-3 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <div class="relative flex items-center justify-between mb-1">
+              <div class="absolute top-3.5 sm:top-4 left-4 right-4 h-1 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0 rounded-full"></div>
+              <div class="absolute top-3.5 sm:top-4 left-4 h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 -translate-y-1/2 z-0 rounded-full transition-all duration-500" style="width: calc(${pctProgresso}% - 0.5rem);"></div>
+              ${stepperHtml}
+            </div>
+          </div>
+
+          <div class="bg-slate-50/70 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs space-y-1.5">
+            <div class="flex justify-between border-b border-slate-200/60 dark:border-slate-800/80 pb-1">
+              <span class="text-slate-500 dark:text-slate-400">Cliente:</span>
+              <strong class="text-slate-800 dark:text-slate-100">${escapeHtml(cliente)}</strong>
+            </div>
+            <div class="flex justify-between border-b border-slate-200/60 dark:border-slate-800/80 pb-1">
+              <span class="text-slate-500 dark:text-slate-400">Serviço:</span>
+              <strong class="text-indigo-600 dark:text-indigo-400 text-right max-w-[70%] truncate">${escapeHtml(servico)}</strong>
+            </div>
+            <div class="flex justify-between border-b border-slate-200/60 dark:border-slate-800/80 pb-1">
+              <span class="text-slate-500 dark:text-slate-400">Previsão / Data:</span>
+              <strong class="text-slate-800 dark:text-slate-100">${escapeHtml(dataPedido)}</strong>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 dark:text-slate-400">Valor Estimado:</span>
+              <strong class="text-emerald-600 dark:text-emerald-400 font-bold">${valorFormatado}</strong>
+            </div>
+          </div>
+
+          <div class="pt-1">
+            <a 
+              href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá! Gostaria de acompanhar o andamento do meu pedido #${id} (${servico}) registrado na Central de Pedidos.`)}"
+              target="_blank"
+              class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-2 shadow-sm"
+            >
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+              <span>Falar com Atendente sobre o Pedido #${id}</span>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    async function consultarPedidoNoSupabase(idOuTelefone) {
+      exibirDigitando(true);
+      try {
+        let pedido = null;
+        let buscaPor = '';
+        const termoLimpo = String(idOuTelefone || '').trim();
+        const matchId = termoLimpo.match(/#?(\d+)/);
+
+        if (matchId && matchId[1] && (termoLimpo.length <= 6 || termoLimpo.startsWith('#') || termoLimpo.toLowerCase().includes('pedido'))) {
+          const idNum = parseInt(matchId[1], 10);
+          buscaPor = `ID #${idNum}`;
+          const { data, error } = await supabaseClient
+            .from('pedidos')
+            .select('*')
+            .eq('id', idNum)
+            .maybeSingle();
+
+          if (!error && data) {
+            pedido = data;
+          }
+        }
+
+        if (!pedido) {
+          const digitos = termoLimpo.replace(/\D/g, '');
+          if (digitos.length >= 8) {
+            buscaPor = `WhatsApp ${termoLimpo}`;
+            const { data, error } = await supabaseClient
+              .from('pedidos')
+              .select('*')
+              .ilike('telefone', `%${digitos.slice(-8)}%`)
+              .order('id', { ascending: false })
+              .limit(1);
+
+            if (!error && data && data.length > 0) {
+              pedido = data[0];
+            }
+          }
+        }
+
+        if (pedido) {
+          emitirSom('msg');
+          const cardHtml = renderizarCardStatusPedido(pedido);
+          adicionarMensagem('bot', cardHtml);
+          atualizarSugestoes([
+            { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
+            { texto: '🔍 Consultar Outro Pedido', valor: 'Quero consultar outro pedido' },
+            { texto: '💬 Falar no WhatsApp', valor: `Olá, gostaria de falar sobre o pedido #${pedido.id}` }
+          ]);
+        } else {
+          adicionarMensagem('bot', `
+            <div class="space-y-2">
+              <p>🔍 Não localizei nenhum pedido ativo com o identificador informado (<strong>${escapeHtml(buscaPor || idOuTelefone)}</strong>).</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Por favor, confira o número do pedido (ex: <em>#38</em>) ou digite seu número de telefone completo com DDD para que eu possa localizar.</p>
+            </div>
+          `);
+          atualizarSugestoes([
+            { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
+            { texto: 'Informar meu WhatsApp', valor: 'Meu telefone é ' }
+          ]);
+        }
+      } catch (err) {
+        console.error('Erro ao consultar pedido:', err);
+        adicionarMensagem('bot', `Desculpe, ocorreu uma instabilidade ao consultar o banco de dados. Por favor, tente novamente em instantes.`);
+      } finally {
+        exibirDigitando(false);
+      }
+    }
+
+    // ==============================================================================
     // CRIAÇÃO AUTOMÁTICA DO PEDIDO NA TABELA SUPABASE
     // ==============================================================================
     async function confirmarECriarPedidoNoSupabase() {
@@ -1019,14 +1326,23 @@
 
               <button 
                 type="button"
-                onclick="reiniciarConversa()"
-                class="w-full sm:w-auto py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer"
+                onclick="consultarPedidoNoSupabase('${idGerado}')"
+                class="w-full sm:w-auto py-2.5 px-3 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1"
               >
-                <span>Fazer Outro Pedido</span>
+                <span>🔍 Rastrear este Pedido</span>
+              </button>
+
+              <button 
+                type="button"
+                onclick="reiniciarConversa()"
+                class="w-full sm:w-auto py-2.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer"
+              >
+                <span>Novo Pedido</span>
               </button>
             </div>
           </div>
         `;
+
 
         adicionarMensagem('bot', msgSucesso);
       } catch (err) {
@@ -1045,53 +1361,90 @@
     }
 
     // ==============================================================================
-    // INTEGRAÇÃO COM GROQ API (QWEN 3.8 27B - MÁXIMO NÍVEL DE RACIOCÍNIO)
+    // INTEGRAÇÃO COM GROQ API (QWEN 3.8 27B - MÁXIMO NÍVEL DE RACIOCÍNIO & CONHECIMENTO)
     // ==============================================================================
     async function tentarProcessarComGroqQwen(textoUsuario) {
       if (!configuracaoChat.groqApiKey) return false;
 
-      // Modelos em ordem de máxima capacidade analítica no Groq
+      // Modelos em ordem de capacidade analítica e resiliência
       const modelos = [configuracaoChat.modeloIa || 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b'];
 
       const promptSistema = `
-Você é o assistente virtual de inteligência artificial de alta performance da empresa "${configuracaoChat.nomeEmpresa}", operando via Groq LPU com o modelo Qwen 3.8 27B no MÁXIMO NÍVEL DE RACIOCÍNIO ANALÍTICO E EMPATIA.
-Seu objetivo é conduzir um atendimento excepcional, ágil e resolutivo para coletar e estruturar todos os dados necessários para o registro de um novo pedido no sistema:
-- Nome do cliente
-- Telefone / WhatsApp para contato
-- Descrição do Serviço ou Produto solicitado
-- Setor ou Categoria (opções disponíveis: ${(configuracaoChat.setoresDisponiveis || []).join(', ')})
-- Data e horário de preferência de execução/entrega
-- Valor estimado (se informado pelo cliente, ou 0 para orçamento)
-- Observações adicionais, endereço ou especificidades
+Você é o assistente virtual de inteligência artificial de alta performance da empresa "${configuracaoChat.nomeEmpresa}", conectado em tempo real à nossa Central de Pedidos via Groq LPU com o modelo Qwen 3.8 27B.
+Você possui RACIOCÍNIO ANALÍTICO PROFUNDO, EMPATIA E CONHECIMENTO OPERACIONAL TOTAL DO SISTEMA.
 
-Dados já coletados anteriormente no atendimento:
+=========================================
+ONTOLOGIA DO SISTEMA & ESTRUTURA OPERACIONAL
+=========================================
+1. CICLO DE VIDA DO PEDIDO (KANBAN OPERACIONAL EM TEMPO REAL):
+   - 🟡 Pendente: Pedido recém-registrado pelo cliente no chatbot. Entra instantaneamente no painel dos operadores aguardando triagem técnica.
+   - 🔵 Agendado: Data, horário e detalhes confirmados pela equipe.
+   - 🟣 Em Produção: Pedido em execução física ativa pela equipe do setor correspondente.
+   - 🟢 Concluído: Pedido finalizado, revisado no controle de qualidade, entregue ao cliente ou disponível para retirada.
+   - 🔴 Cancelado: Cancelado a pedido do cliente ou por inviabilidade técnica.
+
+2. SETORES E DEPARTAMENTOS DISPONÍVEIS:
+   ${(configuracaoChat.setoresDisponiveis || ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']).map(s => `- ${s}`).join('\n   ')}
+
+3. POLÍTICAS INSTITUCIONAIS & FAQ INTEGRADO:
+   - Horário de Funcionamento: Segunda a Sexta das 08h às 18h; Sábados das 08h às 12h. Atendimento digital 24h.
+   - Formas de Pagamento: PIX instantâneo (com desconto especial), Cartões de Débito, Cartões de Crédito (em até 12x), Boleto bancário e Dinheiro.
+   - Garantia: 90 dias de garantia legal com suporte pós-atendimento garantido pelo painel.
+   - Prazos: 24h a 48h úteis para serviços regulares; pedidos urgentes sinalizados com prioridade máxima.
+   - Orçamentos: Gratuitos e sem compromisso.
+
+=========================================
+ESTADO ATUAL DO PEDIDO EM CONSTRUÇÃO
+=========================================
 ${JSON.stringify(dadosPedidoEmConstrucao)}
 
-Mensagem recebida do cliente agora: "${textoUsuario}".
+=========================================
+AÇÕES DISPONÍVEIS:
+=========================================
+Classifique a intenção no campo "acao":
+- "CONSULTAR_PEDIDO": Se o cliente quer consultar ou rastrear o andamento de um pedido existente (ex: "como está meu pedido #38?", "rastrear pedido 38", "consultar pedido").
+- "RESPONDER_DUVIDA": Se o cliente tem dúvidas sobre formas de pagamento, horários, localização, garantias, prazos gerais, etc.
+- "CRIAR_PEDIDO": Se o cliente está solicitando um novo serviço, orçamento ou informando dados para um novo pedido.
+- "EDITAR_PEDIDO": Se o cliente está alterando algum dado do pedido em construção.
 
-DIRETRIZES DE MÁXIMO RACIOCÍNIO ANALÍTICO:
-1. Analise o contexto da conversa e deduza informações implícitas (ex: se o cliente cita "pastilhas de freio", "troca de óleo" ou "alinhamento", o setor é Oficina; se cita "vacina", "ração" ou "tosa", Pet Shop; se cita "formatação" ou "computador", Informática).
-2. Se o cliente tiver dúvidas sobre prazos, formas de pagamento ou detalhes técnicos, responda de forma prestativa, transparente e acolhedora.
-3. Se o cliente estiver confirmando o pedido (ex: "sim", "pode confirmar", "está certo", "ok", "enviar pedido", "pode agendar"), defina "clienteConfirmou": true.
-4. Se Nome, Telefone e Serviço já foram identificados ou informados agora, defina "prontoParaConfirmar": true.
-
-Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e sem texto antes ou depois) no formato:
+=========================================
+FORMATO ESTRITO DE RESPOSTA (JSON):
+=========================================
+Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem texto antes ou depois):
 {
-  "raciocinio": "Resumo do raciocínio analítico sobre as necessidades do cliente",
-  "mensagem": "Sua resposta altamente profissional, empática e acolhedora para o cliente",
+  "raciocinio": "Resumo do raciocínio analítico da intenção",
+  "acao": "CRIAR_PEDIDO" | "CONSULTAR_PEDIDO" | "RESPONDER_DUVIDA" | "EDITAR_PEDIDO",
+  "mensagem": "Sua resposta altamente acolhedora, profissional e resolutiva em português",
   "dadosAtualizados": {
     "cliente": "Nome do cliente",
-    "telefone": "Telefone/WhatsApp",
-    "servico": "Serviço solicitado",
-    "setor": "Setor mais adequado",
-    "data_pedido": "Data e horário",
+    "telefone": "Telefone/WhatsApp com DDD",
+    "servico": "Descrição detalhada do serviço ou produto",
+    "setor": "Setor mais adequado entre os disponíveis",
+    "data_pedido": "Data e horário preferenciais",
     "valor": 0,
-    "observacoes": "Observações relevantes"
+    "observacoes": "Observações relevantes ou [URGENTE]"
   },
+  "consulta": {
+    "idPedido": null,
+    "telefone": null
+  },
+  "sugestoes": ["Texto Chip 1", "Texto Chip 2"],
   "prontoParaConfirmar": false,
   "clienteConfirmou": false
 }
 `;
+
+      // Histórico multi-turn recente (últimas 8 mensagens limpas de HTML)
+      const historicoRecente = historicoMensagens.slice(-8).map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const messages = [
+        { role: 'system', content: promptSistema },
+        ...historicoRecente,
+        { role: 'user', content: textoUsuario }
+      ];
 
       for (const modelo of modelos) {
         try {
@@ -1103,12 +1456,9 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
             },
             body: JSON.stringify({
               model: modelo,
-              reasoning_effort: 'high',
-              messages: [
-                { role: 'system', content: promptSistema },
-                { role: 'user', content: textoUsuario }
-              ],
-              temperature: 0.15
+              messages,
+              max_tokens: 500,
+              temperature: 0.1
             })
           });
 
@@ -1122,18 +1472,27 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
           const rawText = choice?.content;
           if (!rawText) continue;
 
-          // Registro do raciocínio analítico gerado pelo Qwen 3.8
           if (choice.reasoning) {
             console.info(`[Qwen 3.8 27B Reasoning]:`, choice.reasoning);
           }
 
           let respostaObj = null;
           try {
-            const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+            let cleanJson = rawText;
+            if (cleanJson.includes('</think>')) {
+              cleanJson = cleanJson.split('</think>')[1];
+            }
+            cleanJson = cleanJson.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const firstBrace = cleanJson.indexOf('{');
+            const lastBrace = cleanJson.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+              cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+            }
             respostaObj = JSON.parse(cleanJson);
           } catch (parseErr) {
             respostaObj = {
-              mensagem: rawText,
+              acao: 'RESPONDER_DUVIDA',
+              mensagem: rawText.replace(/<[^>]+>/g, ' ').trim(),
               dadosAtualizados: {},
               prontoParaConfirmar: false,
               clienteConfirmou: false
@@ -1141,7 +1500,44 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
           }
 
           if (respostaObj && respostaObj.mensagem) {
-            // Mescla dados estruturados extraídos pelo raciocínio do Qwen 3.8
+            // 1. AÇÃO: CONSULTAR_PEDIDO
+            if (respostaObj.acao === 'CONSULTAR_PEDIDO') {
+              adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
+              const idPed = respostaObj.consulta?.idPedido;
+              const telPed = respostaObj.consulta?.telefone;
+              if (idPed || telPed) {
+                await consultarPedidoNoSupabase(idPed || telPed);
+              } else {
+                const matchNum = textoUsuario.match(/#?(\d+)/);
+                if (matchNum && matchNum[1] && matchNum[1].length <= 6) {
+                  await consultarPedidoNoSupabase(matchNum[1]);
+                } else {
+                  atualizarSugestoes([
+                    { texto: 'Informar número #', valor: 'Meu pedido é #' },
+                    { texto: 'Informar meu WhatsApp', valor: 'Meu telefone é ' },
+                    { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
+                  ]);
+                }
+              }
+              return true;
+            }
+
+            // 2. AÇÃO: RESPONDER_DUVIDA
+            if (respostaObj.acao === 'RESPONDER_DUVIDA') {
+              adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
+              if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
+                atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
+              } else {
+                atualizarSugestoes([
+                  { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
+                  { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' },
+                  { texto: '💰 Solicitar Orçamento', valor: 'Quero solicitar um orçamento' }
+                ]);
+              }
+              return true;
+            }
+
+            // 3. AÇÃO: CRIAR_PEDIDO OU EDITAR_PEDIDO
             if (respostaObj.dadosAtualizados) {
               const d = respostaObj.dadosAtualizados;
               if (d.cliente && d.cliente.trim() && d.cliente !== 'Não informado') dadosPedidoEmConstrucao.cliente = d.cliente.trim();
@@ -1166,8 +1562,12 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e se
               return true;
             }
 
-            // Renderiza a resposta refinada do Qwen
+            // Renderiza a resposta do assistente
             adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
+
+            if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
+              atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
+            }
 
             // Se estiver pronto para confirmação ou tiver os 3 dados vitais
             if (respostaObj.prontoParaConfirmar || (dadosPedidoEmConstrucao.cliente && dadosPedidoEmConstrucao.telefone && dadosPedidoEmConstrucao.servico)) {
