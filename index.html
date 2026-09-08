@@ -415,32 +415,21 @@
               <p class="text-[10px] text-slate-400 dark:text-slate-500">Seu nome e sobrenome completo serão usados para identificar seu perfil no sistema.</p>
             </div>
 
-            <!-- Seletor de Cargo / Tipo de Conta -->
+            <!-- Seletor de Tipo de Conta (Apenas Usuário) -->
             <div class="space-y-1.5 pt-0.5">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                Tipo de Conta (Cargo) *
+                Tipo de Conta *
               </label>
-              <div class="grid grid-cols-2 gap-2">
+              <div class="w-full">
                 <label id="card-cargo-opt-cliente" class="relative flex flex-col p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none shadow-xs">
                   <div class="flex items-center justify-between">
                     <span class="text-xs font-bold flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300">
                       <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      Cliente
+                      Usuário
                     </span>
                     <input type="radio" name="registro-cargo" id="cargo-cliente" value="cliente" checked class="w-3.5 h-3.5 text-indigo-600 focus:ring-indigo-500 cursor-pointer" onchange="atualizarEstiloCargoRegistro()" />
                   </div>
-                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">Acesso aos meus próprios pedidos e histórico pessoal</span>
-                </label>
-                
-                <label id="card-cargo-opt-admin" class="relative flex flex-col p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none">
-                  <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
-                      <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-                      Administrador
-                    </span>
-                    <input type="radio" name="registro-cargo" id="cargo-admin" value="admin" class="w-3.5 h-3.5 text-indigo-600 focus:ring-indigo-500 cursor-pointer" onchange="atualizarEstiloCargoRegistro()" />
-                  </div>
-                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">Acesso global a todos os pedidos e gestão</span>
+                  <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">Acesso pessoal aos seus pedidos e acompanhamento em tempo real</span>
                 </label>
               </div>
             </div>
@@ -2717,20 +2706,12 @@
     let modoAuditoriaClienteAtivo = false; // Modo Auditoria (Administrador simula visão de cliente sem faturamento)
     let listaNotificacoes = []; // Central de Notificações em Tempo Real
 
+
     // ATUALIZAR ESTILO VISUAL DO SELETOR DE CARGO NO REGISTRO
     function atualizarEstiloCargoRegistro() {
-      const radioCliente = document.getElementById('cargo-cliente');
       const cardCliente = document.getElementById('card-cargo-opt-cliente');
-      const cardAdmin = document.getElementById('card-cargo-opt-admin');
-
-      if (!cardCliente || !cardAdmin || !radioCliente) return;
-
-      if (radioCliente.checked) {
+      if (cardCliente) {
         cardCliente.className = 'relative flex flex-col p-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none shadow-xs';
-        cardAdmin.className = 'relative flex flex-col p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none';
-      } else {
-        cardCliente.className = 'relative flex flex-col p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none';
-        cardAdmin.className = 'relative flex flex-col p-2.5 rounded-xl border-2 border-purple-600 bg-purple-50/70 dark:bg-purple-950/40 text-slate-800 dark:text-slate-200 cursor-pointer transition select-none shadow-xs';
       }
     }
 
@@ -3893,8 +3874,8 @@
       const senha = document.getElementById('registro-senha').value;
       const confirmaSenha = document.getElementById('registro-confirma-senha').value;
 
-      const cargoSelecionado = document.querySelector('input[name="registro-cargo"]:checked')?.value || 'cliente';
-      const roleFinal = (cargoSelecionado === 'admin' || cargoSelecionado === 'administrador') ? 'administrador' : 'cliente';
+      // Cadastro público via painel de login permite exclusivamente perfil de usuário comum
+      const roleFinal = 'cliente';
 
       const btn = document.getElementById('btn-submit-registro');
       const btnText = document.getElementById('btn-text-registro');
