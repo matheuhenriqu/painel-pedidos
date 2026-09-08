@@ -2749,10 +2749,14 @@
       }
     }
 
-    // SALVAR REGISTRO DE CONTAS NO SUPABASE E LOCALSTORAGE
+    // SALVAR REGISTRO DE CONTAS NO SUPABASE E LOCALSTORAGE (RESTRITO A ADMINISTRADORES)
     async function salvarRegistroContasSupabase() {
       localStorage.setItem('sistema_contas_usuarios', JSON.stringify(registroContasUsuarios));
       atualizarBadgeTotalClientes();
+
+      // Trava de segurança: apenas administrador autenticado pode gravar no banco
+      if (usuarioCargo !== 'administrador') return;
+
       try {
         const jsonContas = JSON.stringify(registroContasUsuarios);
         const { data: existente } = await supabaseClient
@@ -2793,7 +2797,8 @@
       const email = (usuario.email || '').toLowerCase();
       const meta = usuario.user_metadata || {};
       const nome = meta.full_name || meta.username || email.split('@')[0] || 'Usuário';
-      const rawCargo = meta.role || meta.cargo || (email.includes('admin') ? 'administrador' : 'cliente');
+      // Não deduzir cargo por email.includes('admin')
+      const rawCargo = meta.role || meta.cargo || 'cliente';
       const cargoPadrao = (rawCargo === 'admin' || rawCargo === 'administrador') ? 'administrador' : 'cliente';
 
       const idx = registroContasUsuarios.findIndex(c => c.id === usuario.id || (c.email && c.email.toLowerCase() === email));
@@ -2834,7 +2839,7 @@
         usuarioCargo = (conta.role === 'admin' || conta.role === 'administrador') ? 'administrador' : 'cliente';
       } else {
         const metaRole = usuarioAtual.user_metadata?.role || usuarioAtual.user_metadata?.cargo;
-        if (metaRole === 'admin' || metaRole === 'administrador' || email.includes('admin')) {
+        if (metaRole === 'admin' || metaRole === 'administrador') {
           usuarioCargo = 'administrador';
         } else {
           usuarioCargo = 'cliente';
@@ -3046,10 +3051,10 @@
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between gap-1">
-              <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${n.titulo}</p>
-              <span class="text-[10px] text-slate-400 shrink-0">${n.data}</span>
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${escapeHtml(n.titulo)}</p>
+              <span class="text-[10px] text-slate-400 shrink-0">${escapeHtml(n.data)}</span>
             </div>
-            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">${n.mensagem}</p>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5 leading-snug">${escapeHtml(n.mensagem)}</p>
             ${n.idPedido ? `
               <button onclick="abrirModalDetalhes(${n.idPedido}); alternarDropdownNotificacoes();" class="mt-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">
                 Ver pedido #${n.idPedido} &rarr;
@@ -3158,23 +3163,19 @@
       if (statAtivas) statAtivas.textContent = registroContasUsuarios.filter(c => c.status !== 'suspenso').length;
     }
 
-    // VERIFICAR SE O PEDIDO PERTENCE AO USUÁRIO
+    // VERIFICAR SE O PEDIDO PERTENCE AO USUÁRIO (VÍNCULO SEGURO)
     function pedidoPertenceAoUsuario(pedido, usuario) {
       if (!pedido || !usuario) return false;
-      // 1. Verificação direta por user_id
+      // 1. Verificação primária e segura por user_id imutável
       if (pedido.user_id && String(pedido.user_id) === String(usuario.id)) {
         return true;
       }
-      // 2. Verificação por nome do cliente ou e-mail nos metadados
-      const meta = usuario.user_metadata || {};
-      const nomeCompleto = removerAcentos(meta.full_name || meta.username || '');
-      const emailNome = removerAcentos((usuario.email || '').split('@')[0] || '');
-      const clientePedido = removerAcentos(getCampo(pedido, 'cliente', 'nome', 'nome_cliente'));
-
-      if (clientePedido && (clientePedido === nomeCompleto || clientePedido.includes(nomeCompleto) || (nomeCompleto && nomeCompleto.includes(clientePedido)) || clientePedido === emailNome)) {
+      // 2. Fallback estrito: correspondência exata de e-mail registrado no pedido
+      const emailPedido = (getCampo(pedido, 'email', 'email_cliente') || '').toLowerCase().trim();
+      const emailUsuario = (usuario.email || '').toLowerCase().trim();
+      if (emailPedido && emailUsuario && emailPedido === emailUsuario) {
         return true;
       }
-
       return false;
     }
 
@@ -3285,7 +3286,7 @@
               </div>
               <div class="truncate">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">${c.full_name || 'Usuário Sem Nome'}</span>
+                  <span class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(c.full_name || 'Usuário Sem Nome')}</span>
                   ${isAdmin 
                     ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200 dark:border-purple-800">Administrador</span>' 
                     : '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Cliente</span>'}
@@ -3295,8 +3296,8 @@
                   ${isEuMesmo ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-indigo-600 text-white">Você</span>' : ''}
                 </div>
                 <div class="flex items-center gap-3 text-[11px] text-slate-400 mt-0.5 flex-wrap">
-                  <span>${c.email || 'Sem e-mail'}</span>
-                  ${c.phone || c.telefone ? `<span>• ${c.phone || c.telefone}</span>` : ''}
+                  <span>${escapeHtml(c.email || 'Sem e-mail')}</span>
+                  ${c.phone || c.telefone ? `<span>• ${escapeHtml(c.phone || c.telefone)}</span>` : ''}
                   <span>• <b class="text-slate-700 dark:text-slate-300">${qtdPedidos}</b> ${qtdPedidos === 1 ? 'pedido' : 'pedidos'}</span>
                 </div>
               </div>
@@ -4580,10 +4581,10 @@
         container.innerHTML = historicoAtividades.map(a => `
           <div class="pt-3 first:pt-0 space-y-1 text-xs">
             <div class="flex items-center justify-between font-bold">
-              <span class="text-indigo-600 dark:text-indigo-400">${a.acao}</span>
-              <span class="text-[10px] text-slate-400">${a.hora}</span>
+              <span class="text-indigo-600 dark:text-indigo-400">${escapeHtml(a.acao)}</span>
+              <span class="text-[10px] text-slate-400">${escapeHtml(a.hora)}</span>
             </div>
-            <p class="text-slate-600 dark:text-slate-300">${a.detalhes}</p>
+            <p class="text-slate-600 dark:text-slate-300">${escapeHtml(a.detalhes)}</p>
           </div>
         `).join('');
       }
@@ -4691,24 +4692,42 @@
       if (usuarioAtual && document.visibilityState === 'visible') carregarPedidos(true);
     });
 
+    // HELPER: ESCAPE SEGURO DE HTML CONTRA XSS
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     // HELPER: NORMALIZAÇÃO DE TEXTO
     function removerAcentos(str) {
       return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     }
 
-    // HELPER: DESTAQUE DE TERMOS DE BUSCA
+    // HELPER: DESTAQUE SEGURO DE TERMOS DE BUSCA (COM ESCAPE HTML AUTOMÁTICO)
     function destacarTexto(texto, termo) {
-      if (!termo || !texto) return texto || '';
+      if (texto === null || texto === undefined) return '';
       const t = String(texto);
-      const termoNorm = removerAcentos(termo);
+      if (!termo || !termo.trim()) return escapeHtml(t);
+      const termoLimpo = termo.trim();
+      const termoNorm = removerAcentos(termoLimpo);
       const textoNorm = removerAcentos(t);
       const idx = textoNorm.indexOf(termoNorm);
-      if (idx === -1) return t;
+      if (idx === -1) return escapeHtml(t);
 
       const antes = t.substring(0, idx);
-      const correspondente = t.substring(idx, idx + termo.length);
-      const depois = t.substring(idx + termo.length);
-      return `${antes}<mark class="bg-amber-200 dark:bg-amber-800/80 text-slate-900 dark:text-white rounded px-0.5">${correspondente}</mark>${destacarTexto(depois, termo)}`;
+      const correspondente = t.substring(idx, idx + termoLimpo.length);
+      const depois = t.substring(idx + termoLimpo.length);
+      return `${escapeHtml(antes)}<mark class="bg-amber-200 dark:bg-amber-800/80 text-slate-900 dark:text-white rounded px-0.5">${escapeHtml(correspondente)}</mark>${destacarTexto(depois, termoLimpo)}`;
+    }
+
+    // ALIAS PARA COMPATIBILIDADE (KANBAN E OUTRAS VISÕES)
+    function realcarTermo(texto, termo) {
+      return destacarTexto(texto, termo);
     }
 
     // HELPER: TOLERÂNCIA DE NOMES DE COLUNA
@@ -4777,22 +4796,29 @@
       }
 
       try {
-        const { data, error } = await supabaseClient
-          .from('pedidos')
-          .select('*');
+        let query = supabaseClient.from('pedidos').select('*');
+
+        // Se for cliente comum, solicita ao Supabase estritamente os pedidos vinculados ao seu ID
+        if (usuarioCargo !== 'administrador' && usuarioAtual && usuarioAtual.id) {
+          query = query.eq('user_id', usuarioAtual.id);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
-        // Extrair registro de contas se presente no Supabase (__sistema_contas__)
-        const registroContasRemoto = (data || []).find(p => p.setor === '__sistema_contas__');
-        if (registroContasRemoto && registroContasRemoto.observacoes) {
-          try {
-            const contasRemotas = JSON.parse(registroContasRemoto.observacoes);
-            if (Array.isArray(contasRemotas) && contasRemotas.length > 0) {
-              sincronizarContasRemotas(contasRemotas);
+        // Apenas administradores autenticados podem sincronizar o registro de contas de usuários
+        if (usuarioCargo === 'administrador') {
+          const registroContasRemoto = (data || []).find(p => p.setor === '__sistema_contas__');
+          if (registroContasRemoto && registroContasRemoto.observacoes) {
+            try {
+              const contasRemotas = JSON.parse(registroContasRemoto.observacoes);
+              if (Array.isArray(contasRemotas) && contasRemotas.length > 0) {
+                sincronizarContasRemotas(contasRemotas);
+              }
+            } catch (e) {
+              console.warn('Erro ao ler registro de contas remoto:', e);
             }
-          } catch (e) {
-            console.warn('Erro ao ler registro de contas remoto:', e);
           }
         }
 
@@ -5019,7 +5045,7 @@
         return `
           <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60 space-y-2">
             <div class="flex items-center justify-between font-bold">
-              <span class="text-slate-800 dark:text-slate-200">${s}</span>
+              <span class="text-slate-800 dark:text-slate-200">${escapeHtml(s)}</span>
               <span class="text-indigo-600 dark:text-indigo-400 font-extrabold">${formatarMoeda(valor)}</span>
             </div>
             <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -5055,16 +5081,16 @@
 
       statusSelect.innerHTML = '<option value="">Todos os status</option>' +
         Object.keys(contagemStatus).sort().map(s => `
-          <option value="${s}" ${s === statusAtual ? 'selected' : ''}>${s} (${contagemStatus[s]})</option>
+          <option value="${escapeHtml(s)}" ${s === statusAtual ? 'selected' : ''}>${escapeHtml(s)} (${contagemStatus[s]})</option>
         `).join('');
 
       setorSelect.innerHTML = '<option value="">Todos os setores</option>' +
         Object.keys(contagemSetor).sort().map(s => `
-          <option value="${s}" ${s === setorAtual ? 'selected' : ''}>${s} (${contagemSetor[s]})</option>
+          <option value="${escapeHtml(s)}" ${s === setorAtual ? 'selected' : ''}>${escapeHtml(s)} (${contagemSetor[s]})</option>
         `).join('');
 
       if (datalistSetores) {
-        datalistSetores.innerHTML = Object.keys(contagemSetor).map(s => `<option value="${s}">`).join('');
+        datalistSetores.innerHTML = Object.keys(contagemSetor).map(s => `<option value="${escapeHtml(s)}">`).join('');
       }
     }
 
@@ -5200,6 +5226,12 @@
     async function atualizarStatusRapido(id, novoStatus) {
       const pedido = dadosOriginais.find(p => p.id === id);
       if (!pedido) return;
+
+      // Trava de autorização: cliente só pode alterar o status de seus próprios pedidos
+      if (usuarioCargo !== 'administrador' && !pedidoPertenceAoUsuario(pedido, usuarioAtual)) {
+        mostrarToast('Você não tem permissão para alterar o status deste pedido.');
+        return;
+      }
 
       const statusAntigo = pedido.status;
       pedido.status = novoStatus;
@@ -5403,7 +5435,7 @@
                     title="Selecionar pedido"
                   />
                   <span class="inline-flex items-center text-[11px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-100 dark:border-indigo-800/80 px-2.5 py-1 rounded-lg">
-                    ${setor}
+                    ${escapeHtml(setor)}
                   </span>
                 </div>
 
@@ -5438,7 +5470,7 @@
                   </span>
                   ${whatsUrl ? `
                     <a href="${whatsUrl}" target="_blank" rel="noopener" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
-                      ${telefone}
+                      ${escapeHtml(telefone)}
                       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     </a>
                   ` : '<span class="text-slate-400 font-medium">Não informado</span>'}
@@ -5522,7 +5554,7 @@
             </td>
             <td class="px-4 py-3">
               <span class="inline-flex text-[11px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
-                ${setor}
+                ${escapeHtml(setor)}
               </span>
             </td>
             <td class="px-4 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">
@@ -5727,7 +5759,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
             <div class="px-4 sm:px-5 py-3.5 sm:py-4 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div class="flex items-center gap-2.5">
                 <span class="w-3 h-3 rounded-full bg-indigo-500 shrink-0"></span>
-                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${s}</h3>
+                <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${escapeHtml(s)}</h3>
                 <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shrink-0">
                   ${itens.length} ${itens.length === 1 ? 'pedido' : 'pedidos'}
                 </span>
@@ -5750,7 +5782,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
                   <div onclick="abrirModalDetalhes(${id})" class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-3">
                     <div class="space-y-1">
                       <div class="flex items-center justify-between">
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${badgeStatus(status)}">${status}</span>
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full border ${badgeStatus(status)}">${escapeHtml(status)}</span>
                         <span class="text-[11px] text-slate-400">${formatarData(data)}</span>
                       </div>
                       <h4 class="text-sm font-bold text-slate-900 dark:text-white pt-1">${cliente}</h4>
@@ -6440,7 +6472,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </span>
                 <div>
-                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${dataLabel}</h3>
+                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">${escapeHtml(dataLabel)}</h3>
                   <p class="text-[11px] text-slate-400">${itens.length} ${itens.length === 1 ? 'pedido/agendamento' : 'pedidos/agendamentos'}</p>
                 </div>
               </div>
@@ -6475,7 +6507,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
                           class="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer"
                         />
                         <span class="text-xs font-bold text-slate-900 dark:text-white cursor-pointer hover:text-indigo-600" onclick="abrirModalDetalhes(${id})">${cliente}</span>
-                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">${setor}</span>
+                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">${escapeHtml(setor)}</span>
                       </div>
                       <div class="flex items-center gap-2">
                         <select 
@@ -6754,6 +6786,19 @@ const colPendente = document.getElementById('kanban-col-pendente');
       erroEl.classList.add('hidden');
 
       const idEdicao = document.getElementById('pedido-id-edicao').value;
+
+      // Trava de autorização: cliente comum só pode editar seus próprios pedidos
+      if (idEdicao && usuarioCargo !== 'administrador') {
+        const pedidoExistente = dadosOriginais.find(p => Number(p.id) === Number(idEdicao));
+        if (pedidoExistente && !pedidoPertenceAoUsuario(pedidoExistente, usuarioAtual)) {
+          erroEl.textContent = 'Acesso negado: Você só pode editar pedidos pertencentes ao seu perfil.';
+          erroEl.classList.remove('hidden');
+          btnSalvar.disabled = false;
+          btnSalvar.textContent = 'Atualizar Pedido';
+          return;
+        }
+      }
+
       const cliente = document.getElementById('novo-cliente').value.trim();
       const telefone = document.getElementById('novo-telefone').value.trim();
       const setor = document.getElementById('novo-setor').value.trim() || 'Geral';
@@ -6817,6 +6862,13 @@ const colPendente = document.getElementById('kanban-col-pendente');
       if (!numId) return;
 
       const pedido = dadosOriginais.find(p => Number(p.id) === numId);
+
+      // Trava de autorização: cliente comum só pode excluir os seus próprios pedidos
+      if (usuarioCargo !== 'administrador' && pedido && !pedidoPertenceAoUsuario(pedido, usuarioAtual)) {
+        mostrarToast('Acesso negado: Você só pode excluir pedidos do seu próprio perfil.');
+        return;
+      }
+
       const nomeCliente = pedido ? (getCampo(pedido, 'cliente', 'nome') || 'Cliente') : '';
       const confirmMsg = nomeCliente
         ? `Tem certeza que deseja excluir o Pedido #${numId} (${nomeCliente})?\nEsta ação não poderá ser desfeita.`
@@ -6863,6 +6915,18 @@ const colPendente = document.getElementById('kanban-col-pendente');
     // EXCLUIR MÚLTIPLOS PEDIDOS SELECIONADOS EM LOTE
     async function excluirSelecionadosLote() {
       if (pedidosSelecionados.size === 0) return;
+
+      // Trava de autorização: cliente comum não pode excluir em lote pedidos alheios
+      if (usuarioCargo !== 'administrador') {
+        const temPedidoAlheio = Array.from(pedidosSelecionados).some(id => {
+          const ped = dadosOriginais.find(p => Number(p.id) === Number(id));
+          return ped && !pedidoPertenceAoUsuario(ped, usuarioAtual);
+        });
+        if (temPedidoAlheio) {
+          mostrarToast('Acesso negado: A seleção contém pedidos que não pertencem ao seu perfil.');
+          return;
+        }
+      }
       const ids = Array.from(pedidosSelecionados).map(Number);
       const total = ids.length;
 
@@ -7092,11 +7156,11 @@ const colPendente = document.getElementById('kanban-col-pendente');
         const tbody = document.getElementById('corpo-preview-csv');
         tbody.innerHTML = novos.slice(0, 8).map(p => `
           <tr>
-            <td class="px-3 py-2 font-bold">${p.cliente}</td>
-            <td class="px-3 py-2">${p.setor}</td>
-            <td class="px-3 py-2 truncate max-w-xs">${p.servico}</td>
+            <td class="px-3 py-2 font-bold">${escapeHtml(p.cliente)}</td>
+            <td class="px-3 py-2">${escapeHtml(p.setor)}</td>
+            <td class="px-3 py-2 truncate max-w-xs">${escapeHtml(p.servico)}</td>
             <td class="px-3 py-2 text-right font-bold">${formatarMoeda(p.valor)}</td>
-            <td class="px-3 py-2">${p.status}</td>
+            <td class="px-3 py-2">${escapeHtml(p.status)}</td>
           </tr>
         `).join('');
 
