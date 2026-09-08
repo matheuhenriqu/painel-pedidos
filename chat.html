@@ -149,8 +149,9 @@
             <h1 id="chat-empresa-titulo" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
               Atendimento Inteligente
             </h1>
-            <span class="hidden sm:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
-              IA Ativa
+            <span class="inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/60 dark:to-indigo-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 shadow-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
+              Gemini 3.8 Flash &bull; Raciocínio Máximo
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -1025,119 +1026,135 @@
     }
 
     // ==============================================================================
-    // INTEGRAÇÃO COM GOOGLE GEMINI API (GEMINI 3.6 FLASH)
+    // INTEGRAÇÃO COM GOOGLE GEMINI API (MÁXIMO RACIOCÍNIO - GEMINI 3.8 FLASH)
     // ==============================================================================
     async function tentarProcessarComGemini(textoUsuario) {
       if (!configuracaoChat.geminiApiKey) return false;
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${configuracaoChat.geminiApiKey}`;
-        const promptSistema = `
-Você é o assistente virtual de inteligência artificial da empresa "${configuracaoChat.nomeEmpresa}".
-Seu objetivo é conduzir um atendimento prestativo, empático e ágil para coletar as informações necessárias de um novo pedido do cliente:
+
+      // Modelos em ordem de máxima capacidade e raciocínio analítico
+      const modelos = ['gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.6-flash'];
+
+      const promptSistema = `
+Você é o assistente virtual de inteligência artificial da empresa "${configuracaoChat.nomeEmpresa}", operando com MÁXIMA CAPACIDADE DE RACIOCÍNIO ANALÍTICO E EMPATIA.
+Seu objetivo é conduzir um atendimento excepcional, ágil e resolutivo para coletar e estruturar todos os dados necessários para o registro de um novo pedido:
 - Nome do cliente
 - Telefone / WhatsApp para contato
 - Descrição do Serviço ou Produto solicitado
 - Setor ou Categoria (opções disponíveis: ${(configuracaoChat.setoresDisponiveis || []).join(', ')})
-- Data e horário de preferência
-- Valor estimado (número ou 0 se for para orçamento)
-- Observações adicionais
+- Data e horário de preferência de execução/entrega
+- Valor estimado (se informado pelo cliente, ou 0 para orçamento)
+- Observações adicionais, endereço ou especificidades
 
-Dados já coletados anteriormente:
+Dados já coletados anteriormente no atendimento:
 ${JSON.stringify(dadosPedidoEmConstrucao)}
 
-Mensagem recebida do cliente: "${textoUsuario}".
+Mensagem recebida do cliente agora: "${textoUsuario}".
 
-INSTRUÇÕES OBRIGATÓRIAS:
-Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem blocos extras de texto) exatamente neste formato:
+DIRETRIZES DE MÁXIMO RACIOCÍNIO:
+1. Analise o contexto da conversa, deduza informações implícitas (ex: se o cliente cita "pastilhas de freio", o setor é Oficina; se cita "vacina ou tosa", Pet Shop; se cita "formatação", Informática).
+2. Se o cliente tiver dúvidas sobre prazos, formas de pagamento ou detalhes técnicos, responda de forma prestativa, transparente e acolhedora.
+3. Se o cliente estiver confirmando o pedido (ex: "sim", "pode confirmar", "está certo", "ok", "enviar pedido"), defina "clienteConfirmou": true.
+4. Se Nome, Telefone e Serviço já foram identificados, defina "prontoParaConfirmar": true.
+
+Retorne ESTRITAMENTE um objeto JSON válido (sem blocos markdown de código e sem texto antes ou depois) no formato:
 {
-  "mensagem": "Sua resposta simpática e profissional para o cliente confirmando os dados recebidos e perguntando a próxima informação necessária de forma natural",
+  "mensagem": "Sua resposta altamente profissional, empática e inteligente em português brasileiro para o cliente",
   "dadosAtualizados": {
-    "cliente": "Nome do cliente se detectado (ou manter o anterior)",
-    "telefone": "Telefone formatado se detectado (ou manter o anterior)",
-    "servico": "Serviço solicitado se detectado (ou manter o anterior)",
-    "setor": "Setor detectado ou Geral",
-    "data_pedido": "Data e horário detectados se houver (ou manter o anterior)",
+    "cliente": "Nome do cliente",
+    "telefone": "Telefone/WhatsApp",
+    "servico": "Serviço solicitado",
+    "setor": "Setor mais adequado",
+    "data_pedido": "Data e horário",
     "valor": 0,
-    "observacoes": "Observações se houver"
+    "observacoes": "Observações relevantes"
   },
   "prontoParaConfirmar": false,
   "clienteConfirmou": false
 }
-Se o cliente tiver informado os dados principais (Nome, Telefone/Contato e Serviço/Pedido), defina "prontoParaConfirmar": true.
-Se o cliente tiver expressado confirmação (ex: "sim", "pode confirmar", "ok", "enviar pedido"), defina "clienteConfirmou": true.
 `;
 
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: promptSistema }]
-            }]
-          })
-        });
-
-        if (!res.ok) {
-          console.warn('Gemini 3.6 Flash retorno não-ok:', res.status);
-          return false;
-        }
-
-        const json = await res.json();
-        const rawText = json.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!rawText) return false;
-
-        let respostaObj = null;
+      for (const modelo of modelos) {
         try {
-          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-          respostaObj = JSON.parse(cleanJson);
-        } catch (parseErr) {
-          respostaObj = {
-            mensagem: rawText,
-            dadosAtualizados: {},
-            prontoParaConfirmar: false,
-            clienteConfirmou: false
-          };
-        }
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${configuracaoChat.geminiApiKey}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: promptSistema }]
+              }],
+              generationConfig: {
+                temperature: 0.15,
+                thinkingConfig: {
+                  thinkingBudget: 2048
+                }
+              }
+            })
+          });
 
-        if (respostaObj && respostaObj.mensagem) {
-          // Mescla dados estruturados extraídos pelo Gemini
-          if (respostaObj.dadosAtualizados) {
-            const d = respostaObj.dadosAtualizados;
-            if (d.cliente && d.cliente.trim() && d.cliente !== 'Não informado') dadosPedidoEmConstrucao.cliente = d.cliente.trim();
-            if (d.telefone && d.telefone.trim() && d.telefone !== 'Não informado') dadosPedidoEmConstrucao.telefone = d.telefone.trim();
-            if (d.servico && d.servico.trim()) dadosPedidoEmConstrucao.servico = d.servico.trim();
-            if (d.setor && d.setor.trim()) dadosPedidoEmConstrucao.setor = d.setor.trim();
-            if (d.data_pedido && d.data_pedido.trim()) dadosPedidoEmConstrucao.data_pedido = d.data_pedido.trim();
-            if (d.valor) dadosPedidoEmConstrucao.valor = parseFloat(d.valor) || 0;
-            if (d.observacoes && d.observacoes.trim()) dadosPedidoEmConstrucao.observacoes = d.observacoes.trim();
+          if (!res.ok) {
+            console.warn(`Modelo ${modelo} retornou status ${res.status}, tentando próximo...`);
+            continue;
           }
 
-          // Fallback com o extrator local
-          const entidadesLocais = extrairEntidadesTexto(textoUsuario);
-          if (entidadesLocais.cliente && !dadosPedidoEmConstrucao.cliente) dadosPedidoEmConstrucao.cliente = entidadesLocais.cliente;
-          if (entidadesLocais.telefone && !dadosPedidoEmConstrucao.telefone) dadosPedidoEmConstrucao.telefone = entidadesLocais.telefone;
-          if (entidadesLocais.data_pedido && !dadosPedidoEmConstrucao.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidadesLocais.data_pedido;
-          if (entidadesLocais.setor && dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = entidadesLocais.setor;
+          const json = await res.json();
+          const contentPart = json.candidates?.[0]?.content?.parts?.find(p => !p.thought) || json.candidates?.[0]?.content?.parts?.[0];
+          const rawText = contentPart?.text;
+          if (!rawText) continue;
 
-          // Se o cliente confirmou o pedido via Gemini
-          if (respostaObj.clienteConfirmou) {
-            await confirmarECriarPedidoNoSupabase();
+          let respostaObj = null;
+          try {
+            const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+            respostaObj = JSON.parse(cleanJson);
+          } catch (parseErr) {
+            respostaObj = {
+              mensagem: rawText,
+              dadosAtualizados: {},
+              prontoParaConfirmar: false,
+              clienteConfirmou: false
+            };
+          }
+
+          if (respostaObj && respostaObj.mensagem) {
+            // Mescla dados estruturados extraídos pelo raciocínio do Gemini
+            if (respostaObj.dadosAtualizados) {
+              const d = respostaObj.dadosAtualizados;
+              if (d.cliente && d.cliente.trim() && d.cliente !== 'Não informado') dadosPedidoEmConstrucao.cliente = d.cliente.trim();
+              if (d.telefone && d.telefone.trim() && d.telefone !== 'Não informado') dadosPedidoEmConstrucao.telefone = d.telefone.trim();
+              if (d.servico && d.servico.trim()) dadosPedidoEmConstrucao.servico = d.servico.trim();
+              if (d.setor && d.setor.trim()) dadosPedidoEmConstrucao.setor = d.setor.trim();
+              if (d.data_pedido && d.data_pedido.trim()) dadosPedidoEmConstrucao.data_pedido = d.data_pedido.trim();
+              if (d.valor) dadosPedidoEmConstrucao.valor = parseFloat(d.valor) || 0;
+              if (d.observacoes && d.observacoes.trim()) dadosPedidoEmConstrucao.observacoes = d.observacoes.trim();
+            }
+
+            // Fallback de segurança com o extrator nativo
+            const entidadesLocais = extrairEntidadesTexto(textoUsuario);
+            if (entidadesLocais.cliente && !dadosPedidoEmConstrucao.cliente) dadosPedidoEmConstrucao.cliente = entidadesLocais.cliente;
+            if (entidadesLocais.telefone && !dadosPedidoEmConstrucao.telefone) dadosPedidoEmConstrucao.telefone = entidadesLocais.telefone;
+            if (entidadesLocais.data_pedido && !dadosPedidoEmConstrucao.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidadesLocais.data_pedido;
+            if (entidadesLocais.setor && dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = entidadesLocais.setor;
+
+            // Se o cliente confirmou o pedido via raciocínio do Gemini
+            if (respostaObj.clienteConfirmou) {
+              await confirmarECriarPedidoNoSupabase();
+              return true;
+            }
+
+            // Renderiza a resposta refinada do Gemini
+            adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
+
+            // Se estiver pronto para confirmação ou tiver os 3 dados vitais
+            if (respostaObj.prontoParaConfirmar || (dadosPedidoEmConstrucao.cliente && dadosPedidoEmConstrucao.telefone && dadosPedidoEmConstrucao.servico)) {
+              etapaColetaAtual = 'confirmacao';
+              exibirCardResumoConfirmacao();
+            }
+
             return true;
           }
-
-          // Renderiza a mensagem conversacional do Gemini
-          adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
-
-          // Se estiver pronto para confirmação ou tiver os 3 dados vitais
-          if (respostaObj.prontoParaConfirmar || (dadosPedidoEmConstrucao.cliente && dadosPedidoEmConstrucao.telefone && dadosPedidoEmConstrucao.servico)) {
-            etapaColetaAtual = 'confirmacao';
-            exibirCardResumoConfirmacao();
-          }
-
-          return true;
+        } catch (errModelo) {
+          console.warn(`Erro no modelo ${modelo}:`, errModelo);
         }
-      } catch (e) {
-        console.warn('Gemini 3.6 Flash indisponível, usando motor conversacional nativo:', e);
       }
       return false;
     }
