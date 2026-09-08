@@ -127,8 +127,17 @@
     <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-500/20 dark:bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- Botão Flutuante de Tema na Tela de Login -->
-    <div class="absolute top-4 right-4 z-30">
+    <!-- Botões Flutuantes no Topo da Tela de Login -->
+    <div class="absolute top-4 right-4 z-30 flex items-center gap-2">
+      <a 
+        href="chat.html"
+        title="Fazer Pedido Online com Assistente IA"
+        class="py-2 px-3 sm:px-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-2xl shadow-md shadow-indigo-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5 sm:gap-2 text-xs font-bold"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        <span>Fazer Pedido com IA ✨</span>
+      </a>
+
       <button 
         onclick="alternarTema()"
         title="Alternar Tema Claro / Escuro"
@@ -179,6 +188,20 @@
             <p class="text-xs font-bold text-slate-800 dark:text-slate-200">5 Modos Operacionais</p>
             <p class="text-[11px] text-slate-400">Cards interativos, Tabela, Colunas Kanban, Setores agrupados e Cronograma de Agenda.</p>
           </div>
+
+          <!-- Destaque do Chatbot Público com IA -->
+          <div class="col-span-2 p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50/90 to-purple-50/90 dark:from-indigo-950/40 dark:to-purple-950/40 backdrop-blur-md border border-indigo-200/80 dark:border-indigo-800/80 shadow-sm flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold shadow-sm shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-900 dark:text-white">Chatbot Público com IA Integrada</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400">Seus clientes solicitam pedidos 24/7 de forma conversacional, registrados automaticamente no Supabase.</p>
+              </div>
+            </div>
+            <a href="chat.html" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">Testar Chatbot</a>
+          </div>
         </div>
 
         <!-- Indicador de Confiança -->
@@ -203,7 +226,7 @@
           <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-t-3xl"></div>
 
           <!-- Cabeçalho do Card (Logo e Título) -->
-          <div class="text-center space-y-2 mb-5 pt-1">
+          <div class="text-center space-y-2 mb-4 pt-1">
             <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -211,6 +234,25 @@
             </div>
             <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Central de Pedidos</h1>
             <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Acesso Restrito ao Painel Operacional</p>
+          </div>
+
+          <!-- CARD DE ACESSO AO CHATBOT PÚBLICO DE PEDIDOS -->
+          <div class="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-violet-950/40 border border-indigo-200/80 dark:border-indigo-800/80 flex items-center justify-between gap-3 shadow-xs">
+            <div class="space-y-0.5">
+              <span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Atendimento Rápido sem Login
+              </span>
+              <p class="text-xs font-bold text-slate-900 dark:text-white">É cliente e quer fazer um pedido?</p>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">Peça online em segundos com a nossa IA!</p>
+            </div>
+            <a 
+              href="chat.html"
+              class="shrink-0 py-2 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Pedir com IA</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </a>
           </div>
 
           <!-- Abas de Navegação (Entrar vs Criar Conta) -->
@@ -842,6 +884,68 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span class="hidden sm:inline">Novo Pedido</span>
           </button>
+
+          <!-- Botão Chatbot IA Público & Atendimento -->
+          <div class="relative">
+            <button 
+              id="btn-menu-chatbot-header"
+              onclick="alternarMenuChatbotHeader()"
+              class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 active:scale-95 rounded-xl transition cursor-pointer shadow-xs"
+              title="Chatbot Público & Pedidos com IA"
+            >
+              <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+              </svg>
+              <span class="hidden md:inline">Chatbot IA</span>
+              <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+
+            <!-- Dropdown Menu do Chatbot -->
+            <div id="dropdown-chatbot-header" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 p-2 space-y-1">
+              <a 
+                href="chat.html" 
+                target="_blank"
+                class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/70 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+              >
+                <span class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </span>
+                <div>
+                  <p class="font-bold">Abrir Chatbot Público</p>
+                  <p class="text-[10px] text-slate-400 font-normal">Página direta para clientes</p>
+                </div>
+              </a>
+
+              <button 
+                type="button"
+                onclick="copiarLinkPublicoChatbot()"
+                class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/70 hover:text-indigo-600 dark:hover:text-indigo-400 transition text-left cursor-pointer"
+              >
+                <span class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                </span>
+                <div>
+                  <p class="font-bold">Copiar Link do Chatbot</p>
+                  <p class="text-[10px] text-slate-400 font-normal">Enviar aos clientes via WhatsApp</p>
+                </div>
+              </button>
+
+              <button 
+                type="button"
+                id="btn-abrir-config-chatbot"
+                onclick="abrirModalConfigChatbot()"
+                class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/70 hover:text-indigo-600 dark:hover:text-indigo-400 transition text-left cursor-pointer"
+              >
+                <span class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </span>
+                <div>
+                  <p class="font-bold">Configurar IA &amp; Negócio</p>
+                  <p class="text-[10px] text-slate-400 font-normal">Chave Gemini, empresa e setores</p>
+                </div>
+              </button>
+            </div>
+          </div>
 
           <!-- Botão Som de Notificação Realtime -->
           <button 
@@ -2399,6 +2503,146 @@
         </button>
       </div>
 
+  <!-- MODAL: CONFIGURAÇÕES DO CHATBOT IA & ATENDIMENTO PÚBLICO -->
+  <div id="modal-configuracoes-chatbot" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden modal-mobile-bottomsheet">
+    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 sm:zoom-in-95 duration-150 flex flex-col max-h-[92vh] sm:max-h-[88vh]">
+      
+      <!-- Alça de Toque para Mobile -->
+      <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
+
+      <!-- Cabeçalho do Modal -->
+      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-xs">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </span>
+          <div class="truncate">
+            <div class="flex items-center gap-2">
+              <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Configurações do Chatbot IA</h3>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">Público</span>
+            </div>
+            <p class="text-xs text-slate-400 dark:text-slate-500 truncate">Personalize a IA de pedidos, link público e setores de atendimento</p>
+          </div>
+        </div>
+        <button onclick="fecharModalConfigChatbot()" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Formulário de Configuração -->
+      <form id="form-configuracoes-chatbot" onsubmit="salvarConfiguracoesChatbot(event)" class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1 text-xs">
+        
+        <!-- Link Público para Compartilhar -->
+        <div class="p-3.5 bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 rounded-2xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              Link Público do seu Chatbot de Pedidos
+            </span>
+            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 rounded-full">Pronto para Divulgar</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input 
+              type="text" 
+              id="cfg-chat-link-publico" 
+              readonly 
+              class="flex-1 px-3 py-2 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl text-slate-700 dark:text-slate-300 font-mono text-[11px] select-all cursor-text"
+            />
+            <button 
+              type="button" 
+              onclick="copiarLinkPublicoChatbot()"
+              class="py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition active:scale-95 shrink-0 flex items-center gap-1 shadow-xs cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+              <span>Copiar</span>
+            </button>
+            <a 
+              id="btn-abrir-link-publico-chat"
+              href="chat.html" 
+              target="_blank"
+              class="py-2 px-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition active:scale-95 shrink-0"
+              title="Abrir em nova aba"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">Envie este link para clientes no WhatsApp, Instagram ou coloque como botão no seu site.</p>
+        </div>
+
+        <!-- Nome da Empresa / Loja -->
+        <div class="space-y-1">
+          <label class="block font-bold text-slate-700 dark:text-slate-300">Nome da Empresa ou Loja *</label>
+          <input 
+            type="text" 
+            id="cfg-chat-nome-empresa" 
+            required 
+            placeholder="Ex: Auto Mecânica Silva, Pet Shop Amigo Fiel" 
+            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+          />
+          <p class="text-[10px] text-slate-400">Exibido no cabeçalho e na saudação inicial do Chatbot.</p>
+        </div>
+
+        <!-- Chave Google Gemini API (Opcional) -->
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="block font-bold text-slate-700 dark:text-slate-300">Chave da API Google Gemini (Opcional)</label>
+            <a 
+              href="https://aistudio.google.com/app/apikey" 
+              target="_blank" 
+              class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+            >
+              <span>Obter chave gratuita</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+          </div>
+          <input 
+            type="password" 
+            id="cfg-chat-gemini-key" 
+            placeholder="AIzaSy..." 
+            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition"
+          />
+          <div class="p-2.5 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            💡 <strong>Dica:</strong> Se deixada em branco, o sistema funciona <strong>100% normalmente</strong> através do nosso Motor Conversacional Nativo com inteligência para extração de nomes, telefones, serviços, datas e orçamentos.
+          </div>
+        </div>
+
+        <!-- Setores em Destaque -->
+        <div class="space-y-1">
+          <label class="block font-bold text-slate-700 dark:text-slate-300">Setores / Categorias de Pedidos</label>
+          <input 
+            type="text" 
+            id="cfg-chat-setores" 
+            placeholder="Oficina, Pet Shop, Vendas, Informática, Geral" 
+            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition"
+          />
+          <p class="text-[10px] text-slate-400">Separe os setores por vírgula. Eles aparecerão como botões clicáveis no Chatbot.</p>
+        </div>
+
+        <!-- Mensagem de Feedback -->
+        <div id="cfg-chat-feedback" class="hidden p-3 rounded-xl text-xs font-semibold"></div>
+
+        <!-- Rodapé com Ações -->
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button 
+            type="button" 
+            onclick="fecharModalConfigChatbot()"
+            class="px-4 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-bold transition cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            id="btn-salvar-cfg-chat"
+            class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+          >
+            <span>Salvar Configurações</span>
+          </button>
+        </div>
+
+      </form>
+
     </div>
   </div>
 
@@ -2877,6 +3121,16 @@
         } else {
           btnGestaoClientes.classList.add('hidden');
           btnGestaoClientes.classList.remove('inline-flex');
+        }
+      }
+
+      // Botão de Configuração do Chatbot no Header (Exclusivo Administrador)
+      const btnCfgChatbot = document.getElementById('btn-abrir-config-chatbot');
+      if (btnCfgChatbot) {
+        if (isAdminReal && !modoAuditoriaClienteAtivo) {
+          btnCfgChatbot.classList.remove('hidden');
+        } else {
+          btnCfgChatbot.classList.add('hidden');
         }
       }
 
@@ -4172,6 +4426,178 @@
           btnReg.disabled = false;
           btnRegText?.classList.remove('hidden');
           btnRegSpinner?.classList.add('hidden');
+        }
+      }
+    }
+
+    // ==============================================================================
+    // CONFIGURAÇÕES E GESTÃO DO CHATBOT PÚBLICO IA
+    // ==============================================================================
+    let configuracaoChatGlobal = {
+      nomeEmpresa: 'Nossa Empresa',
+      geminiApiKey: '',
+      setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']
+    };
+
+    function obterUrlBaseChatbot() {
+      const loc = window.location;
+      const caminho = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+      return `${loc.origin}${caminho}chat.html`;
+    }
+
+    function alternarMenuChatbotHeader() {
+      const dropdown = document.getElementById('dropdown-chatbot-header');
+      if (dropdown) dropdown.classList.toggle('hidden');
+    }
+
+    function fecharMenuChatbotHeader() {
+      const dropdown = document.getElementById('dropdown-chatbot-header');
+      if (dropdown) dropdown.classList.add('hidden');
+    }
+
+    function copiarLinkPublicoChatbot() {
+      const url = obterUrlBaseChatbot();
+      navigator.clipboard.writeText(url).then(() => {
+        mostrarToast('Link do Chatbot copiado para a área de transferência! 📋✨');
+        fecharMenuChatbotHeader();
+      }).catch(() => {
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        mostrarToast('Link do Chatbot copiado! 📋✨');
+        fecharMenuChatbotHeader();
+      });
+    }
+
+    function abrirModalConfigChatbot() {
+      fecharMenuChatbotHeader();
+      carregarConfiguracoesChatbot();
+
+      const inputLink = document.getElementById('cfg-chat-link-publico');
+      const btnAbrir = document.getElementById('btn-abrir-link-publico-chat');
+      const url = obterUrlBaseChatbot();
+      if (inputLink) inputLink.value = url;
+      if (btnAbrir) btnAbrir.href = url;
+
+      const inputEmpresa = document.getElementById('cfg-chat-nome-empresa');
+      const inputGemini = document.getElementById('cfg-chat-gemini-key');
+      const inputSetores = document.getElementById('cfg-chat-setores');
+      const feedback = document.getElementById('cfg-chat-feedback');
+
+      if (feedback) feedback.classList.add('hidden');
+      if (inputEmpresa) inputEmpresa.value = configuracaoChatGlobal.nomeEmpresa || '';
+      if (inputGemini) inputGemini.value = configuracaoChatGlobal.geminiApiKey || '';
+      if (inputSetores) inputSetores.value = (configuracaoChatGlobal.setoresDisponiveis || []).join(', ');
+
+      const modal = document.getElementById('modal-configuracoes-chatbot');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function fecharModalConfigChatbot() {
+      const modal = document.getElementById('modal-configuracoes-chatbot');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function carregarConfiguracoesChatbot() {
+      try {
+        const salvo = localStorage.getItem('painel_chat_config');
+        if (salvo) {
+          const parsed = JSON.parse(salvo);
+          configuracaoChatGlobal = { ...configuracaoChatGlobal, ...parsed };
+        }
+      } catch (e) {
+        console.warn('Erro ao ler painel_chat_config do localStorage:', e);
+      }
+    }
+
+    async function salvarConfiguracoesChatbot(e) {
+      if (e) e.preventDefault();
+      const inputEmpresa = document.getElementById('cfg-chat-nome-empresa');
+      const inputGemini = document.getElementById('cfg-chat-gemini-key');
+      const inputSetores = document.getElementById('cfg-chat-setores');
+      const feedback = document.getElementById('cfg-chat-feedback');
+      const btn = document.getElementById('btn-salvar-cfg-chat');
+
+      const nomeEmpresa = inputEmpresa ? inputEmpresa.value.trim() : 'Nossa Empresa';
+      const geminiApiKey = inputGemini ? inputGemini.value.trim() : '';
+      const setoresTexto = inputSetores ? inputSetores.value.trim() : '';
+
+      const setores = setoresTexto 
+        ? setoresTexto.split(',').map(s => s.trim()).filter(Boolean)
+        : ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'];
+
+      configuracaoChatGlobal = {
+        nomeEmpresa: nomeEmpresa || 'Nossa Empresa',
+        geminiApiKey,
+        setoresDisponiveis: setores
+      };
+
+      try {
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = `<span>Salvando...</span>`;
+        }
+
+        // Salvar no localStorage (acessível pelo chat.html no mesmo domínio)
+        localStorage.setItem('painel_chat_config', JSON.stringify(configuracaoChatGlobal));
+
+        // Se for administrador, sincronizar também no Supabase na tabela pedidos (setor especial __sistema_config__)
+        if (usuarioCargo === 'administrador') {
+          try {
+            const { data: existente } = await supabaseClient
+              .from('pedidos')
+              .select('id')
+              .eq('setor', '__sistema_config__')
+              .maybeSingle();
+
+            const configPayload = {
+              setor: '__sistema_config__',
+              cliente: 'Configurações do Chatbot',
+              servico: 'Parametrização do Assistente IA',
+              valor: 0,
+              status: 'Concluído',
+              observacoes: JSON.stringify(configuracaoChatGlobal),
+              data_pedido: new Date().toISOString().split('T')[0]
+            };
+
+            if (existente && existente.id) {
+              await supabaseClient
+                .from('pedidos')
+                .update(configPayload)
+                .eq('id', existente.id);
+            } else {
+              await supabaseClient
+                .from('pedidos')
+                .insert([configPayload]);
+            }
+          } catch (syncErr) {
+            console.warn('Sincronização remota de config opcional ignorada:', syncErr);
+          }
+        }
+
+        if (feedback) {
+          feedback.className = 'p-3 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300';
+          feedback.textContent = 'Configurações do Chatbot salvas com sucesso! ✨';
+          feedback.classList.remove('hidden');
+        }
+
+        mostrarToast('Configurações do Chatbot atualizadas! ✨');
+        setTimeout(() => {
+          fecharModalConfigChatbot();
+        }, 800);
+      } catch (err) {
+        if (feedback) {
+          feedback.className = 'p-3 rounded-xl text-xs font-semibold bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300';
+          feedback.textContent = `Erro ao salvar: ${err.message || 'Tente novamente'}`;
+          feedback.classList.remove('hidden');
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<span>Salvar Configurações</span>`;
         }
       }
     }
@@ -7232,6 +7658,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
         fecharConfirmacaoExclusao();
         fecharModalGestaoContas();
         fecharModalFormCliente();
+        fecharModalConfigChatbot();
+        fecharMenuChatbotHeader();
         return;
       }
 
@@ -7281,10 +7709,31 @@ const colPendente = document.getElementById('kanban-col-pendente');
     document.getElementById('filtro-setor').addEventListener('change', filtrarEOrdenar);
     document.getElementById('filtro-ordem').addEventListener('change', filtrarEOrdenar);
 
+    // Fechar dropdown do chatbot ao clicar fora
+    window.addEventListener('click', (e) => {
+      const btnMenu = document.getElementById('btn-menu-chatbot-header');
+      const dropdown = document.getElementById('dropdown-chatbot-header');
+      if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!dropdown.contains(e.target) && (!btnMenu || !btnMenu.contains(e.target))) {
+          dropdown.classList.add('hidden');
+        }
+      }
+    });
+
+    // Roteamento inteligente de Hash para o Chatbot Público (#chat ou #pedido)
+    function verificarRotaHashChatbot() {
+      if (window.location.hash === '#chat' || window.location.hash === '#pedido') {
+        window.location.href = 'chat.html';
+      }
+    }
+    window.addEventListener('hashchange', verificarRotaHashChatbot);
+
     // INICIALIZAÇÃO NO CARREGAMENTO
     window.addEventListener('DOMContentLoaded', async () => {
+      verificarRotaHashChatbot();
       iniciarTema();
       inicializarRegistroContas();
+      carregarConfiguracoesChatbot();
       alternarVisualizacao(modoVisualizacao);
       atualizarBadgeAtividades();
 

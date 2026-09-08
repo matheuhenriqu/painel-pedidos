@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Atendimento &amp; Novos Pedidos &bull; Assistente Virtual IA</title>
+  <meta name="description" content="Faça seu pedido ou solicite um orçamento de forma rápida e inteligente com nosso assistente virtual com IA integrado ao sistema de pedidos." />
+
+  <!-- Tipografia Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Supabase JS Client v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Canvas Confetti CDN para celebração de pedido -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Estilização da barra de rolagem */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+    /* Efeitos de Glassmorphism */
+    .glass-surface {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .dark .glass-surface {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Animação suave para novas mensagens */
+    @keyframes messageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .animate-msg {
+      animation: messageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Animação de pulso para o status de IA */
+    @keyframes pulseAi {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.8; }
+    }
+    .pulse-ai {
+      animation: pulseAi 2s infinite ease-in-out;
+    }
+
+    /* Indicador de digitação */
+    .dot-flashing {
+      position: relative;
+      width: 6px;
+      height: 6px;
+      border-radius: 5px;
+      background-color: #6366f1;
+      color: #6366f1;
+      animation: dotFlashing 1s infinite linear alternate;
+      animation-delay: .5s;
+    }
+    .dot-flashing::before, .dot-flashing::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      width: 6px;
+      height: 6px;
+      border-radius: 5px;
+      background-color: #6366f1;
+      color: #6366f1;
+    }
+    .dot-flashing::before {
+      left: -10px;
+      animation: dotFlashing 1s infinite alternate;
+      animation-delay: 0s;
+    }
+    .dot-flashing::after {
+      left: 10px;
+      animation: dotFlashing 1s infinite alternate;
+      animation-delay: 1s;
+    }
+    @keyframes dotFlashing {
+      0% { background-color: #6366f1; }
+      50%, 100% { background-color: rgba(99, 102, 241, 0.2); }
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+
+  <!-- Glows de Fundo Decorativos -->
+  <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-violet-500/15 dark:bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- CONTAINER PRINCIPAL DO CHATBOT -->
+  <div class="relative z-10 flex flex-col h-full max-w-3xl w-full mx-auto shadow-2xl sm:my-3 sm:h-[calc(100vh-1.5rem)] sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-hidden">
+    
+    <!-- CABEÇALHO DO CHATBOT -->
+    <header class="glass-surface border-b border-slate-200/80 dark:border-slate-800/80 px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between shrink-0 z-20">
+      <div class="flex items-center gap-3">
+        <!-- Avatar IA com Indicador de Status -->
+        <div class="relative">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full"></span>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="chat-empresa-titulo" class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Atendimento Inteligente
+            </h1>
+            <span class="hidden sm:inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300">
+              IA Ativa
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Online &bull; Solicitação Rápida de Pedidos
+          </p>
+        </div>
+      </div>
+
+      <!-- Ações do Cabeçalho -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <!-- Alternador de Som -->
+        <button 
+          id="btn-toggle-som"
+          onclick="alternarSomChat()"
+          title="Alternar Som de Notificação"
+          class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
+        >
+          <svg id="icon-som-on" class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+          <svg id="icon-som-off" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+          </svg>
+        </button>
+
+        <!-- Alternar Tema Claro/Escuro -->
+        <button 
+          onclick="alternarTema()"
+          title="Alternar Tema Claro / Escuro"
+          class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
+        >
+          <svg class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+          <svg class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+        </button>
+
+        <!-- Reiniciar Conversa -->
+        <button 
+          onclick="reiniciarConversa()"
+          title="Reiniciar Conversa"
+          class="p-2 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </button>
+
+        <!-- Link para o Painel (Admin/Login) -->
+        <a 
+          href="index.html"
+          title="Acessar Painel do Lojista / Login"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition ml-1"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          <span class="hidden sm:inline">Painel</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- ÁREA DE MENSAGENS DO CHAT -->
+    <div 
+      id="chat-mensagens-container" 
+      class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-sm"
+    >
+      <!-- As mensagens serão injetadas dinamicamente aqui -->
+    </div>
+
+    <!-- CHIPS DE SUGESTÃO / AÇÕES RÁPIDAS -->
+    <div id="chat-sugestoes-container" class="px-4 py-2 border-t border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/50 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+      <!-- Chips rápidos injetados dinamicamente -->
+    </div>
+
+    <!-- INDICADOR DE DIGITAÇÃO -->
+    <div id="chat-digitando" class="hidden px-5 py-2 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-medium shrink-0 bg-white/40 dark:bg-slate-900/40">
+      <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center">
+        <div class="dot-flashing"></div>
+      </div>
+      <span>Assistente digitando...</span>
+    </div>
+
+    <!-- BARRA INFERIOR DE ENVIO DE MENSAGEM -->
+    <footer class="p-3 sm:p-4 bg-white/80 dark:bg-slate-900/80 border-t border-slate-200/80 dark:border-slate-800/80 shrink-0">
+      <form id="form-chat-envio" onsubmit="enviarMensagemUsuario(event)" class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            id="chat-input-texto"
+            placeholder="Digite sua mensagem ou descreva o pedido..."
+            autocomplete="off"
+            class="w-full pl-4 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition shadow-inner"
+          />
+          <button 
+            type="button" 
+            id="btn-limpar-input"
+            onclick="limparInputTexto()"
+            class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+            title="Limpar texto"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <button 
+          type="submit" 
+          id="btn-enviar-msg"
+          class="h-11 px-4 sm:px-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-2xl shadow-md shadow-indigo-500/25 transition active:scale-95 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+          title="Enviar mensagem"
+        >
+          <span class="hidden sm:inline text-xs">Enviar</span>
+          <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-400 dark:text-slate-500">
+        <span>Seu pedido é enviado diretamente para o sistema com confirmação instantânea.</span>
+        <span class="font-medium text-indigo-500 dark:text-indigo-400 flex items-center gap-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Ambiente Seguro
+        </span>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- JAVASCRIPT DO CHATBOT -->
+  <script>
+    // ==============================================================================
+    // CONFIGURAÇÃO DO SUPABASE & AMBIENTE
+    // ==============================================================================
+    const SUPABASE_URL = 'https://pwyytcyofxtriulqesqm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_vk-vctYaPnPRm0fWlRkcTQ_RtYigr2L';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ESTADO DA CONVERSA E DADOS DO PEDIDO
+    let dadosPedidoEmConstrucao = {
+      cliente: '',
+      telefone: '',
+      setor: 'Geral',
+      servico: '',
+      valor: 0,
+      data_pedido: '',
+      observacoes: ''
+    };
+
+    let etapaColetaAtual = 'inicio'; // 'inicio', 'nome', 'telefone', 'servico', 'setor', 'data', 'confirmacao', 'finalizado'
+    let historicoMensagens = [];
+    let somHabilitado = true;
+    let configuracaoChat = {
+      nomeEmpresa: 'Nossa Empresa',
+      geminiApiKey: '',
+      setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']
+    };
+
+    // ==============================================================================
+    // INICIALIZAÇÃO DO TEMA E CONFIGURAÇÕES
+    // ==============================================================================
+    function carregarConfiguracoes() {
+      try {
+        const temaSalvo = localStorage.getItem('tema_preferido');
+        if (temaSalvo === 'dark' || (!temaSalvo && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+
+        const somSalvo = localStorage.getItem('chat_som_habilitado');
+        if (somSalvo !== null) {
+          somHabilitado = somSalvo === 'true';
+        }
+        atualizarIconeSom();
+
+        const configLocal = localStorage.getItem('painel_chat_config');
+        if (configLocal) {
+          const parse = JSON.parse(configLocal);
+          configuracaoChat = { ...configuracaoChat, ...parse };
+        }
+
+        // Chave Gemini via URL param se fornecida
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('gemini_key')) {
+          configuracaoChat.geminiApiKey = urlParams.get('gemini_key');
+        }
+
+        if (configuracaoChat.nomeEmpresa && configuracaoChat.nomeEmpresa !== 'Nossa Empresa') {
+          const tit = document.getElementById('chat-empresa-titulo');
+          if (tit) tit.textContent = configuracaoChat.nomeEmpresa;
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar configurações do chat:', e);
+      }
+    }
+
+    function alternarTema() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('tema_preferido', isDark ? 'dark' : 'light');
+    }
+
+    function alternarSomChat() {
+      somHabilitado = !somHabilitado;
+      localStorage.setItem('chat_som_habilitado', somHabilitado ? 'true' : 'false');
+      atualizarIconeSom();
+      if (somHabilitado) emitirSom('msg');
+    }
+
+    function atualizarIconeSom() {
+      const on = document.getElementById('icon-som-on');
+      const off = document.getElementById('icon-som-off');
+      if (on && off) {
+        if (somHabilitado) {
+          on.classList.remove('hidden');
+          off.classList.add('hidden');
+        } else {
+          on.classList.add('hidden');
+          off.classList.remove('hidden');
+        }
+      }
+    }
+
+    // FEEDBACK SONORO SINTETIZADO (WEB AUDIO API - ZERO DEPENDÊNCIAS EXTERNAS)
+    function emitirSom(tipo = 'msg') {
+      if (!somHabilitado) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+
+        if (tipo === 'msg') {
+          // Bip suave e acolhedor de mensagem nova
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+        } else if (tipo === 'sucesso') {
+          // Acorde alegre de celebração de pedido
+          const notas = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+          notas.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + (idx * 0.08));
+            gain.gain.setValueAtTime(0.09, ctx.currentTime + (idx * 0.08));
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (idx * 0.08) + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + (idx * 0.08));
+            osc.stop(ctx.currentTime + (idx * 0.08) + 0.35);
+          });
+        }
+      } catch (e) {
+        // Ignora silenciosamente se o navegador bloquear autoplay
+      }
+    }
+
+    // ==============================================================================
+    // RENDERIZAÇÃO DE MENSAGENS E BALÕES
+    // ==============================================================================
+    function rolarParaFim() {
+      const container = document.getElementById('chat-mensagens-container');
+      if (container) {
+        setTimeout(() => {
+          container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+        }, 60);
+      }
+    }
+
+    function formatarHoraAtual() {
+      return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(texto) {
+      if (texto === null || texto === undefined) return '';
+      return String(texto)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Adiciona mensagem no histórico e na tela
+    function adicionarMensagem(remetente, conteudoHtml, meta = {}) {
+      const container = document.getElementById('chat-mensagens-container');
+      if (!container) return;
+
+      const hora = formatarHoraAtual();
+      const divMsg = document.createElement('div');
+      divMsg.className = `flex gap-2.5 sm:gap-3 animate-msg ${remetente === 'usuario' ? 'justify-end' : 'justify-start'}`;
+
+      if (remetente === 'bot') {
+        divMsg.innerHTML = `
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div class="max-w-[85%] sm:max-w-[78%] space-y-1">
+            <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl rounded-tl-sm p-3.5 sm:p-4 text-slate-800 dark:text-slate-100 shadow-sm space-y-2">
+              <div class="leading-relaxed">${conteudoHtml}</div>
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500 pl-1">${hora} &bull; Assistente IA</div>
+          </div>
+        `;
+        emitirSom('msg');
+      } else {
+        divMsg.innerHTML = `
+          <div class="max-w-[85%] sm:max-w-[78%] space-y-1 flex flex-col items-end">
+            <div class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-md shadow-indigo-600/20 leading-relaxed break-words">
+              ${escapeHtml(conteudoHtml)}
+            </div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500 pr-1">${hora} &bull; Você</div>
+          </div>
+          <div class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-200 flex items-center justify-center shrink-0 shadow-sm mt-0.5 font-bold text-xs">
+            ${meta.iniciais || 'EU'}
+          </div>
+        `;
+      }
+
+      container.appendChild(divMsg);
+      rolarParaFim();
+    }
+
+    function exibirDigitando(visivel) {
+      const el = document.getElementById('chat-digitando');
+      if (el) {
+        if (visivel) {
+          el.classList.remove('hidden');
+          rolarParaFim();
+        } else {
+          el.classList.add('hidden');
+        }
+      }
+    }
+
+    // ==============================================================================
+    // CHIPS E BOTÕES DE SUGESTÃO RÁPIDA
+    // ==============================================================================
+    function atualizarSugestoes(chips = []) {
+      const container = document.getElementById('chat-sugestoes-container');
+      if (!container) return;
+
+      if (!chips || chips.length === 0) {
+        container.classList.add('hidden');
+        container.innerHTML = '';
+        return;
+      }
+
+      container.classList.remove('hidden');
+      container.innerHTML = chips.map(chip => `
+        <button 
+          type="button"
+          onclick="acionarSugestaoChip('${escapeHtml(chip.valor || chip.texto)}')"
+          class="px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition shadow-xs active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer"
+        >
+          ${chip.icone ? `<span>${chip.icone}</span>` : ''}
+          <span>${chip.texto}</span>
+        </button>
+      `).join('');
+    }
+
+    function acionarSugestaoChip(valor) {
+      const input = document.getElementById('chat-input-texto');
+      if (input) {
+        input.value = valor;
+        processarEnvioMensagem(valor);
+      }
+    }
+
+    // ==============================================================================
+    // MOTOR DE IA CONVERSACIONAL INTELIGENTE (NLP + GEMINI)
+    // ==============================================================================
+
+    // Extração inteligente de entidades via Regex / Padrões comuns em Português
+    function extrairEntidadesTexto(texto) {
+      const extraido = {};
+
+      // 1. Extração de Telefone / WhatsApp (ex: (11) 98765-4321, 11988887777, 21 9999-8888)
+      const telRegex = /(?:\+?55\s?)?(?:\(?([1-9]{2})\)?\s?)?(?:(9\d{4})[-\s]?(\d{4})|(\d{4})[-\s]?(\d{4}))/g;
+      const matchTel = telRegex.exec(texto);
+      if (matchTel && matchTel[0].replace(/\D/g, '').length >= 8) {
+        const digitos = matchTel[0].replace(/\D/g, '');
+        if (digitos.length === 11) {
+          extraido.telefone = `(${digitos.slice(0,2)}) ${digitos.slice(2,7)}-${digitos.slice(7)}`;
+        } else if (digitos.length === 10) {
+          extraido.telefone = `(${digitos.slice(0,2)}) ${digitos.slice(2,6)}-${digitos.slice(6)}`;
+        } else {
+          extraido.telefone = matchTel[0].trim();
+        }
+      }
+
+      // 2. Extração de Nome próprio ("Meu nome é...", "Sou o...", "Me chamo...")
+      const nomeRegex = /(?:meu\s+nome\s+é|me\s+chamo|sou\s+o|sou\s+a|falar\s+com)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+?)(?=\s+(?:e\s+meu|e\s+o|meu\s+whatsapp|meu\s+zap|meu\s+tel|telefone|whatsapp|zap|contato|\(|\d)|[,\.\n]|$)/i;
+      const matchNome = texto.match(nomeRegex);
+      if (matchNome && matchNome[1]) {
+        const limpo = matchNome[1].split(/[,\.\n]/)[0].trim();
+        if (limpo.length > 2 && !limpo.includes('pedido') && !limpo.includes('gostaria')) {
+          extraido.cliente = limpo;
+        }
+      }
+
+      // 3. Extração de Valor em R$ ou reais
+      const valorRegex = /(?:r\$\s*|valor\s*(?:de\s*)?|preco\s*(?:de\s*)?|por\s*)(\d+(?:[\.,]\d{2})?)/i;
+      const matchValor = texto.match(valorRegex);
+      if (matchValor && matchValor[1]) {
+        extraido.valor = parseFloat(matchValor[1].replace(',', '.'));
+      }
+
+      // 4. Extração de Data / Horário ("para amanhã às 14h", "sexta-feira", "hoje", etc.)
+      const dataRegex = /(?:para\s+|no\s+dia\s+|em\s+)?(hoje|amanhã|depois\s+de\s+amanhã|segunda(?:-feira)?|terça(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|sábado|domingo|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)(?:\s+(?:às|as)\s+\d{1,2}(?:h|:\d{2})?)?/i;
+      const matchData = texto.match(dataRegex);
+      if (matchData && matchData[0]) {
+        extraido.data_pedido = matchData[0].trim();
+      }
+
+      // 5. Mapeamento de Setor / Categoria
+      const setores = configuracaoChat.setoresDisponiveis || [];
+      for (const s of setores) {
+        if (new RegExp(`\\b${s}\\b`, 'i').test(texto)) {
+          extraido.setor = s;
+          break;
+        }
+      }
+
+      return extraido;
+    }
+
+    // Inicialização da Conversa
+    function iniciarConversa() {
+      const container = document.getElementById('chat-mensagens-container');
+      if (container) container.innerHTML = '';
+
+      const saudacao = `
+        <p class="font-bold text-base text-slate-900 dark:text-white">Olá! Seja muito bem-vindo(a)! 👋✨</p>
+        <p>Sou o seu <strong>Assistente Virtual com Inteligência Artificial</strong>. Estou aqui para ajudar você a registrar um <strong>novo pedido</strong> ou solicitar um orçamento de forma rápida e descomplicada.</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 pt-1">Para começarmos, qual é o seu <strong>nome completo</strong>?</p>
+      `;
+
+      adicionarMensagem('bot', saudacao);
+      etapaColetaAtual = 'nome';
+
+      atualizarSugestoes([
+        { texto: 'Fazer um novo pedido', icone: '🛍️' },
+        { texto: 'Ver serviços disponíveis', icone: '📋' },
+        { texto: 'Solicitar orçamento rápido', icone: '💡' }
+      ]);
+    }
+
+    function reiniciarConversa() {
+      if (confirm('Deseja reiniciar a conversa do atendimento?')) {
+        dadosPedidoEmConstrucao = {
+          cliente: '',
+          telefone: '',
+          setor: 'Geral',
+          servico: '',
+          valor: 0,
+          data_pedido: '',
+          observacoes: ''
+        };
+        etapaColetaAtual = 'inicio';
+        iniciarConversa();
+      }
+    }
+
+    // ENVIO DE MENSAGEM PELO FORMULÁRIO
+    function enviarMensagemUsuario(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('chat-input-texto');
+      const texto = input.value.trim();
+      if (!texto) return;
+
+      input.value = '';
+      const btnLimpar = document.getElementById('btn-limpar-input');
+      if (btnLimpar) btnLimpar.classList.add('hidden');
+
+      processarEnvioMensagem(texto);
+    }
+
+    function limparInputTexto() {
+      const input = document.getElementById('chat-input-texto');
+      if (input) {
+        input.value = '';
+        input.focus();
+        document.getElementById('btn-limpar-input')?.classList.add('hidden');
+      }
+    }
+
+    // Listener para exibir botão limpar
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarConfiguracoes();
+      iniciarConversa();
+
+      const input = document.getElementById('chat-input-texto');
+      const btnLimpar = document.getElementById('btn-limpar-input');
+      if (input && btnLimpar) {
+        input.addEventListener('input', () => {
+          if (input.value.length > 0) {
+            btnLimpar.classList.remove('hidden');
+          } else {
+            btnLimpar.classList.add('hidden');
+          }
+        });
+      }
+    });
+
+    // Processamento central da mensagem
+    async function processarEnvioMensagem(texto) {
+      // Extrai as iniciais do nome se já tiver cliente
+      let iniciais = 'EU';
+      if (dadosPedidoEmConstrucao.cliente) {
+        const p = dadosPedidoEmConstrucao.cliente.trim().split(/\s+/);
+        iniciais = p.length > 1 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : p[0].slice(0, 2).toUpperCase();
+      }
+
+      adicionarMensagem('usuario', texto, { iniciais });
+      exibirDigitando(true);
+      atualizarSugestoes([]);
+
+      // Simulação de processamento inteligente da IA (latência natural de diálogo)
+      setTimeout(async () => {
+        try {
+          await executarLogicaRespostaIA(texto);
+        } catch (err) {
+          console.error('Erro na resposta da IA:', err);
+          adicionarMensagem('bot', 'Desculpe, tive uma instabilidade momentânea ao processar sua resposta. Pode repetir, por favor?');
+        } finally {
+          exibirDigitando(false);
+        }
+      }, 700);
+    }
+
+    // LÓGICA CONVERSACIONAL DE COLETA DE DADOS DO PEDIDO
+    async function executarLogicaRespostaIA(texto) {
+      const textoLower = texto.toLowerCase();
+      const entidades = extrairEntidadesTexto(texto);
+
+      // Se a IA tiver chave do Gemini configurada, pode chamar Gemini API para enriquecimento
+      if (configuracaoChat.geminiApiKey && configuracaoChat.geminiApiKey.trim().length > 10) {
+        const chamadaGemini = await tentarProcessarComGemini(texto);
+        if (chamadaGemini) {
+          return;
+        }
+      }
+
+      // Fluxo Nativo Especializado e Ultrarrápido
+
+      // Se o cliente quer reiniciar ou cancelar
+      if (textoLower.includes('cancelar') || textoLower.includes('recomeçar') || textoLower.includes('reiniciar')) {
+        reiniciarConversa();
+        return;
+      }
+
+      // Coleta em Estágios
+      if (etapaColetaAtual === 'inicio' || etapaColetaAtual === 'nome') {
+        let nome = entidades.cliente;
+        if (!nome) {
+          // Se for resposta direta com apenas o nome (ex: "Carlos Eduardo" ou "Sou Maria")
+          const limpo = texto.replace(/^(olá|oi|bom dia|boa tarde|boa noite|sou|meu nome é|me chamo|o meu é)\s*/i, '').trim();
+          if (limpo.length >= 2 && !limpo.includes('pedido')) {
+            nome = limpo;
+          }
+        }
+
+        if (nome) {
+          dadosPedidoEmConstrucao.cliente = nome;
+          // Se na mesma mensagem o cliente já passou o telefone
+          if (entidades.telefone) dadosPedidoEmConstrucao.telefone = entidades.telefone;
+          if (entidades.servico) dadosPedidoEmConstrucao.servico = entidades.servico;
+
+          etapaColetaAtual = 'telefone';
+          if (!dadosPedidoEmConstrucao.telefone) {
+            adicionarMensagem('bot', `
+              Prazer em te conhecer, <strong>${escapeHtml(nome)}</strong>! 😊<br/>
+              Para que possamos entrar em contato e enviar atualizações do seu pedido, qual é o seu <strong>número de WhatsApp ou telefone</strong>?
+            `);
+            atualizarSugestoes([
+              { texto: '(11) 99999-8888', icone: '📱' },
+              { texto: 'Prefiro informar depois', icone: '⏩' }
+            ]);
+            return;
+          }
+        } else {
+          adicionarMensagem('bot', `Olá! Para iniciarmos seu pedido, por favor, me informe o seu <strong>nome completo</strong>.`);
+          return;
+        }
+      }
+
+      if (etapaColetaAtual === 'telefone') {
+        let tel = entidades.telefone;
+        if (!tel) {
+          const apenasNumeros = texto.replace(/\D/g, '');
+          if (apenasNumeros.length >= 8) {
+            tel = texto.trim();
+          } else if (textoLower.includes('depois') || textoLower.includes('pular') || textoLower.includes('não')) {
+            tel = 'Não informado';
+          }
+        }
+
+        if (tel) {
+          dadosPedidoEmConstrucao.telefone = tel;
+          etapaColetaAtual = 'servico';
+          adicionarMensagem('bot', `
+            Perfeito, contato salvo! 📝<br/>
+            Agora me conte: <strong>qual serviço ou produto você gostaria de solicitar?</strong><br/>
+            <span class="text-xs text-slate-400">Pode detalhar o que precisa (Ex: Troca de óleo, Banho e tosa, Formatação, Criação de Banner, etc.)</span>
+          `);
+          atualizarSugestoes([
+            { texto: 'Manutenção Geral', icone: '🛠️' },
+            { texto: 'Atendimento de Suporte', icone: '💻' },
+            { texto: 'Orçamento Personalizado', icone: '📋' }
+          ]);
+          return;
+        } else {
+          adicionarMensagem('bot', `Por favor, informe seu número de telefone ou WhatsApp (ex: <em>(11) 98765-4321</em>) para facilitar nosso contato.`);
+          return;
+        }
+      }
+
+      if (etapaColetaAtual === 'servico') {
+        dadosPedidoEmConstrucao.servico = texto;
+        if (entidades.setor) dadosPedidoEmConstrucao.setor = entidades.setor;
+        if (entidades.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidades.data_pedido;
+        if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
+
+        etapaColetaAtual = 'setor';
+        const setores = configuracaoChat.setoresDisponiveis || ['Geral', 'Oficina', 'Vendas'];
+        
+        adicionarMensagem('bot', `
+          Excelente! Entendi sua solicitação: <strong>"${escapeHtml(texto)}"</strong>. 🎯<br/><br/>
+          A qual <strong>setor ou categoria</strong> esse pedido melhor se encaixa? Clique em uma das opções abaixo ou digite:
+        `);
+
+        atualizarSugestoes(setores.map(s => ({ texto: s, valor: s, icone: '🏷️' })));
+        return;
+      }
+
+      if (etapaColetaAtual === 'setor') {
+        dadosPedidoEmConstrucao.setor = texto.trim() || 'Geral';
+        etapaColetaAtual = 'data';
+
+        adicionarMensagem('bot', `
+          Setor definido como <strong>${escapeHtml(dadosPedidoEmConstrucao.setor)}</strong>. ✅<br/>
+          Para quando você gostaria de agendar ou receber esse pedido? (Ex: <em>Hoje</em>, <em>Amanhã às 14h</em>, <em>Sexta-feira</em>, etc.)
+        `);
+
+        atualizarSugestoes([
+          { texto: 'Hoje o mais breve possível', icone: '⚡' },
+          { texto: 'Amanhã pela manhã', icone: '🌅' },
+          { texto: 'Amanhã à tarde (14h)', icone: '🕒' },
+          { texto: 'Próxima semana', icone: '📅' }
+        ]);
+        return;
+      }
+
+      if (etapaColetaAtual === 'data') {
+        dadosPedidoEmConstrucao.data_pedido = texto.trim();
+        etapaColetaAtual = 'observacoes';
+
+        adicionarMensagem('bot', `
+          Agendamento registrado para <strong>${escapeHtml(dadosPedidoEmConstrucao.data_pedido)}</strong>. 📅<br/>
+          Você gostaria de adicionar alguma <strong>observação especial</strong>, endereço para entrega ou detalhe adicional? Se não houver, pode responder "Não".
+        `);
+
+        atualizarSugestoes([
+          { texto: 'Sem observações adicionais', icone: '👍' },
+          { texto: 'Preciso de nota fiscal', icone: '🧾' },
+          { texto: 'Entregar em endereço residencial', icone: '📍' }
+        ]);
+        return;
+      }
+
+      if (etapaColetaAtual === 'observacoes') {
+        if (!textoLower.includes('não') && !textoLower.includes('nao') && !textoLower.includes('nenhuma') && !textoLower.includes('sem observações')) {
+          dadosPedidoEmConstrucao.observacoes = texto.trim();
+        } else {
+          dadosPedidoEmConstrucao.observacoes = 'Nenhuma observação informada.';
+        }
+
+        etapaColetaAtual = 'confirmacao';
+        exibirCardResumoConfirmacao();
+        return;
+      }
+
+      if (etapaColetaAtual === 'confirmacao') {
+        if (textoLower.includes('sim') || textoLower.includes('confirmar') || textoLower.includes('ok') || textoLower.includes('enviar') || textoLower.includes('pode')) {
+          await confirmarECriarPedidoNoSupabase();
+        } else if (textoLower.includes('alterar') || textoLower.includes('mudar') || textoLower.includes('corrigir')) {
+          adicionarMensagem('bot', `O que você gostaria de alterar? Me diga o novo valor, serviço, telefone ou data que atualizarei imediatamente para você.`);
+        } else {
+          // Tenta aplicar atualização com base no que foi dito
+          if (entidades.telefone) dadosPedidoEmConstrucao.telefone = entidades.telefone;
+          if (entidades.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidades.data_pedido;
+          if (entidades.cliente) dadosPedidoEmConstrucao.cliente = entidades.cliente;
+          if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
+
+          adicionarMensagem('bot', `Informações atualizadas! Confira o resumo abaixo e clique em <strong>Confirmar Pedido</strong>.`);
+          exibirCardResumoConfirmacao();
+        }
+      }
+    }
+
+    // EXIBIÇÃO DO CARD DE RESUMO INTERATIVO
+    function exibirCardResumoConfirmacao() {
+      const p = dadosPedidoEmConstrucao;
+      const cardHtml = `
+        <div class="space-y-3">
+          <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-extrabold text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Quase lá! Confira os detalhes do seu pedido:</span>
+          </div>
+
+          <div class="bg-slate-50 dark:bg-slate-900/80 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/80 space-y-2 text-xs">
+            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Cliente:</span>
+              <strong class="text-slate-900 dark:text-white font-bold">${escapeHtml(p.cliente || 'Não informado')}</strong>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Contato / WhatsApp:</span>
+              <strong class="text-slate-900 dark:text-white font-bold">${escapeHtml(p.telefone || 'Não informado')}</strong>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Serviço / Pedido:</span>
+              <strong class="text-indigo-600 dark:text-indigo-400 font-bold">${escapeHtml(p.servico || 'Não informado')}</strong>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Setor / Categoria:</span>
+              <span class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[11px]">${escapeHtml(p.setor || 'Geral')}</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Data / Horário:</span>
+              <strong class="text-slate-900 dark:text-white font-bold">${escapeHtml(p.data_pedido || 'Imediato')}</strong>
+            </div>
+            ${p.observacoes ? `
+              <div class="pt-1 text-[11px] text-slate-500 dark:text-slate-400 italic">
+                <strong>Obs:</strong> ${escapeHtml(p.observacoes)}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
+            <button 
+              type="button" 
+              onclick="confirmarECriarPedidoNoSupabase()"
+              class="w-full sm:w-auto flex-1 py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Confirmar e Enviar Pedido</span>
+            </button>
+            <button 
+              type="button" 
+              onclick="solicitarAlteracaoDados()"
+              class="w-full sm:w-auto py-2.5 px-3 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-xl text-xs transition cursor-pointer"
+            >
+              <span>Alterar</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      adicionarMensagem('bot', cardHtml);
+      atualizarSugestoes([
+        { texto: 'Confirmar Pedido Agora', icone: '✅' },
+        { texto: 'Mudar a Data', icone: '📅' },
+        { texto: 'Mudar o Telefone', icone: '📱' }
+      ]);
+    }
+
+    function solicitarAlteracaoDados() {
+      adicionarMensagem('bot', 'Qual dado você gostaria de alterar? Pode escrever diretamente (ex: "Meu telefone é 11988887777" ou "Data para sexta às 10h").');
+    }
+
+    // ==============================================================================
+    // CRIAÇÃO AUTOMÁTICA DO PEDIDO NA TABELA SUPABASE
+    // ==============================================================================
+    async function confirmarECriarPedidoNoSupabase() {
+      exibirDigitando(true);
+      atualizarSugestoes([]);
+
+      const p = dadosPedidoEmConstrucao;
+      const payload = {
+        cliente: p.cliente || 'Cliente Chatbot',
+        telefone: p.telefone || 'Não informado',
+        setor: p.setor || 'Geral',
+        servico: p.servico || 'Solicitação via Chatbot',
+        valor: parseFloat(p.valor) || 0,
+        data_pedido: p.data_pedido || new Date().toLocaleDateString('pt-BR'),
+        status: 'Pendente',
+        observacoes: (p.observacoes || '') + ' [Criado automaticamente via Chatbot IA]',
+        user_id: null // Cliente público / visitante
+      };
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('pedidos')
+          .insert([payload])
+          .select();
+
+        if (error) throw error;
+
+        const novoPedido = (data && data[0]) ? data[0] : null;
+        const idGerado = novoPedido ? novoPedido.id : Math.floor(1000 + Math.random() * 9000);
+
+        etapaColetaAtual = 'finalizado';
+        emitirSom('sucesso');
+
+        // Dispara celebração de confetes
+        if (window.confetti) {
+          confetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+
+        const msgSucesso = `
+          <div class="space-y-3">
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-md">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-extrabold text-emerald-800 dark:text-emerald-300">Pedido #${idGerado} Registrado com Sucesso! 🎉</h3>
+                <p class="text-xs text-emerald-700 dark:text-emerald-400">Nossa equipe já recebeu sua solicitação em tempo real.</p>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800">
+              <p><strong>Número do Pedido:</strong> #${idGerado}</p>
+              <p><strong>Cliente:</strong> ${escapeHtml(payload.cliente)}</p>
+              <p><strong>Serviço:</strong> ${escapeHtml(payload.servico)}</p>
+              <p><strong>Status:</strong> <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold text-[10px]">Pendente de Atendimento</span></p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-2 pt-2">
+              <a 
+                href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá! Acabei de registrar meu pedido #${idGerado} (${payload.servico}) com vocês pelo Assistente Virtual.`)}"
+                target="_blank"
+                class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                <span>Enviar Comprovante WhatsApp</span>
+              </a>
+
+              <button 
+                type="button"
+                onclick="reiniciarConversa()"
+                class="w-full sm:w-auto py-2.5 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer"
+              >
+                <span>Fazer Outro Pedido</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        adicionarMensagem('bot', msgSucesso);
+      } catch (err) {
+        console.error('Erro ao cadastrar pedido no Supabase:', err);
+        adicionarMensagem('bot', `
+          <div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-800 dark:text-rose-300 text-xs">
+            <strong>Não foi possível gravar o pedido automaticamente:</strong><br/>
+            ${escapeHtml(err.message || 'Erro de conexão com o banco')}.<br/>
+            Por favor, verifique a conexão ou clique no botão abaixo para tentar novamente.
+          </div>
+          <button onclick="confirmarECriarPedidoNoSupabase()" class="mt-2 py-2 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl">Tentar Novamente</button>
+        `);
+      } finally {
+        exibirDigitando(false);
+      }
+    }
+
+    // ==============================================================================
+    // INTEGRAÇÃO OPCIONAL COM GOOGLE GEMINI API
+    // ==============================================================================
+    async function tentarProcessarComGemini(textoUsuario) {
+      if (!configuracaoChat.geminiApiKey) return false;
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${configuracaoChat.geminiApiKey}`;
+        const promptSistema = `
+Você é o assistente virtual de atendimento da empresa "${configuracaoChat.nomeEmpresa}".
+Seu objetivo é coletar de forma simpática, cordial e eficiente os dados para criação de um pedido:
+1. Nome do cliente
+2. Telefone/WhatsApp
+3. Serviço/Produto desejado
+4. Setor/Categoria (${(configuracaoChat.setoresDisponiveis || []).join(', ')})
+5. Data/Horário preferido
+6. Observações
+
+Dados já coletados até agora:
+${JSON.stringify(dadosPedidoEmConstrucao)}
+
+Analise a mensagem do usuário: "${textoUsuario}".
+Responda diretamente em português de maneira natural e amigável. Se tiver coletado dados novos, extraia-os. Se todos os dados estiverem prontos, pergunte se o cliente confirma o envio do pedido.
+`;
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: promptSistema }]
+            }]
+          })
+        });
+
+        if (!res.ok) return false;
+        const json = await res.json();
+        const respostaGemini = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (respostaGemini) {
+          // Atualiza dados pelo regex das entidades
+          const entidades = extrairEntidadesTexto(textoUsuario);
+          if (entidades.cliente) dadosPedidoEmConstrucao.cliente = entidades.cliente;
+          if (entidades.telefone) dadosPedidoEmConstrucao.telefone = entidades.telefone;
+          if (entidades.servico) dadosPedidoEmConstrucao.servico = entidades.servico;
+          if (entidades.setor) dadosPedidoEmConstrucao.setor = entidades.setor;
+          if (entidades.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidades.data_pedido;
+
+          adicionarMensagem('bot', respostaGemini.replace(/\n/g, '<br/>'));
+          return true;
+        }
+      } catch (e) {
+        console.warn('Gemini API indisponível, usando motor conversacional nativo:', e);
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>

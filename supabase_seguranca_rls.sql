@@ -54,3 +54,16 @@ USING (
   (auth.uid() = user_id)
   OR ((auth.jwt() -> 'user_metadata' ->> 'role') IN ('admin', 'administrador'))
 );
+
+-- 7. POLÍTICA DE CRIAÇÃO PÚBLICA / CHATBOT (INSERT PARA VISITANTES E CLIENTES VIA CHATBOT):
+-- - Permite que qualquer cliente envie um pedido via Chatbot público sem precisar de login
+--   com o status inicial 'Pendente' e sem vincular obrigatoriamente um user_id.
+DROP POLICY IF EXISTS "pedidos_chatbot_anon_insert_policy" ON pedidos;
+CREATE POLICY "pedidos_chatbot_anon_insert_policy" ON pedidos
+FOR INSERT
+TO anon
+WITH CHECK (
+  (status = 'Pendente' OR status IS NULL)
+  AND (user_id IS NULL)
+);
+
