@@ -6,7 +6,7 @@
   <title>Atendimento &amp; Novos Pedidos &bull; Assistente Virtual IA</title>
   <meta name="description" content="Faça seu pedido ou solicite um orçamento de forma rápida e inteligente com nosso assistente virtual com IA integrado ao sistema de pedidos." />
 
-  <!-- Tipografia Google Fonts: Plus Jakarta Sans -->
+  <!-- Tipografia Google Fonts: Plus Jakarta Sans com suporte a Numerais Tabulares -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,16 +19,27 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
           },
           colors: {
             brand: {
               50: '#eef2ff',
               100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
               500: '#6366f1',
               600: '#4f46e5',
               700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
             }
+          },
+          boxShadow: {
+            'glow': '0 0 25px -5px rgba(99, 102, 241, 0.35)',
+            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.35)',
+            'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.35)'
           }
         }
       }
@@ -42,6 +53,20 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
+    /* Tipografia e Numerais Tabulares Alinhados */
+    body, input, button, select, textarea {
+      font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+    }
+
+    /* Foco Acessível Universal (WCAG 2.1 AA) */
+    *:focus-visible {
+      outline: 2px solid #6366f1 !important;
+      outline-offset: 2px !important;
+    }
+    .dark *:focus-visible {
+      outline-color: #818cf8 !important;
+    }
+
     /* Altura Dinâmica e Safe-Area Insets para Mobile */
     html, body {
       min-height: 100%;
@@ -58,24 +83,26 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
     .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Efeitos de Glassmorphism */
+    /* Efeitos de Glassmorphism & Superfícies */
     .glass-surface {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
     .dark .glass-surface {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(11, 15, 25, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     /* Animação suave para novas mensagens */
     @keyframes messageSlideIn {
       from {
         opacity: 0;
-        transform: translateY(10px) scale(0.98);
+        transform: translateY(12px) scale(0.98);
       }
       to {
         opacity: 1;
@@ -131,22 +158,46 @@
       0% { background-color: #6366f1; }
       50%, 100% { background-color: rgba(99, 102, 241, 0.2); }
     }
+
+    /* Barras Animadas de Onda de Áudio no Microfone (Groq Whisper) */
+    @keyframes soundWave {
+      0%, 100% { height: 4px; }
+      50% { height: 16px; }
+    }
+    .wave-bar {
+      display: inline-block;
+      width: 3px;
+      background: #e11d48;
+      border-radius: 9999px;
+      animation: soundWave 0.7s ease-in-out infinite alternate;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
   </style>
 </head>
 <body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
 
+  <!-- LINK ACESSÍVEL: PULAR PARA O CONTEÚDO PRINCIPAL (WCAG 2.1) -->
+  <a 
+    href="#chat-mensagens-container" 
+    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-indigo-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs font-bold transition"
+  >
+    Pular para as mensagens do atendimento
+  </a>
+
   <!-- Glows de Fundo Decorativos -->
-  <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-violet-500/15 dark:bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-violet-500/15 dark:bg-violet-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
 
   <!-- CONTAINER PRINCIPAL DO CHATBOT (100dvh sem saltos no mobile) -->
   <div class="relative z-10 flex flex-col h-[100dvh] max-w-3xl w-full mx-auto shadow-2xl sm:my-3 sm:h-[calc(100dvh-1.5rem)] sm:rounded-3xl border-x-0 sm:border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-hidden">
     
     <!-- CABEÇALHO DO CHATBOT (ADAPTATIVO PARA TELAS ESTREITAS) -->
-    <header class="glass-surface border-b border-slate-200/80 dark:border-slate-800/80 px-3.5 py-2.5 sm:px-6 sm:py-3.5 flex items-center justify-between shrink-0 z-20 gap-2">
+    <header class="glass-surface border-b border-slate-200/80 dark:border-slate-800/80 px-3.5 py-2.5 sm:px-6 sm:py-3.5 flex items-center justify-between shrink-0 z-20 gap-2" role="banner">
       <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <!-- Avatar IA com Indicador de Status -->
-        <div class="relative shrink-0">
+        <div class="relative shrink-0" aria-hidden="true">
           <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
             <svg class="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -160,71 +211,80 @@
             <h1 id="chat-empresa-titulo" class="text-xs sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
               Atendimento Inteligente
             </h1>
-            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-300/60 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-xs shrink-0">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-300/60 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-xs shrink-0" aria-label="Modelo de Inteligência Artificial: Qwen 3.8 27B via Groq LPU">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
               <span class="hidden sm:inline">Qwen 3.8 27B &bull; Groq LPU</span>
               <span class="sm:hidden">Qwen 3.8</span>
             </span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 sm:gap-1.5 truncate">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" aria-hidden="true"></span>
             <span class="truncate">Online &bull; Pedidos 24/7 com IA</span>
           </p>
         </div>
       </div>
 
       <!-- Ações do Cabeçalho -->
-      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+      <nav class="flex items-center gap-1 sm:gap-1.5 shrink-0" aria-label="Controles do Atendimento">
         <!-- Alternador de Som -->
         <button 
+          type="button"
           id="btn-toggle-som"
           onclick="alternarSomChat()"
+          aria-label="Ativar ou desativar efeitos sonoros"
           title="Alternar Som de Notificação"
           class="p-1.5 sm:p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
         >
-          <svg id="icon-som-on" class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="icon-som-on" class="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
           </svg>
-          <svg id="icon-som-off" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="icon-som-off" class="w-4 h-4 text-slate-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
           </svg>
         </button>
 
         <!-- Alternar Tema Claro/Escuro -->
         <button 
+          type="button"
+          id="btn-toggle-tema-chat"
           onclick="alternarTema()"
+          aria-label="Alternar entre tema claro e tema escuro"
           title="Alternar Tema Claro / Escuro"
           class="p-1.5 sm:p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
         >
-          <svg class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-          <svg class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+          <svg class="w-4 h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+          <svg class="w-4 h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
         </button>
 
         <!-- Reiniciar Conversa -->
         <button 
+          type="button"
+          id="btn-reiniciar-chat"
           onclick="reiniciarConversa()"
+          aria-label="Reiniciar atendimento e limpar conversa"
           title="Reiniciar Conversa"
           class="p-1.5 sm:p-2 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800/80 rounded-xl transition cursor-pointer"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
 
         <!-- Link para o Painel (Admin/Login) -->
         <a 
           href="index.html"
+          aria-label="Acessar painel operacional do lojista"
           title="Acessar Painel do Lojista / Login"
-          class="inline-flex items-center gap-1 px-2 py-1.5 sm:px-2.5 sm:py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition"
+          class="inline-flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold transition"
         >
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           <span class="hidden sm:inline">Painel</span>
         </a>
-      </div>
+      </nav>
     </header>
 
     <!-- BANNER DE RESTAURAÇÃO DE ATENDIMENTO ANTERIOR (SESSIONSTORAGE) -->
-    <div id="banner-restaurar-sessao" class="hidden mx-3 sm:mx-6 mt-3 p-3 sm:p-3.5 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm animate-msg">
+    <div id="banner-restaurar-sessao" class="hidden mx-3 sm:mx-6 mt-3 p-3 sm:p-3.5 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm animate-msg" role="region" aria-label="Recuperação de atendimento">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs" aria-hidden="true">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div>
@@ -242,22 +302,30 @@
       </div>
     </div>
 
-    <!-- ÁREA DE MENSAGENS DO CHAT -->
-    <div 
+    <!-- ÁREA PRINCIPAL DE MENSAGENS DO CHAT (SEMÂNTICA COM MAIN E ROLE LOG) -->
+    <main 
       id="chat-mensagens-container" 
+      role="log"
+      aria-live="polite"
+      aria-label="Histórico de mensagens da conversa"
       class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 text-sm overscroll-contain"
     >
       <!-- As mensagens serão injetadas dinamicamente aqui -->
-    </div>
+    </main>
 
-    <!-- CHIPS DE SUGESTÃO / AÇÕES RÁPIDAS -->
-    <div id="chat-sugestoes-container" class="px-4 py-2 border-t border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/50 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
+    <!-- CHIPS DE SUGESTÃO / AÇÕES RÁPIDAS (COM ROLAGEM SUAVE) -->
+    <div 
+      id="chat-sugestoes-container" 
+      role="group"
+      aria-label="Sugestões de resposta rápida"
+      class="px-4 py-2 border-t border-slate-100 dark:border-slate-800/60 bg-slate-50/70 dark:bg-slate-900/50 flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0"
+    >
       <!-- Chips rápidos injetados dinamicamente -->
     </div>
 
     <!-- INDICADOR DE DIGITAÇÃO -->
-    <div id="chat-digitando" class="hidden px-5 py-2 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-medium shrink-0 bg-white/40 dark:bg-slate-900/40">
-      <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center">
+    <div id="chat-digitando" class="hidden px-5 py-2 flex items-center gap-2 text-xs text-indigo-600 dark:text-indigo-400 font-medium shrink-0 bg-white/40 dark:bg-slate-900/40" aria-live="polite">
+      <div class="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center" aria-hidden="true">
         <div class="dot-flashing"></div>
       </div>
       <span>Assistente digitando...</span>
@@ -266,33 +334,34 @@
     <!-- BARRA INFERIOR DE ENVIO DE MENSAGEM (COM SAFE AREA PARA IPHONES/ANDROID) -->
     <footer class="p-2.5 sm:p-4 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800/80 shrink-0 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
       <!-- PREVIEW FLUTUANTE DE FOTO / ANEXO SELECIONADO -->
-      <div id="chat-anexo-preview-container" class="hidden mb-2 p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-between gap-2 max-w-sm animate-msg">
+      <div id="chat-anexo-preview-container" class="hidden mb-2 p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-between gap-2 max-w-sm animate-msg" role="status" aria-label="Imagem anexada">
         <div class="flex items-center gap-2 overflow-hidden">
-          <img id="chat-anexo-preview-thumb" src="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" alt="Preview" />
+          <img id="chat-anexo-preview-thumb" src="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" alt="Miniatura do anexo" />
           <div class="truncate text-xs text-slate-700 dark:text-slate-200 font-medium">
             <span id="chat-anexo-preview-nome" class="truncate block">foto.jpg</span>
             <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">✓ Imagem anexada</span>
           </div>
         </div>
-        <button type="button" onclick="removerAnexo()" class="w-7 h-7 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition cursor-pointer" title="Remover anexo">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button type="button" onclick="removerAnexo()" class="w-7 h-7 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition cursor-pointer" aria-label="Remover foto anexada" title="Remover anexo">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <!-- FORMULÁRIO DE ENVIO COM BOTÕES DE ANEXO E ÁUDIO -->
-      <form id="form-chat-envio" onsubmit="enviarMensagemUsuario(event)" class="flex items-center gap-1.5 sm:gap-2">
+      <form id="form-chat-envio" onsubmit="enviarMensagemUsuario(event)" class="flex items-center gap-1.5 sm:gap-2" aria-label="Formulário de envio de mensagem">
         <!-- Input de arquivo oculto -->
-        <input type="file" id="chat-file-input" accept="image/*" class="hidden" onchange="processarArquivoSelecionado(event)" />
+        <input type="file" id="chat-file-input" accept="image/*" class="hidden" onchange="processarArquivoSelecionado(event)" aria-label="Carregar foto ou imagem" />
 
         <!-- Botão de Anexo / Foto -->
         <button 
           type="button" 
           id="btn-anexo"
           onclick="document.getElementById('chat-file-input').click()"
+          aria-label="Anexar foto ou imagem ao pedido"
           class="h-10 sm:h-11 w-10 sm:w-11 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer"
           title="Anexar foto ou imagem"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
@@ -303,6 +372,7 @@
           <input 
             type="text" 
             id="chat-input-texto"
+            aria-label="Mensagem para o assistente virtual"
             placeholder="Digite sua mensagem ou descreva o pedido..."
             autocomplete="off"
             class="w-full pl-3.5 sm:pl-4 pr-9 sm:pr-10 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition shadow-inner"
@@ -311,21 +381,29 @@
             type="button" 
             id="btn-limpar-input"
             onclick="limparInputTexto()"
+            aria-label="Limpar texto digitado"
             class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
             title="Limpar texto"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
 
-        <!-- Container de Gravação de Áudio Ativa (Oculta o input quando gravando) -->
-        <div id="chat-gravando-container" class="hidden flex-1 flex items-center justify-between px-3 sm:px-4 py-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 rounded-2xl text-xs text-rose-700 dark:text-rose-300">
+        <!-- Container de Gravação de Áudio Ativa (Oculta o input quando gravando com onda sonora animada) -->
+        <div id="chat-gravando-container" class="hidden flex-1 flex items-center justify-between px-3 sm:px-4 py-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 rounded-2xl text-xs text-rose-700 dark:text-rose-300" role="status" aria-live="assertive">
           <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping" aria-hidden="true"></span>
+            <!-- Barras animadas de onda sonora -->
+            <div class="flex items-center gap-0.5 h-4" aria-hidden="true">
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+            </div>
             <span class="font-bold">Gravando áudio...</span>
-            <span id="timer-gravacao" class="font-mono text-[11px] bg-rose-100 dark:bg-rose-900/60 px-1.5 py-0.5 rounded-md font-bold">0:00</span>
+            <span id="timer-gravacao" class="font-mono text-[11px] bg-rose-100 dark:bg-rose-900/60 px-1.5 py-0.5 rounded-md font-bold" aria-label="Duração da gravação">0:00</span>
           </div>
-          <button type="button" onclick="pararGravacaoAudio()" class="text-xs font-extrabold text-rose-600 hover:text-rose-800 dark:text-rose-400 underline cursor-pointer">
+          <button type="button" onclick="pararGravacaoAudio()" aria-label="Concluir gravação de áudio" class="text-xs font-extrabold text-rose-600 hover:text-rose-800 dark:text-rose-400 underline cursor-pointer">
             Concluir
           </button>
         </div>
@@ -335,10 +413,11 @@
           type="button" 
           id="btn-gravar-audio"
           onclick="alternarGravacaoAudio()"
+          aria-label="Gravar áudio com inteligência artificial Whisper"
           class="h-10 sm:h-11 w-10 sm:w-11 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer"
           title="Gravar Mensagem de Voz (IA Whisper)"
         >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
           </svg>
         </button>
@@ -347,11 +426,12 @@
         <button 
           type="submit" 
           id="btn-enviar-msg"
+          aria-label="Enviar mensagem"
           class="h-10 sm:h-11 px-3.5 sm:px-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-2xl shadow-md shadow-indigo-500/25 transition active:scale-95 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           title="Enviar mensagem"
         >
           <span class="hidden sm:inline text-xs">Enviar</span>
-          <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
           </svg>
         </button>
