@@ -211,10 +211,10 @@
             <h1 id="chat-empresa-titulo" class="text-xs sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
               Atendimento Inteligente
             </h1>
-            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 dark:from-amber-950/60 dark:to-orange-950/60 border border-amber-300/60 dark:border-amber-700 text-amber-800 dark:text-amber-300 shadow-xs shrink-0" aria-label="Modelo de Inteligência Artificial: Qwen 3.8 27B via Groq LPU">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" aria-hidden="true"></span>
-              <span class="hidden sm:inline">Qwen 3.8 27B &bull; Groq LPU</span>
-              <span class="sm:hidden">Qwen 3.8</span>
+            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 dark:from-indigo-950/60 dark:to-violet-950/60 border border-indigo-300/60 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 shadow-xs shrink-0" aria-label="Assistente Virtual Oficial Conectado">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+              <span class="hidden sm:inline">Assistente Virtual Oficial</span>
+              <span class="sm:hidden">IA Oficial</span>
             </span>
           </div>
           <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1 sm:gap-1.5 truncate">
@@ -413,9 +413,9 @@
           type="button" 
           id="btn-gravar-audio"
           onclick="alternarGravacaoAudio()"
-          aria-label="Gravar áudio com inteligência artificial Whisper"
+          aria-label="Gravar mensagem de voz"
           class="h-10 sm:h-11 w-10 sm:w-11 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer"
-          title="Gravar Mensagem de Voz (IA Whisper)"
+          title="Gravar Mensagem de Voz"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
@@ -455,8 +455,8 @@
     // ==============================================================================
     // CONFIGURAÇÃO DO SUPABASE & AMBIENTE
     // ==============================================================================
-    const SUPABASE_URL = 'https://pwyytcyofxtriulqesqm.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_vk-vctYaPnPRm0fWlRkcTQ_RtYigr2L';
+    const SUPABASE_URL = 'https://xqmzysjzopyuelvhokwm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_RfIxDPxwUdyzsaXXsa2tIw_XRvfyxAn';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // ESTADO DA CONVERSA E DADOS DO PEDIDO
@@ -959,7 +959,7 @@
 
     async function transcreverAudioComGroqWhisper(blob) {
       if (!configuracaoChat.groqApiKey) {
-        adicionarMensagem('bot', '⚠️ A gravação de voz requer a chave Groq para transcrição automática via Whisper.');
+        adicionarMensagem('bot', '⚠️ O recurso de mensagem por voz requer a chave de inteligência artificial configurada no painel.');
         return;
       }
 
@@ -1233,145 +1233,65 @@
       return melhorItem;
     }
 
-    // Detector e Extrator Especializado de Correção de Nome
-    function extrairNovoNome(texto) {
-      const t = String(texto || '').trim();
+    // ==============================================================================
+    // NOVAS FUNCIONALIDADES: COMPROVANTE DIGITAL, CSAT E ATENDIMENTO HUMANO
+    // ==============================================================================
 
-      const padroes = [
-        /(?:corrija|corrigir|mudar|mude|alterar|altere|trocar|troque)\s+(?:o\s+)?(?:meu\s+)?nome\s+(?:para|p\/|pra)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
-        /(?:errei|erado|errado|coloquei\s+errado|mandei\s+errado|escrevi\s+errado)\s+(?:o\s+)?(?:meu\s+)?nome[,\s:]+(?:(?:na\s+verdade|na\s+vdd)\s+(?:é\s+)?|é|o\s+nome\s+é|sou\s+o|sou\s+a|me\s+chamo|coloca|coloque|o\s+certo\s+é|era)\s*([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
-        /(?:meu\s+nome\s+(?:t[aá]\s+)?(?:est[aá]\s+)?errado|nome\s+errado)[,\s:]+(?:(?:na\s+verdade|na\s+vdd)\s+(?:é\s+)?|é|o\s+certo\s+é|me\s+chamo|sou|o\s+nome\s+é|era)\s*([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
-        /(?:n[aã]o\s+é\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+?[,\s]+(?:é|sou\s+o|sou\s+a|o\s+nome\s+é)\s+)([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
-        /(?:na\s+verdade|na\s+vdd)\s+(?:meu\s+nome\s+é|sou\s+o|sou\s+a|me\s+chamo|o\s+nome\s+é|é)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
-        /(?:meu\s+nome\s+(?:é|na\s+verdade\s+é))\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
-        /(?:meu\s+nome\s+é|me\s+chamo|sou\s+o|sou\s+a|falar\s+com)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i
-      ];
+    // Emissão e Download de Comprovante Digital (.txt)
+    function baixarComprovanteDigital(id, cliente, servico, valor, data, setor) {
+      const agora = new Date().toLocaleString('pt-BR');
+      const authCode = 'AUTH-' + id + '-' + Date.now().toString(36).toUpperCase();
+      const conteudo = `==================================================
+        COMPROVANTE DIGITAL DE PEDIDO
+==================================================
+Protocolo:          #${id}
+Data do Registro:   ${agora}
+Cliente:            ${cliente || 'Cliente'}
+Serviço Solicitado: ${servico || 'Não especificado'}
+Setor Operacional:  ${setor || 'Geral'}
+Previsão / Data:    ${data || 'A combinar'}
+Valor Estimado:     ${Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+Status Inicial:     Pendente de Atendimento
+--------------------------------------------------
+Autenticação:       ${authCode}
+Empresa:            ${configuracaoChat.nomeEmpresa || 'Central de Pedidos'}
+Atendimento Digital via Assistente Virtual Oficial
+==================================================`;
 
-      for (const regex of padroes) {
-        const match = t.match(regex);
-        if (match && match[1]) {
-          let nome = match[1].trim();
-          nome = nome.replace(/^(?:na\s+verdade\s+é|na\s+verdade|na\s+vdd\s+é|na\s+vdd|sou\s+o|sou\s+a|sou|o\s+meu\s+nome\s+é|meu\s+nome\s+é|o\s+certo\s+é|é)\s*/i, '');
-          nome = nome.replace(/^(?:o|a)\s+/i, '');
-          nome = nome.split(/[,\.\n\?!;]/)[0].trim();
-          nome = nome.replace(/\s+(?:na verdade|por favor|pfv|pf|obrigado|valeu|ok|e meu|meu telefone|meu zap|telefone).*$/i, '').trim();
-          if (nome.length >= 2 && !/^(pedido|quero|gostaria|sim|nao|não|ok|errado|certo)$/i.test(nome)) {
-            return nome;
-          }
-        }
-      }
-
-      // Padrão flexível: 'errei meu nome, Carlos' ou 'nome errado: Carlos'
-      const matchFlex = t.match(/(?:errei\s+(?:o\s+)?(?:meu\s+)?nome|nome\s+errado|mandei\s+(?:o\s+)?(?:meu\s+)?nome\s+errado|coloquei\s+(?:o\s+)?(?:meu\s+)?nome\s+errado|escrevi\s+(?:o\s+)?(?:meu\s+)?nome\s+errado)[,\s:]+(?:(?:na\s+verdade|na\s+vdd)\s+(?:é\s+)?|é\s+|era\s+|o\s+certo\s+é\s+|coloca\s+|coloque\s+)?([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]{2,40})/i);
-      if (matchFlex && matchFlex[1]) {
-        let limpo = matchFlex[1].replace(/^(?:na\s+verdade\s+é|na\s+verdade|na\s+vdd\s+é|na\s+vdd|sou\s+o|sou\s+a|sou|é|era|o certo é|coloque|coloca)\s*/i, '');
-        limpo = limpo.replace(/^(?:o|a)\s+/i, '');
-        limpo = limpo.split(/[,\.\n\?!;]/)[0].trim();
-        if (limpo.length >= 2 && !/^(pedido|quero|gostaria|sim|nao|não|ok|errado|certo)$/i.test(limpo)) {
-          return limpo;
-        }
-      }
-
-      return null;
+      const blob = new Blob([conteudo], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `comprovante-pedido-${id}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
-    // Helper para retomar a conversa após correção de dados
-    function retomarFluxoAposCorrecao() {
-      if (etapaColetaAtual === 'inicio' || etapaColetaAtual === 'nome') {
-        etapaColetaAtual = 'telefone';
-        if (!dadosPedidoEmConstrucao.telefone) {
-          adicionarMensagem('bot', `Para continuarmos, qual é o seu <strong>número de WhatsApp ou telefone</strong>?`);
-          atualizarSugestoes([
-            { texto: '(11) 99999-8888', icone: '📱' },
-            { texto: 'Prefiro informar depois', icone: '⏩' }
-          ]);
-        }
-      } else if (etapaColetaAtual === 'telefone' && !dadosPedidoEmConstrucao.telefone) {
-        adicionarMensagem('bot', `Para prosseguirmos, por favor me informe seu <strong>número de WhatsApp com DDD</strong>.`);
-      } else if (etapaColetaAtual === 'servico' && !dadosPedidoEmConstrucao.servico) {
-        adicionarMensagem('bot', `Qual <strong>serviço ou produto</strong> você gostaria de solicitar?`);
-      } else if (etapaColetaAtual === 'setor') {
-        adicionarMensagem('bot', `A qual <strong>setor ou categoria</strong> pertence o seu pedido?`);
-      } else if (etapaColetaAtual === 'data' && !dadosPedidoEmConstrucao.data_pedido) {
-        adicionarMensagem('bot', `Para quando você gostaria de agendar esse pedido?`);
-      } else if (etapaColetaAtual === 'confirmacao') {
-        exibirCardResumoConfirmacao();
-      } else {
-        adicionarMensagem('bot', `Como podemos dar andamento ao seu pedido?`);
+    // Avaliação de Satisfação do Cliente (CSAT)
+    async function avaliarAtendimento(idPedido, nota) {
+      const el = document.getElementById(`csat-widget-${idPedido}`);
+      if (el) {
+        el.innerHTML = `
+          <div class="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs py-1">
+            <span>🌟</span>
+            <span>Muito obrigado pela sua avaliação de ${nota} estrela${nota > 1 ? 's' : ''}! Sua opinião é fundamental para melhorarmos continuamente.</span>
+          </div>
+        `;
+      }
+      emitirSom('sucesso');
+      try {
+        await supabaseClient.from('pedidos').update({ avaliacao_csat: nota }).eq('id', idPedido);
+      } catch (e) {
+        console.warn('Registro CSAT local salvo.');
       }
     }
 
-    // Extração inteligente de entidades via Regex / Padrões comuns em Português
-    function extrairEntidadesTexto(texto) {
-      const extraido = {};
-
-      // 1. Extração de Telefone / WhatsApp (ex: (11) 98765-4321, 11988887777, 21 9999-8888)
-      const telRegex = /(?:\+?55\s?)?(?:\(?([1-9]{2})\)?\s?)?(?:(9\d{4})[-\s]?(\d{4})|(\d{4})[-\s]?(\d{4}))/g;
-      const matchTel = telRegex.exec(texto);
-      if (matchTel && matchTel[0].replace(/\D/g, '').length >= 8) {
-        const digitos = matchTel[0].replace(/\D/g, '');
-        if (digitos.length === 11) {
-          extraido.telefone = `(${digitos.slice(0,2)}) ${digitos.slice(2,7)}-${digitos.slice(7)}`;
-        } else if (digitos.length === 10) {
-          extraido.telefone = `(${digitos.slice(0,2)}) ${digitos.slice(2,6)}-${digitos.slice(6)}`;
-        } else {
-          extraido.telefone = matchTel[0].trim();
-        }
-      }
-
-      // 2. Extração de Nome próprio ("Meu nome é...", "Sou o...", "Me chamo..." ou Correção de Nome)
-      const nomeCorrigido = extrairNovoNome(texto);
-      if (nomeCorrigido) {
-        extraido.cliente = nomeCorrigido;
-      } else {
-        const nomeRegex = /(?:meu\s+nome\s+é|me\s+chamo|sou\s+o|sou\s+a|falar\s+com)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+?)(?=\s+(?:e\s+meu|e\s+o|meu\s+whatsapp|meu\s+zap|meu\s+tel|telefone|whatsapp|zap|contato|\(|\d)|[,\.\n]|$)/i;
-        const matchNome = texto.match(nomeRegex);
-        if (matchNome && matchNome[1]) {
-          const limpo = matchNome[1].split(/[,\.\n]/)[0].trim();
-          if (limpo.length > 2 && !limpo.includes('pedido') && !limpo.includes('gostaria')) {
-            extraido.cliente = limpo;
-          }
-        }
-      }
-
-      // 3. Extração de Valor em R$ ou reais
-      const valorRegex = /(?:r\$\s*|valor\s*(?:de\s*)?|preco\s*(?:de\s*)?|por\s*)(\d+(?:[\.,]\d{2})?)/i;
-      const matchValor = texto.match(valorRegex);
-      if (matchValor && matchValor[1]) {
-        extraido.valor = parseFloat(matchValor[1].replace(',', '.'));
-      }
-
-      // 4. Extração de Data / Horário ("para amanhã às 14h", "sexta-feira", "hoje", etc.)
-      const dataRegex = /(?:para\s+|no\s+dia\s+|em\s+)?(hoje|amanhã|depois\s+de\s+amanhã|segunda(?:-feira)?|terça(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|sábado|domingo|\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)(?:\s+(?:às|as)\s+\d{1,2}(?:h|:\d{2})?)?/i;
-      const matchData = texto.match(dataRegex);
-      if (matchData && matchData[0]) {
-        extraido.data_pedido = matchData[0].trim();
-      }
-
-      // 5. Mapeamento de Setor / Categoria
-      const setores = configuracaoChat.setoresDisponiveis || [];
-      for (const s of setores) {
-        if (new RegExp(`\\b${s}\\b`, 'i').test(texto)) {
-          extraido.setor = s;
-          break;
-        }
-      }
-
-      // 6. Mapeamento Automático com Tabela de Preços de Referência & Orçamentos
-      const orcamentoEncontrado = obterOrcamentoServico(texto);
-      if (orcamentoEncontrado) {
-        if (!extraido.servico && !dadosPedidoEmConstrucao.servico) {
-          extraido.servico = orcamentoEncontrado.servico;
-        }
-        if (!extraido.setor && (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral')) {
-          extraido.setor = orcamentoEncontrado.setor;
-        }
-        if (!extraido.valor && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0) && orcamentoEncontrado.valor > 0) {
-          extraido.valor = orcamentoEncontrado.valor;
-        }
-      }
-
-      return extraido;
+    // Transbordo / Redirecionamento para Atendente Humano no WhatsApp
+    function transbordarParaAtendente(assunto = '') {
+      const texto = encodeURIComponent(`Olá! Estava utilizando o autoatendimento e gostaria de falar diretamente com um atendente humano.${assunto ? ' Assunto: ' + assunto : ''}`);
+      window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
     }
 
     // Inicialização da Conversa
@@ -1495,7 +1415,7 @@
           const textoParaIa = anexo 
             ? (texto ? `${texto} (Enviei uma foto/anexo: ${anexo.nome})` : `Enviei uma imagem em anexo (${anexo.nome}) para análise do meu pedido.`)
             : texto;
-          await executarLogicaRespostaIA(textoParaIa);
+          await processarComIA(textoParaIa);
         } catch (err) {
           console.error('Erro na resposta da IA:', err);
           adicionarMensagem('bot', 'Desculpe, tive uma instabilidade momentânea ao processar sua resposta. Pode repetir, por favor?');
@@ -1505,117 +1425,225 @@
       }, 600);
     }
 
-    // LÓGICA CONVERSACIONAL DE COLETA DE DADOS DO PEDIDO
-    async function executarLogicaRespostaIA(texto) {
-      const textoLower = texto.toLowerCase();
-      const entidades = extrairEntidadesTexto(texto);
+    // ==============================================================================
+    // PROCESSAMENTO 100% LLM-DRIVEN (SEM EURÍSTICAS) & RESPOSTAS INTELIGENTES
+    // ==============================================================================
+    async function processarComIA(textoUsuario) {
+      if (!configuracaoChat.groqApiKey || configuracaoChat.groqApiKey.trim().length < 10) {
+        adicionarMensagem('bot', 'A chave de acesso ao assistente de inteligência artificial não está configurada. Por favor, solicite a configuração ao administrador do painel.');
+        return;
+      }
 
-      // 0. VERIFICAÇÃO PRIORITÁRIA DE CORREÇÃO DE NOME OU DADOS
-      const novoNome = extrairNovoNome(texto);
-      const pediuCorrecaoNome = /(?:errei|errado|errada|corrigir|corrija|mudar|mude|trocar|alterar)\s+(?:o\s+)?(?:meu\s+)?nome/i.test(texto) ||
-                                /(?:meu\s+nome\s+(?:t[aá]\s+)?(?:est[aá]\s+)?errado)/i.test(texto) ||
-                                /(?:mandei|coloquei|escrevi)\s+(?:o\s+)?(?:meu\s+)?nome\s+errado/i.test(texto) ||
-                                /(?:nome\s+errado)/i.test(texto);
+      // Modelos em ordem de capacidade e resiliência
+      const modelos = [configuracaoChat.modeloIa || 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b'];
 
-      // Se o assistente solicitou o nome correto na mensagem anterior
-      if (aguardandoCorrecaoNome) {
-        let limpo = texto.replace(/^(?:na\s+verdade\s+é|na\s+verdade|na\s+vdd\s+é|na\s+vdd|sou\s+o|sou\s+a|sou|o\s+meu\s+nome\s+é|meu\s+nome\s+é|o\s+certo\s+é|é|coloque|coloca)\s*/i, '').trim();
-        limpo = limpo.replace(/^(?:o|a)\s+/i, '').split(/[,\.\n\?!;]/)[0].trim();
-        if (limpo.length >= 2 && !/^(pedido|quero|gostaria|sim|nao|não|ok|cancelar)$/i.test(limpo)) {
-          dadosPedidoEmConstrucao.cliente = limpo;
-          aguardandoCorrecaoNome = false;
-          salvarSessaoNoStorage();
-          adicionarMensagemComEfeito(`Nome corrigido com sucesso para <strong>${escapeHtml(limpo)}</strong>! ✨`);
-          if (etapaColetaAtual === 'confirmacao') {
-            exibirCardResumoConfirmacao();
-          } else {
-            retomarFluxoAposCorrecao();
+      const promptSistema = `Você é o Assistente Virtual Oficial da Central de Pedidos e Atendimento da empresa "${configuracaoChat.nomeEmpresa}".
+Você possui RACIOCÍNIO ANALÍTICO PROFUNDO, EMPATIA, FLUÊNCIA NATURAL E TOTAL CONHECIMENTO OPERACIONAL.
+
+================================================================================
+REGRA ABSOLUTA DE IDENTIDADE E SIGILO TECNOLÓGICO (WHITE-LABEL COMPLETO):
+================================================================================
+- Você é EXCLUSIVAMENTE o "Assistente Virtual Oficial da Central de Atendimento e Pedidos".
+- É ESTRITAMENTE PROIBIDO revelar, mencionar, sugerir ou confirmar o nome de qualquer modelo ou fornecedor de IA (como Qwen, Groq, Llama, OpenAI, ChatGPT, Claude, Gemini, Meta, Alibaba, etc.).
+- Se o usuário perguntar qual IA você é, qual o seu modelo, quem te criou, se você é Qwen ou qual tecnologia está por trás, você DEVE responder obrigatoriamente:
+  "Sou o Assistente Virtual Oficial da Central de Atendimento e Pedidos, desenvolvido especialmente para oferecer um atendimento ágil, inteligente e personalizado."
+- Mantenha sempre essa identidade profissional e acolhedora em todas as circunstâncias.
+
+================================================================================
+ESTRUTURA OPERACIONAL & ONTOLOGIA DA CENTRAL:
+================================================================================
+1. ESTADOS DO PEDIDO NO KANBAN OPERACIONAL:
+   - Pendente: Pedido recém-registrado, aguardando triagem técnica da equipe.
+   - Agendado: Data e horário confirmados.
+   - Em Produção: Pedido em execução ativa pela equipe.
+   - Concluído: Finalizado, inspecionado e pronto/entregue.
+   - Cancelado: Cancelado a pedido ou por inviabilidade técnica.
+
+2. SETORES DISPONÍVEIS:
+   ${(configuracaoChat.setoresDisponiveis || ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']).map(s => `- ${s}`).join('\n   ')}
+
+3. POLÍTICAS INSTITUCIONAIS & FAQ:
+   - Horário de Funcionamento: Segunda a Sexta das 08h às 18h; Sábados das 08h às 12h. Chatbot 24 horas por dia.
+   - Formas de Pagamento: PIX instantâneo (com desconto especial), Cartão de Crédito em até 12x, Cartão de Débito, Boleto Bancário e Dinheiro.
+   - Garantia: 90 dias de garantia legal com suporte direto pelo painel.
+   - Prazos Médios: 24h a 48h úteis para serviços regulares.
+
+4. TABELA DE PREÇOS DE REFERÊNCIA & ORÇAMENTOS:
+   ${(configuracaoChat.tabelaPrecos || []).map(p => `- [${p.setor}] ${p.servico}: R$ ${p.valor},00 (Prazo: ${p.prazo})`).join('\n   ')}
+
+   REGRA MANDATÓRIA DE PREÇOS:
+   - Quando o cliente demonstrar interesse ou citar um serviço, informe SEMPRE o valor estimado e o prazo na sua mensagem e preencha "dadosAtualizados.valor" com o valor numérico da tabela.
+   - Se o cliente pedir tabela ou valores em geral, informe os principais serviços com preços e prazos.
+
+5. PROCESSAMENTO CONVERSACIONAL NATURAL & EDIÇÕES:
+   - Compreenda naturalmente o contexto sem regras rígidas ou suposições.
+   - Se o cliente corrigir qualquer dado (ex: "meu nome é Carlos, mandei errado", "troca a data para amanhã", "muda o serviço para formatar"), defina "acao": "EDITAR_PEDIDO" e atualize o respectivo campo em "dadosAtualizados".
+   - Se o cliente quiser falar com uma pessoa real ou atendente humano, defina "acao": "TRANSBORDAR_HUMANO".
+   - Se o cliente quiser consultar ou rastrear um pedido (por número ou telefone), defina "acao": "CONSULTAR_PEDIDO" e extraia o id ou telefone no campo "consulta".
+   - Se o cliente confirmou o pedido após ver o resumo (ex: "sim", "pode confirmar", "está certo", "fechar"), defina "clienteConfirmou": true.
+   - Se os dados principais (cliente, telefone e serviço) já estiverem preenchidos, defina "prontoParaConfirmar": true.
+
+================================================================================
+ESTADO ATUAL DO PEDIDO EM CONSTRUÇÃO:
+================================================================================
+${JSON.stringify(dadosPedidoEmConstrucao)}
+
+================================================================================
+FORMATO ESTRITO DE RESPOSTA (JSON):
+================================================================================
+Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
+{
+  "raciocinio": "Breve análise analítica da intenção do usuário",
+  "acao": "CRIAR_PEDIDO" | "CONSULTAR_PEDIDO" | "RESPONDER_DUVIDA" | "EDITAR_PEDIDO" | "TRANSBORDAR_HUMANO",
+  "mensagem": "Sua resposta completa, acolhedora e resolutiva em português formatada com quebras de linha normais",
+  "dadosAtualizados": {
+    "cliente": "Nome do cliente atualizado se informado ou mantido",
+    "telefone": "Telefone ou WhatsApp se informado ou mantido",
+    "servico": "Serviço solicitado se informado ou mantido",
+    "setor": "Setor correspondente",
+    "data_pedido": "Data/horário de preferência se informado ou mantido",
+    "valor": 0,
+    "observacoes": "Observações ou mantido"
+  },
+  "consulta": {
+    "idPedido": null,
+    "telefone": null
+  },
+  "sugestoes": ["Opção 1", "Opção 2"],
+  "prontoParaConfirmar": false,
+  "clienteConfirmou": false
+}`;
+
+      const historicoRecente = historicoMensagens.slice(-8).map(m => ({
+        role: m.role,
+        content: m.content
+      }));
+
+      const messages = [
+        { role: 'system', content: promptSistema },
+        ...historicoRecente,
+        { role: 'user', content: textoUsuario }
+      ];
+
+      for (const modelo of modelos) {
+        try {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${configuracaoChat.groqApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: modelo,
+              messages,
+              max_tokens: 500,
+              temperature: 0.1
+            })
+          });
+
+          if (!res.ok) {
+            console.warn(`Modelo ${modelo} retornou status ${res.status}, tentando próximo...`);
+            continue;
           }
-          return;
+
+          const json = await res.json();
+          const choice = json.choices?.[0]?.message;
+          const rawText = choice?.content;
+          if (!rawText) continue;
+
+          let respostaObj = null;
+          try {
+            let cleanJson = rawText;
+            if (cleanJson.includes('</think>')) {
+              cleanJson = cleanJson.split('</think>')[1];
+            }
+            cleanJson = cleanJson.replace(/```json/gi, '').replace(/```/g, '').trim();
+            const firstBrace = cleanJson.indexOf('{');
+            const lastBrace = cleanJson.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace !== -1) {
+              cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+            }
+            respostaObj = JSON.parse(cleanJson);
+          } catch (parseErr) {
+            respostaObj = {
+              acao: 'RESPONDER_DUVIDA',
+              mensagem: rawText.replace(/<[^>]+>/g, ' ').trim(),
+              dadosAtualizados: {},
+              prontoParaConfirmar: false,
+              clienteConfirmou: false
+            };
+          }
+
+          if (respostaObj && respostaObj.mensagem) {
+            await aplicarRespostaIA(respostaObj, textoUsuario);
+            return;
+          }
+        } catch (errModelo) {
+          console.warn(`Erro na chamada da IA modelo ${modelo}:`, errModelo);
         }
       }
 
-      // Se o usuário solicitou correção de nome com o novo nome informado
-      if (novoNome && (pediuCorrecaoNome || dadosPedidoEmConstrucao.cliente)) {
-        dadosPedidoEmConstrucao.cliente = novoNome;
-        aguardandoCorrecaoNome = false;
-        salvarSessaoNoStorage();
-        adicionarMensagemComEfeito(`Entendido! Já atualizei seu nome para <strong>${escapeHtml(novoNome)}</strong>. 😊<br/>O cadastro do seu pedido foi corrigido.`);
-        if (etapaColetaAtual === 'confirmacao') {
-          exibirCardResumoConfirmacao();
-        } else {
-          retomarFluxoAposCorrecao();
+      // Fallback em caso de indisponibilidade geral de rede
+      adicionarMensagem('bot', 'Desculpe, tive uma instabilidade temporária ao me comunicar com a Central. Por favor, tente novamente ou clique no botão abaixo para falar com um atendente humano.');
+      atualizarSugestoes([
+        { texto: '💬 Falar no WhatsApp', valor: 'Quero falar com um atendente' },
+        { texto: '🔄 Tentar Novamente', valor: textoUsuario }
+      ]);
+    }
+
+    // Aplicação da resposta inteligente da IA no estado e na interface
+    async function aplicarRespostaIA(respostaObj, textoUsuario) {
+      if (!respostaObj) return;
+
+      // 1. Atualizar dados do pedido com inteligência analítica
+      if (respostaObj.dadosAtualizados) {
+        const d = respostaObj.dadosAtualizados;
+        if (d.cliente && d.cliente !== 'Não informado' && d.cliente.trim()) dadosPedidoEmConstrucao.cliente = d.cliente.trim();
+        if (d.telefone && d.telefone !== 'Não informado' && d.telefone.trim()) dadosPedidoEmConstrucao.telefone = d.telefone.trim();
+        if (d.servico && d.servico.trim()) dadosPedidoEmConstrucao.servico = d.servico.trim();
+        if (d.setor && d.setor.trim()) dadosPedidoEmConstrucao.setor = d.setor.trim();
+        if (d.data_pedido && d.data_pedido.trim()) dadosPedidoEmConstrucao.data_pedido = d.data_pedido.trim();
+        if (d.valor !== undefined && d.valor !== null) {
+          const valNum = parseFloat(d.valor);
+          if (!isNaN(valNum) && valNum > 0) dadosPedidoEmConstrucao.valor = valNum;
         }
-        return;
-      } else if (pediuCorrecaoNome && !novoNome) {
-        // Usuário avisou que errou o nome mas não digitou o novo ainda
-        aguardandoCorrecaoNome = true;
-        salvarSessaoNoStorage();
-        adicionarMensagemComEfeito(`Sem problemas, vamos arrumar isso agora! Por favor, <strong>qual é o seu nome correto</strong>?`);
-        return;
+        if (d.observacoes && d.observacoes.trim()) dadosPedidoEmConstrucao.observacoes = d.observacoes.trim();
       }
 
-      // Se a IA tiver chave do Groq configurada, processar com Qwen 3.8 27B em nível máximo de raciocínio
-      if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.trim().length > 10) {
-        const chamadaGroq = await tentarProcessarComGroqQwen(texto);
-        if (chamadaGroq) {
-          return;
-        }
-      }
-
-      // Fluxo Nativo Especializado e Ultrarrápido
-
-      // Se o cliente quer reiniciar ou cancelar
-      if (textoLower.includes('cancelar') || textoLower.includes('recomeçar') || textoLower.includes('reiniciar')) {
-        reiniciarConversa();
-        return;
-      }
-
-      // INTENÇÃO: Consulta ou Rastreamento de Pedido Existente
-      const matchConsulta = textoLower.match(/(?:consultar|rastrear|status|andamento|acompanhar|onde est[aá]|como est[aá]|meu pedido|pedido\s*#?\s*(\d+))/i);
-      if (matchConsulta) {
-        const matchNumero = texto.match(/#?(\d+)/);
-        if (matchNumero && matchNumero[1] && matchNumero[1].length <= 6) {
-          adicionarMensagem('bot', `Localizando o andamento do seu pedido <strong>#${matchNumero[1]}</strong> na nossa Central... ⏳`);
-          await consultarPedidoNoSupabase(matchNumero[1]);
-          return;
-        } else if (entidades.telefone) {
-          adicionarMensagem('bot', `Localizando pedidos vinculados ao WhatsApp <strong>${entidades.telefone}</strong>... ⏳`);
-          await consultarPedidoNoSupabase(entidades.telefone);
-          return;
-        } else {
-          adicionarMensagem('bot', `
-            Com certeza! Para consultar o andamento e status do seu pedido, por favor me informe o <strong>número do pedido (ex: #38)</strong> ou o seu <strong>número de WhatsApp com DDD</strong>.
-          `);
-          atualizarSugestoes([
-            { texto: 'Informar meu WhatsApp', valor: 'Meu telefone é ' },
-            { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
-          ]);
-          return;
+      // Auto-preenchimento de valor de referência caso não preenchido
+      if (dadosPedidoEmConstrucao.servico && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) {
+        const orc = obterOrcamentoServico(dadosPedidoEmConstrucao.servico);
+        if (orc && orc.valor > 0) {
+          dadosPedidoEmConstrucao.valor = orc.valor;
+          if (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral') {
+            dadosPedidoEmConstrucao.setor = orc.setor;
+          }
         }
       }
 
-      // INTENÇÃO: Dúvidas Institucionais & FAQ (Formas de Pagamento)
-      if (textoLower.includes('pagamento') || textoLower.includes('pix') || textoLower.includes('cartão') || textoLower.includes('cartao') || textoLower.includes('parcela')) {
-        adicionarMensagem('bot', `
-          💳 <strong>Formas de Pagamento Aceitas:</strong><br/>
-          Aceitamos <strong>PIX instantâneo</strong> (com desconto especial), <strong>Cartões de Crédito</strong> em até 12x, <strong>Cartões de Débito</strong>, <strong>Boleto Bancário</strong> e <strong>Dinheiro</strong> na retirada/entrega.
-        `);
-        atualizarSugestoes([
-          { texto: '🛍️ Fazer Pedido Agora', valor: 'Quero fazer um novo pedido' },
-          { texto: '💰 Solicitar Orçamento', valor: 'Quero solicitar um orçamento' },
-          { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' }
-        ]);
-        return;
-      }
+      // Salva sessão localmente
+      salvarSessaoNoStorage();
 
-      // INTENÇÃO: Dúvidas Institucionais & FAQ (Horários de Atendimento)
-      if (textoLower.includes('horário') || textoLower.includes('horario') || textoLower.includes('aberto') || textoLower.includes('sábado') || textoLower.includes('sabado') || textoLower.includes('funciona')) {
-        adicionarMensagem('bot', `
-          🕒 <strong>Horário de Funcionamento:</strong><br/>
-          Nossa Central atende de <strong>Segunda a Sexta das 08h às 18h</strong> e aos <strong>Sábados das 08h às 12h</strong>.<br/>
-          Nosso assistente virtual opera <strong>24 horas por dia</strong> para você registrar novos pedidos a qualquer momento!
-        `);
+      // 2. Ação: TRANSBORDAR_HUMANO
+      if (respostaObj.acao === 'TRANSBORDAR_HUMANO') {
+        const msgFormatada = (respostaObj.mensagem || 'Encaminhando seu atendimento para nossa equipe no WhatsApp.')
+          .replace(/\n/g, '<br/>');
+        const cardHumano = `
+          <div class="space-y-3">
+            <p>${msgFormatada}</p>
+            <div class="pt-1">
+              <button 
+                type="button" 
+                onclick="transbordarParaAtendente('${escapeHtml(dadosPedidoEmConstrucao.servico || 'Atendimento Geral')}')"
+                class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                <span>Falar com Atendente no WhatsApp</span>
+              </button>
+            </div>
+          </div>
+        `;
+        adicionarMensagem('bot', cardHumano);
         atualizarSugestoes([
           { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
           { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' }
@@ -1623,284 +1651,49 @@
         return;
       }
 
-      // INTENÇÃO: Dúvidas Institucionais & FAQ (Garantia & Prazos)
-      if (textoLower.includes('garantia') || textoLower.includes('prazo') || textoLower.includes('quanto tempo')) {
-        adicionarMensagem('bot', `
-          🛡️ <strong>Garantia & Prazos:</strong><br/>
-          Todos os nossos serviços possuem <strong>garantia de 90 dias</strong> com suporte direto pelo painel.<br/>
-          O prazo padrão varia entre <strong>24h e 48h úteis</strong> conforme a fila da oficina/setor, e você pode acompanhar cada etapa pelo nosso rastreador!
-        `);
-        atualizarSugestoes([
-          { texto: '🛍️ Iniciar Pedido', valor: 'Quero fazer um novo pedido' },
-          { texto: '💰 Solicitar Orçamento', valor: 'Quero solicitar um orçamento' }
-        ]);
-        return;
-      }
-
-      // INTENÇÃO: Preços de Referência, Orçamentos & Valores
-      const pediuPrecoOuOrcamento = /(?:quanto\s+(?:custa|fica|sai|vale|cobra|cobram)|qual\s+(?:o\s+)?(?:pre[çc]o|valor|or[çc]amento)|tabela\s+(?:de\s+)?pre[çc]os?|or[çc]amento|tabela\s+de\s+valores|valores\s+dos\s+servi[çc]os|pre[çc]o|precos)/i.test(textoLower);
-
-      if (pediuPrecoOuOrcamento) {
-        const orcamento = obterOrcamentoServico(texto) || (dadosPedidoEmConstrucao.servico ? obterOrcamentoServico(dadosPedidoEmConstrucao.servico) : null);
-        
-        if (orcamento) {
-          if (!dadosPedidoEmConstrucao.servico) dadosPedidoEmConstrucao.servico = orcamento.servico;
-          if (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = orcamento.setor;
-          if (!dadosPedidoEmConstrucao.valor) dadosPedidoEmConstrucao.valor = orcamento.valor;
-
-          const valorFmt = orcamento.valor > 0 
-            ? Number(orcamento.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-            : 'Sob consulta / A combinar';
-
-          adicionarMensagem('bot', `
-            💰 <strong>Orçamento & Preço de Referência:</strong><br/>
-            O serviço <strong>${escapeHtml(orcamento.servico)}</strong> (Setor: ${escapeHtml(orcamento.setor)}) possui valor estimado de:
-            <div class="my-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-xl flex items-center justify-between">
-              <div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Valor Estimado:</span>
-                <strong class="text-emerald-600 dark:text-emerald-400 text-base font-extrabold">${valorFmt}</strong>
-              </div>
-              <div class="text-right">
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Prazo Médio:</span>
-                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${orcamento.prazo || '24h a 48h'}</span>
-              </div>
-            </div>
-            🛡️ <em>Inclui garantia legal de 90 dias e pagamento facilitado via PIX, Cartão em até 12x ou Dinheiro.</em><br/><br/>
-            Gostaria de agendar ou solicitar esse serviço agora?
-          `);
-
-          atualizarSugestoes([
-            { texto: '✅ Quero agendar este serviço', valor: `Quero agendar ${orcamento.servico}` },
-            { texto: '💳 Formas de pagamento', valor: 'Quais formas de pagamento vocês aceitam?' },
-            { texto: '📋 Ver outros preços', valor: 'Qual a tabela de preços?' }
-          ]);
-          return;
+      // 3. Ação: CONSULTAR_PEDIDO
+      if (respostaObj.acao === 'CONSULTAR_PEDIDO') {
+        const idPed = respostaObj.consulta?.idPedido;
+        const telPed = respostaObj.consulta?.telefone;
+        if (idPed || telPed) {
+          adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
+          await consultarPedidoNoSupabase(idPed || telPed);
         } else {
-          // Consulta geral de preços (mini-catálogo com destaques)
-          const itensDestaque = (configuracaoChat.tabelaPrecos || []).slice(0, 6);
-          adicionarMensagem('bot', `
-            📋 <strong>Tabela de Preços e Serviços em Destaque:</strong><br/>
-            Confira abaixo os valores médios de referência dos nossos principais serviços:
-            <div class="mt-2.5 space-y-1.5 text-xs">
-              ${itensDestaque.map(item => `
-                <div class="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200/80 dark:border-slate-800">
-                  <div>
-                    <strong class="text-slate-800 dark:text-slate-100">${escapeHtml(item.servico)}</strong>
-                    <span class="block text-[10px] text-slate-500 dark:text-slate-400">${escapeHtml(item.setor)} • Prazo: ${item.prazo}</span>
-                  </div>
-                  <strong class="text-emerald-600 dark:text-emerald-400 font-bold ml-2 shrink-0">${item.valor > 0 ? Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'A combinar'}</strong>
-                </div>
-              `).join('')}
-            </div>
-            <p class="mt-2.5 text-xs text-slate-600 dark:text-slate-300">Qual desses serviços você gostaria de solicitar?</p>
-          `);
-
-          atualizarSugestoes(itensDestaque.slice(0, 4).map(i => ({
-            texto: `${i.servico.split(' ')[0]} - R$ ${i.valor}`,
-            valor: `Quero ${i.servico}`
-          })));
-          return;
-        }
-      }
-
-      // Coleta em Estágios
-      if (etapaColetaAtual === 'inicio' || etapaColetaAtual === 'nome') {
-        let nome = entidades.cliente;
-        if (!nome) {
-          // Se for resposta direta com apenas o nome (ex: "Carlos Eduardo" ou "Sou Maria")
-          const ehPerguntaOuIntencao = /(?:quanto|qual|como|onde|quando|quem|por\s*que|pre[çc]o|valor|or[çc]amento|pedido|duvida|ajuda|ola|olá|bom\s+dia|boa\s+tarde|boa\s+noite|troca|conserto|reparo|manutencao|limpeza)/i.test(textoLower);
-          if (!ehPerguntaOuIntencao) {
-            const limpo = texto.replace(/^(?:olá|oi|bom dia|boa tarde|boa noite|sou\s+o|sou\s+a|sou|meu nome é|me chamo|o meu é)\s*/i, '').trim();
-            if (limpo.length >= 2 && limpo.length <= 40 && !/^(pedido|quero|gostaria|sim|nao|não|ok|errado|certo|ajuda|cancelar)$/i.test(limpo)) {
-              nome = limpo;
-            }
-          }
-        }
-
-        if (nome) {
-          dadosPedidoEmConstrucao.cliente = nome;
-          // Se na mesma mensagem o cliente já passou o telefone
-          if (entidades.telefone) dadosPedidoEmConstrucao.telefone = entidades.telefone;
-          if (entidades.servico) dadosPedidoEmConstrucao.servico = entidades.servico;
-          if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
-
-          etapaColetaAtual = 'telefone';
-          if (!dadosPedidoEmConstrucao.telefone) {
-            adicionarMensagem('bot', `
-              Prazer em te conhecer, <strong>${escapeHtml(nome)}</strong>! 😊<br/>
-              Para que possamos entrar em contato e enviar atualizações do seu pedido, qual é o seu <strong>número de WhatsApp ou telefone</strong>?
-            `);
+          const matchNum = textoUsuario.match(/#?(\d+)/);
+          if (matchNum && matchNum[1] && matchNum[1].length <= 6) {
+            adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
+            await consultarPedidoNoSupabase(matchNum[1]);
+          } else {
+            adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
             atualizarSugestoes([
-              { texto: '(11) 99999-8888', icone: '📱' },
-              { texto: 'Prefiro informar depois', icone: '⏩' }
+              { texto: 'Informar número #', valor: 'Meu pedido é #' },
+              { texto: 'Informar WhatsApp', valor: 'Meu telefone é ' },
+              { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
             ]);
-            return;
           }
-        } else {
-          adicionarMensagem('bot', `Olá! Para iniciarmos seu atendimento ou pedido, por favor, me informe o seu <strong>nome completo</strong>.`);
-          return;
-        }
-      }
-
-      if (etapaColetaAtual === 'telefone') {
-        let tel = entidades.telefone;
-        if (!tel) {
-          const apenasNumeros = texto.replace(/\D/g, '');
-          if (apenasNumeros.length >= 8) {
-            tel = texto.trim();
-          } else if (textoLower.includes('depois') || textoLower.includes('pular') || textoLower.includes('não')) {
-            tel = 'Não informado';
-          }
-        }
-
-        if (tel) {
-          dadosPedidoEmConstrucao.telefone = tel;
-          etapaColetaAtual = 'servico';
-          adicionarMensagem('bot', `
-            Perfeito, contato salvo! 📝<br/>
-            Agora me conte: <strong>qual serviço ou produto você gostaria de solicitar?</strong><br/>
-            <span class="text-xs text-slate-400">Pode detalhar o que precisa (Ex: Troca de óleo, Banho e tosa, Formatação, Criação de Banner, etc.)</span>
-          `);
-          atualizarSugestoes([
-            { texto: 'Troca de Óleo', icone: '🛢️' },
-            { texto: 'Formatação de PC', icone: '💻' },
-            { texto: 'Banho e Tosa', icone: '🐾' },
-            { texto: 'Criação de Banner', icone: '🎨' }
-          ]);
-          return;
-        } else {
-          adicionarMensagem('bot', `Por favor, informe seu número de telefone ou WhatsApp (ex: <em>(11) 98765-4321</em>) para facilitar nosso contato.`);
-          return;
-        }
-      }
-
-      if (etapaColetaAtual === 'servico') {
-        dadosPedidoEmConstrucao.servico = texto;
-
-        // Identificar orçamento e preço de referência para o serviço informado
-        const orcamento = obterOrcamentoServico(texto) || (entidades.valor ? { valor: entidades.valor, setor: entidades.setor, prazo: 'A combinar' } : null);
-
-        if (orcamento) {
-          if (orcamento.valor && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) {
-            dadosPedidoEmConstrucao.valor = orcamento.valor;
-          }
-          if (orcamento.setor && (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral')) {
-            dadosPedidoEmConstrucao.setor = orcamento.setor;
-          }
-        }
-
-        if (entidades.setor) dadosPedidoEmConstrucao.setor = entidades.setor;
-        if (entidades.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidades.data_pedido;
-        if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
-
-        const valorFmt = dadosPedidoEmConstrucao.valor > 0 
-          ? Number(dadosPedidoEmConstrucao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-          : (orcamento?.valor > 0 ? Number(orcamento.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta / A combinar');
-
-        const prazoFmt = orcamento?.prazo || '24h a 48h';
-
-        const cardPrecoHtml = `
-          <div class="my-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-xl">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Valor de Referência / Estimado:</span>
-                <strong class="text-emerald-600 dark:text-emerald-400 text-base font-extrabold">${valorFmt}</strong>
-              </div>
-              <div class="text-right">
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Prazo Médio:</span>
-                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${prazoFmt}</span>
-              </div>
-            </div>
-          </div>
-        `;
-
-        if (dadosPedidoEmConstrucao.setor && dadosPedidoEmConstrucao.setor !== 'Geral') {
-          etapaColetaAtual = 'data';
-          adicionarMensagem('bot', `
-            Excelente! Entendi sua solicitação: <strong>"${escapeHtml(texto)}"</strong> (Setor: <strong>${escapeHtml(dadosPedidoEmConstrucao.setor)}</strong>). 🎯<br/>
-            ${cardPrecoHtml}
-            Para quando você gostaria de agendar ou receber esse pedido? (Ex: <em>Hoje</em>, <em>Amanhã às 14h</em>, <em>Sexta-feira</em>, etc.)
-          `);
-          atualizarSugestoes([
-            { texto: 'Hoje o quanto antes', icone: '⚡' },
-            { texto: 'Amanhã pela manhã', icone: '🌅' },
-            { texto: 'Neste final de semana', icone: '📅' }
-          ]);
-        } else {
-          etapaColetaAtual = 'setor';
-          const setores = configuracaoChat.setoresDisponiveis || ['Geral', 'Oficina', 'Vendas'];
-          adicionarMensagem('bot', `
-            Excelente! Entendi sua solicitação: <strong>"${escapeHtml(texto)}"</strong>. 🎯<br/>
-            ${cardPrecoHtml}
-            A qual <strong>setor ou categoria</strong> esse pedido melhor se encaixa? Clique em uma das opções abaixo ou digite:
-          `);
-          atualizarSugestoes(setores.map(s => ({ texto: s, valor: s, icone: '🏷️' })));
         }
         return;
       }
 
-      if (etapaColetaAtual === 'setor') {
-        dadosPedidoEmConstrucao.setor = texto.trim() || 'Geral';
-        etapaColetaAtual = 'data';
-
-        adicionarMensagem('bot', `
-          Setor definido como <strong>${escapeHtml(dadosPedidoEmConstrucao.setor)}</strong>. ✅<br/>
-          Para quando você gostaria de agendar ou receber esse pedido? (Ex: <em>Hoje</em>, <em>Amanhã às 14h</em>, <em>Sexta-feira</em>, etc.)
-        `);
-
-        atualizarSugestoes([
-          { texto: 'Hoje o mais breve possível', icone: '⚡' },
-          { texto: 'Amanhã pela manhã', icone: '🌅' },
-          { texto: 'Amanhã à tarde (14h)', icone: '🕒' },
-          { texto: 'Próxima semana', icone: '📅' }
-        ]);
+      // 4. Confirmação do Pedido pelo Usuário
+      if (respostaObj.clienteConfirmou) {
+        await confirmarECriarPedidoNoSupabase();
         return;
       }
 
-      if (etapaColetaAtual === 'data') {
-        dadosPedidoEmConstrucao.data_pedido = texto.trim();
-        etapaColetaAtual = 'observacoes';
+      // 5. Exibe a mensagem do assistente com efeito suave de digitação
+      adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
 
-        adicionarMensagem('bot', `
-          Agendamento registrado para <strong>${escapeHtml(dadosPedidoEmConstrucao.data_pedido)}</strong>. 📅<br/>
-          Você gostaria de adicionar alguma <strong>observação especial</strong>, endereço para entrega ou detalhe adicional? Se não houver, pode responder "Não".
-        `);
-
-        atualizarSugestoes([
-          { texto: 'Sem observações adicionais', icone: '👍' },
-          { texto: 'Preciso de nota fiscal', icone: '🧾' },
-          { texto: 'Entregar em endereço residencial', icone: '📍' }
-        ]);
-        return;
+      // 6. Atualiza chips de sugestão interativos
+      if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
+        atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
       }
 
-      if (etapaColetaAtual === 'observacoes') {
-        if (!textoLower.includes('não') && !textoLower.includes('nao') && !textoLower.includes('nenhuma') && !textoLower.includes('sem observações')) {
-          dadosPedidoEmConstrucao.observacoes = texto.trim();
-        } else {
-          dadosPedidoEmConstrucao.observacoes = 'Nenhuma observação informada.';
-        }
-
+      // 7. Se pronto para confirmação (ou dados essenciais preenchidos), exibe o Card de Resumo
+      const temDadosMinimos = Boolean(dadosPedidoEmConstrucao.cliente && dadosPedidoEmConstrucao.telefone && dadosPedidoEmConstrucao.servico);
+      if (respostaObj.prontoParaConfirmar || (temDadosMinimos && respostaObj.acao !== 'RESPONDER_DUVIDA')) {
         etapaColetaAtual = 'confirmacao';
         exibirCardResumoConfirmacao();
-        return;
-      }
-
-      if (etapaColetaAtual === 'confirmacao') {
-        if (textoLower.includes('sim') || textoLower.includes('confirmar') || textoLower.includes('ok') || textoLower.includes('enviar') || textoLower.includes('pode')) {
-          await confirmarECriarPedidoNoSupabase();
-        } else if (textoLower.includes('alterar') || textoLower.includes('mudar') || textoLower.includes('corrigir')) {
-          adicionarMensagem('bot', `O que você gostaria de alterar? Me diga o novo valor, serviço, telefone ou data que atualizarei imediatamente para você.`);
-        } else {
-          // Tenta aplicar atualização com base no que foi dito
-          if (entidades.telefone) dadosPedidoEmConstrucao.telefone = entidades.telefone;
-          if (entidades.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidades.data_pedido;
-          if (entidades.cliente) dadosPedidoEmConstrucao.cliente = entidades.cliente;
-          if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
-
-          adicionarMensagem('bot', `Informações atualizadas! Confira o resumo abaixo e clique em <strong>Confirmar Pedido</strong>.`);
-          exibirCardResumoConfirmacao();
-        }
       }
     }
 
@@ -2255,26 +2048,50 @@
               <p><strong>Status:</strong> <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold text-[10px]">Pendente de Atendimento</span></p>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-2 pt-2">
+            <!-- CSAT AVALIAÇÃO DO ATENDIMENTO -->
+            <div id="csat-widget-${idGerado}" class="p-3 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900/60 text-center space-y-1.5">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block">Como foi sua experiência com nosso Assistente Virtual?</span>
+              <div class="flex items-center justify-center gap-2">
+                <button type="button" onclick="avaliarAtendimento(${idGerado}, 1)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="1 estrela - Ruim">⭐</button>
+                <button type="button" onclick="avaliarAtendimento(${idGerado}, 2)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="2 estrelas - Regular">⭐</button>
+                <button type="button" onclick="avaliarAtendimento(${idGerado}, 3)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="3 estrelas - Bom">⭐</button>
+                <button type="button" onclick="avaliarAtendimento(${idGerado}, 4)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="4 estrelas - Muito Bom">⭐</button>
+                <button type="button" onclick="avaliarAtendimento(${idGerado}, 5)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="5 estrelas - Excelente">⭐</button>
+              </div>
+              <span class="text-[10px] text-slate-400 block">Clique para avaliar o atendimento</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <button 
+                type="button" 
+                onclick="baixarComprovanteDigital(${idGerado}, '${escapeHtml(payload.cliente).replace(/'/g, "\\'")}', '${escapeHtml(payload.servico).replace(/'/g, "\\'")}', ${payload.valor}, '${escapeHtml(payload.data_pedido).replace(/'/g, "\\'")}', '${escapeHtml(payload.setor).replace(/'/g, "\\'")}')"
+                class="w-full py-2.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700"
+              >
+                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Baixar Comprovante (.txt)</span>
+              </button>
+
               <a 
                 href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá! Acabei de registrar meu pedido #${idGerado} (${payload.servico}) com vocês pelo Assistente Virtual.`)}"
                 target="_blank"
-                class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm"
+                class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                <span>Enviar Comprovante WhatsApp</span>
+                <span>WhatsApp da Central</span>
               </a>
+            </div>
 
+            <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
               <button 
-                type="button"
+                type="button" 
                 onclick="consultarPedidoNoSupabase('${idGerado}')"
-                class="w-full sm:w-auto py-2.5 px-3 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1"
+                class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1"
               >
                 <span>🔍 Rastrear este Pedido</span>
               </button>
 
               <button 
-                type="button"
+                type="button" 
                 onclick="reiniciarConversa()"
                 class="w-full sm:w-auto py-2.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer"
               >
@@ -2283,7 +2100,6 @@
             </div>
           </div>
         `;
-
 
         adicionarMensagem('bot', msgSucesso);
       } catch (err) {
@@ -2299,277 +2115,6 @@
       } finally {
         exibirDigitando(false);
       }
-    }
-
-    // ==============================================================================
-    // INTEGRAÇÃO COM GROQ API (QWEN 3.8 27B - MÁXIMO NÍVEL DE RACIOCÍNIO & CONHECIMENTO)
-    // ==============================================================================
-    async function tentarProcessarComGroqQwen(textoUsuario) {
-      if (!configuracaoChat.groqApiKey) return false;
-
-      // Modelos em ordem de capacidade analítica e resiliência
-      const modelos = [configuracaoChat.modeloIa || 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b'];
-
-      const promptSistema = `
-Você é o assistente virtual de inteligência artificial de alta performance da empresa "${configuracaoChat.nomeEmpresa}", conectado em tempo real à nossa Central de Pedidos via Groq LPU com o modelo Qwen 3.8 27B.
-Você possui RACIOCÍNIO ANALÍTICO PROFUNDO, EMPATIA E CONHECIMENTO OPERACIONAL TOTAL DO SISTEMA.
-
-=========================================
-ONTOLOGIA DO SISTEMA & ESTRUTURA OPERACIONAL
-=========================================
-1. CICLO DE VIDA DO PEDIDO (KANBAN OPERACIONAL EM TEMPO REAL):
-   - 🟡 Pendente: Pedido recém-registrado pelo cliente no chatbot. Entra instantaneamente no painel dos operadores aguardando triagem técnica.
-   - 🔵 Agendado: Data, horário e detalhes confirmados pela equipe.
-   - 🟣 Em Produção: Pedido em execução física ativa pela equipe do setor correspondente.
-   - 🟢 Concluído: Pedido finalizado, revisado no controle de qualidade, entregue ao cliente ou disponível para retirada.
-   - 🔴 Cancelado: Cancelado a pedido do cliente ou por inviabilidade técnica.
-
-2. SETORES E DEPARTAMENTOS DISPONÍVEIS:
-   ${(configuracaoChat.setoresDisponiveis || ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']).map(s => `- ${s}`).join('\n   ')}
-
-3. POLÍTICAS INSTITUCIONAIS & FAQ INTEGRADO:
-   - Horário de Funcionamento: Segunda a Sexta das 08h às 18h; Sábados das 08h às 12h. Atendimento digital 24h.
-   - Formas de Pagamento: PIX instantâneo (com desconto especial), Cartões de Débito, Cartões de Crédito (em até 12x), Boleto bancário e Dinheiro.
-   - Garantia: 90 dias de garantia legal com suporte pós-atendimento garantido pelo painel.
-   - Prazos: 24h a 48h úteis para serviços regulares; pedidos urgentes sinalizados com prioridade máxima.
-   - Orçamentos: Gratuitos e sem compromisso.
-
-4. TABELA DE PREÇOS DE REFERÊNCIA & ORÇAMENTOS ESTIMADOS:
-   ${(configuracaoChat.tabelaPrecos || []).map(p => `- [${p.setor}] ${p.servico}: R$ ${p.valor},00 (Prazo: ${p.prazo})`).join('\n   ')}
-
-   REGRA MANDATÓRIA DE PREÇOS E VALORES (MÁXIMA PRIORIDADE):
-   - SEMPRE que o cliente mencionar, solicitar ou tiver interesse em qualquer serviço ou produto, você DEVE OBRIGATORIAMENTE CITAR O VALOR ESTIMADO DE REFERÊNCIA (ex: "O valor estimado para Troca de Óleo é R$ 180,00 com prazo de 1 a 2 horas") diretamente na sua "mensagem".
-   - Preencha SEMPRE o campo "dadosAtualizados.valor" com o valor numérico da tabela correspondente (ex: 180).
-   - Se o cliente perguntar "quanto custa?", "qual o valor?", ou solicitar orçamento, responda informando o preço e o prazo do serviço específico ou apresente os valores dos nossos serviços principais.
-   - NUNCA deixe de informar o preço quando o cliente disser qual serviço deseja!
-
-5. CORREÇÃO E ATUALIZAÇÃO DE DADOS (PRIORIDADE MÁXIMA):
-   - Se o cliente informar que errou o nome, que o nome foi enviado errado, ou pedir para corrigir/mudar o nome (ex: "mandei meu nome errado", "errei meu nome, é Carlos", "meu nome não é João, é Lucas", "corrija meu nome para Carlos", "na verdade me chamo Pedro", "muda meu nome para Arthur"):
-     * OBRIGATORIAMENTE defina "acao": "EDITAR_PEDIDO".
-     * OBRIGATORIAMENTE atualize o campo "dadosAtualizados.cliente" com o NOVO nome correto informado pelo cliente!
-     * Na sua "mensagem", confirme com clareza que o nome foi corrigido com sucesso para o novo nome (ex: "Nome atualizado para Carlos!").
-     * Se o cliente apenas disser "mandei meu nome errado" sem fornecer o novo nome ainda, pergunte carinhosamente qual é o nome correto.
-   - O mesmo princípio se aplica a correções de telefone, data, serviço, setor ou observações!
-
-=========================================
-ESTADO ATUAL DO PEDIDO EM CONSTRUÇÃO
-=========================================
-${JSON.stringify(dadosPedidoEmConstrucao)}
-
-=========================================
-AÇÕES DISPONÍVEIS:
-=========================================
-Classifique a intenção no campo "acao":
-- "CONSULTAR_PEDIDO": Se o cliente quer consultar ou rastrear o andamento de um pedido existente (ex: "como está meu pedido #38?", "rastrear pedido 38", "consultar pedido").
-- "RESPONDER_DUVIDA": Se o cliente tem dúvidas sobre formas de pagamento, horários, localização, garantias, prazos gerais, etc.
-- "CRIAR_PEDIDO": Se o cliente está solicitando um novo serviço, orçamento ou informando dados para um novo pedido.
-- "EDITAR_PEDIDO": Se o cliente está alterando ou corrigindo qualquer dado do pedido em construção (ex: corrigindo nome que enviou errado, alterando telefone, trocando serviço, data, setor ou valor).
-
-=========================================
-FORMATO ESTRITO DE RESPOSTA (JSON):
-=========================================
-Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem texto antes ou depois):
-{
-  "raciocinio": "Resumo do raciocínio analítico da intenção",
-  "acao": "CRIAR_PEDIDO" | "CONSULTAR_PEDIDO" | "RESPONDER_DUVIDA" | "EDITAR_PEDIDO",
-  "mensagem": "Sua resposta altamente acolhedora, profissional e resolutiva em português",
-  "dadosAtualizados": {
-    "cliente": "Nome do cliente",
-    "telefone": "Telefone/WhatsApp com DDD",
-    "servico": "Descrição detalhada do serviço ou produto",
-    "setor": "Setor mais adequado entre os disponíveis",
-    "data_pedido": "Data e horário preferenciais",
-    "valor": 0,
-    "observacoes": "Observações relevantes ou [URGENTE]"
-  },
-  "consulta": {
-    "idPedido": null,
-    "telefone": null
-  },
-  "sugestoes": ["Texto Chip 1", "Texto Chip 2"],
-  "prontoParaConfirmar": false,
-  "clienteConfirmou": false
-}
-`;
-
-      // Histórico multi-turn recente (últimas 8 mensagens limpas de HTML)
-      const historicoRecente = historicoMensagens.slice(-8).map(m => ({
-        role: m.role,
-        content: m.content
-      }));
-
-      const messages = [
-        { role: 'system', content: promptSistema },
-        ...historicoRecente,
-        { role: 'user', content: textoUsuario }
-      ];
-
-      for (const modelo of modelos) {
-        try {
-          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${configuracaoChat.groqApiKey}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: modelo,
-              messages,
-              max_tokens: 500,
-              temperature: 0.1
-            })
-          });
-
-          if (!res.ok) {
-            console.warn(`Modelo Groq ${modelo} retornou status ${res.status}, tentando próximo...`);
-            continue;
-          }
-
-          const json = await res.json();
-          const choice = json.choices?.[0]?.message;
-          const rawText = choice?.content;
-          if (!rawText) continue;
-
-          if (choice.reasoning) {
-            console.info(`[Qwen 3.8 27B Reasoning]:`, choice.reasoning);
-          }
-
-          let respostaObj = null;
-          try {
-            let cleanJson = rawText;
-            if (cleanJson.includes('</think>')) {
-              cleanJson = cleanJson.split('</think>')[1];
-            }
-            cleanJson = cleanJson.replace(/```json/gi, '').replace(/```/g, '').trim();
-            const firstBrace = cleanJson.indexOf('{');
-            const lastBrace = cleanJson.lastIndexOf('}');
-            if (firstBrace !== -1 && lastBrace !== -1) {
-              cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
-            }
-            respostaObj = JSON.parse(cleanJson);
-          } catch (parseErr) {
-            respostaObj = {
-              acao: 'RESPONDER_DUVIDA',
-              mensagem: rawText.replace(/<[^>]+>/g, ' ').trim(),
-              dadosAtualizados: {},
-              prontoParaConfirmar: false,
-              clienteConfirmou: false
-            };
-          }
-
-          if (respostaObj && respostaObj.mensagem) {
-            // 1. AÇÃO: CONSULTAR_PEDIDO
-            if (respostaObj.acao === 'CONSULTAR_PEDIDO') {
-              adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
-              const idPed = respostaObj.consulta?.idPedido;
-              const telPed = respostaObj.consulta?.telefone;
-              if (idPed || telPed) {
-                await consultarPedidoNoSupabase(idPed || telPed);
-              } else {
-                const matchNum = textoUsuario.match(/#?(\d+)/);
-                if (matchNum && matchNum[1] && matchNum[1].length <= 6) {
-                  await consultarPedidoNoSupabase(matchNum[1]);
-                } else {
-                  atualizarSugestoes([
-                    { texto: 'Informar número #', valor: 'Meu pedido é #' },
-                    { texto: 'Informar meu WhatsApp', valor: 'Meu telefone é ' },
-                    { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
-                  ]);
-                }
-              }
-              return true;
-            }
-
-            // 2. AÇÃO: RESPONDER_DUVIDA
-            if (respostaObj.acao === 'RESPONDER_DUVIDA') {
-              adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
-              if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
-                atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
-              } else {
-                atualizarSugestoes([
-                  { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
-                  { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' },
-                  { texto: '💰 Solicitar Orçamento', valor: 'Quero solicitar um orçamento' }
-                ]);
-              }
-              return true;
-            }
-
-            // 3. AÇÃO: CRIAR_PEDIDO OU EDITAR_PEDIDO
-            if (respostaObj.dadosAtualizados) {
-              const d = respostaObj.dadosAtualizados;
-              if (d.cliente && d.cliente.trim() && d.cliente !== 'Não informado') dadosPedidoEmConstrucao.cliente = d.cliente.trim();
-              if (d.telefone && d.telefone.trim() && d.telefone !== 'Não informado') dadosPedidoEmConstrucao.telefone = d.telefone.trim();
-              if (d.servico && d.servico.trim()) dadosPedidoEmConstrucao.servico = d.servico.trim();
-              if (d.setor && d.setor.trim()) dadosPedidoEmConstrucao.setor = d.setor.trim();
-              if (d.data_pedido && d.data_pedido.trim()) dadosPedidoEmConstrucao.data_pedido = d.data_pedido.trim();
-              if (d.valor) dadosPedidoEmConstrucao.valor = parseFloat(d.valor) || 0;
-              if (d.observacoes && d.observacoes.trim()) dadosPedidoEmConstrucao.observacoes = d.observacoes.trim();
-            }
-
-            // Fallback de segurança com o extrator local
-            const entidadesLocais = extrairEntidadesTexto(textoUsuario);
-            const novoNomeLocal = extrairNovoNome(textoUsuario);
-            if (novoNomeLocal) {
-              dadosPedidoEmConstrucao.cliente = novoNomeLocal;
-              aguardandoCorrecaoNome = false;
-            } else if (entidadesLocais.cliente && !dadosPedidoEmConstrucao.cliente) {
-              dadosPedidoEmConstrucao.cliente = entidadesLocais.cliente;
-            }
-
-            if (entidadesLocais.telefone && !dadosPedidoEmConstrucao.telefone) dadosPedidoEmConstrucao.telefone = entidadesLocais.telefone;
-            if (entidadesLocais.data_pedido && !dadosPedidoEmConstrucao.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidadesLocais.data_pedido;
-            if (entidadesLocais.setor && dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = entidadesLocais.setor;
-            if (entidadesLocais.valor && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) dadosPedidoEmConstrucao.valor = entidadesLocais.valor;
-
-            // Garantir que o orçamento e valor de referência sejam extraídos se o serviço foi fornecido
-            if (dadosPedidoEmConstrucao.servico && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) {
-              const orc = obterOrcamentoServico(dadosPedidoEmConstrucao.servico) || obterOrcamentoServico(textoUsuario);
-              if (orc && orc.valor > 0) {
-                dadosPedidoEmConstrucao.valor = orc.valor;
-                if (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral') {
-                  dadosPedidoEmConstrucao.setor = orc.setor;
-                }
-              }
-            }
-
-            // Se o modelo não mencionou o preço explicitamente na resposta e temos orçamento para o serviço
-            if (dadosPedidoEmConstrucao.valor > 0 && !respostaObj.mensagem.includes('R$') && !respostaObj.mensagem.includes('reais') && !respostaObj.mensagem.includes('valor')) {
-              const orc = obterOrcamentoServico(dadosPedidoEmConstrucao.servico || textoUsuario);
-              const prazoTexto = orc?.prazo ? ` (Prazo médio: ${orc.prazo})` : '';
-              respostaObj.mensagem += `<br/><br/>💡 <em>Valor estimado de referência: <strong>${Number(dadosPedidoEmConstrucao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>${prazoTexto}.</em>`;
-            }
-
-            if (respostaObj.acao === 'EDITAR_PEDIDO' || novoNomeLocal) {
-              salvarSessaoNoStorage();
-            }
-
-            // Se o cliente confirmou o pedido via raciocínio analítico
-            if (respostaObj.clienteConfirmou) {
-              await confirmarECriarPedidoNoSupabase();
-              return true;
-            }
-
-            // Renderiza a resposta do assistente com efeito typewriter streaming
-            adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
-
-            if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
-              atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
-            }
-
-            // Se estiver pronto para confirmação ou tiver os 3 dados vitais
-            if (respostaObj.prontoParaConfirmar || (dadosPedidoEmConstrucao.cliente && dadosPedidoEmConstrucao.telefone && dadosPedidoEmConstrucao.servico)) {
-              etapaColetaAtual = 'confirmacao';
-              exibirCardResumoConfirmacao();
-            }
-
-            return true;
-          }
-        } catch (errModelo) {
-          console.warn(`Erro no modelo Groq ${modelo}:`, errModelo);
-        }
-      }
-      return false;
     }
   </script>
 </body>
