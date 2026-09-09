@@ -2143,6 +2143,18 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
         const novoPedido = (data && data[0]) ? data[0] : null;
         const idGerado = novoPedido ? novoPedido.id : Math.floor(1000 + Math.random() * 9000);
 
+        // Notifica janela-mãe (painel-pedidos) se estiver rodando dentro de iframe
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+              tipo: 'PEDIDO_CRIADO_CHATBOT',
+              pedido: novoPedido || { id: idGerado, ...payload }
+            }, '*');
+          }
+        } catch (postErr) {
+          console.warn('Erro ao notificar janela pai:', postErr);
+        }
+
         etapaColetaAtual = 'finalizado';
         salvarSessaoNoStorage(); // Limpa sessão do storage
         emitirSom('sucesso');
