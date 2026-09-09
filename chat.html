@@ -487,7 +487,7 @@
 
     let configuracaoChat = {
       nomeEmpresa: 'Nossa Empresa',
-      groqApiKey: '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',
+      groqApiKey: '', // Gerenciado de forma 100% segura via Supabase Edge Function 'chat-ia' (sem chaves no frontend)
       modeloIa: 'qwen/qwen3.8-27b',
       setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'],
       tabelaPrecos: [
@@ -958,41 +958,62 @@
     }
 
     async function transcreverAudioComGroqWhisper(blob) {
-      if (!configuracaoChat.groqApiKey) {
-        adicionarMensagem('bot', '⚠️ O recurso de mensagem por voz requer a chave de inteligência artificial configurada no painel.');
-        return;
-      }
-
       exibirDigitando(true);
       try {
         const formData = new FormData();
         formData.append('file', blob, 'gravacao.webm');
-        formData.append('model', 'whisper-large-v3-turbo');
-        formData.append('language', 'pt');
-        formData.append('response_format', 'json');
 
-        const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${configuracaoChat.groqApiKey}`
-          },
-          body: formData
-        });
+        const headers = {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        };
 
-        if (!res.ok) {
-          throw new Error(`Groq Whisper retornou status HTTP ${res.status}`);
+        if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
+          headers['x-groq-key'] = configuracaoChat.groqApiKey;
         }
 
-        const data = await res.json();
-        const textoTranscrito = data.text ? data.text.trim() : '';
+        // 1. Envia prioritariamente para a Supabase Edge Function 'chat-ia'
+        let textoTranscrito = '';
+        try {
+          const res = await fetch(`${SUPABASE_URL}/functions/v1/chat-ia`, {
+            method: 'POST',
+            headers,
+            body: formData
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            textoTranscrito = data.text ? data.text.trim() : '';
+          }
+        } catch (eEdge) {
+          console.warn('Tentativa via Edge Function para áudio falhou:', eEdge);
+        }
+
+        // 2. Fallback caso a Edge Function não esteja publicada e haja chave no storage
+        if (!textoTranscrito && configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
+          formData.append('model', 'whisper-large-v3-turbo');
+          formData.append('language', 'pt');
+          formData.append('response_format', 'json');
+          const resDirect = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${configuracaoChat.groqApiKey}`
+            },
+            body: formData
+          });
+          if (resDirect.ok) {
+            const dataDirect = await resDirect.json();
+            textoTranscrito = dataDirect.text ? dataDirect.text.trim() : '';
+          }
+        }
 
         if (textoTranscrito) {
           processarEnvioMensagem(textoTranscrito);
         } else {
-          adicionarMensagem('bot', '🎤 Não consegui identificar a fala com clareza no áudio. Você pode tentar falar novamente ou digitar sua mensagem.');
+          adicionarMensagem('bot', '🎤 Não foi possível transcrever o áudio no momento. Você pode tentar falar novamente ou enviar sua mensagem por texto.');
         }
       } catch (err) {
-        console.error('Erro na transcrição Whisper:', err);
+        console.error('Erro na transcrição de voz:', err);
         adicionarMensagem('bot', '🎤 Tive uma instabilidade ao transcrever seu áudio. Pode enviar por texto, por favor?');
       } finally {
         exibirDigitando(false);
@@ -1426,16 +1447,11 @@ Atendimento Digital via Assistente Virtual Oficial
     }
 
     // ==============================================================================
-    // PROCESSAMENTO 100% LLM-DRIVEN (SEM EURÍSTICAS) & RESPOSTAS INTELIGENTES
+    // PROCESSAMENTO 100% LLM-DRIVEN VIA SUPABASE EDGE FUNCTION COM GUARDRAILS E SIGILO
     // ==============================================================================
     async function processarComIA(textoUsuario) {
-      if (!configuracaoChat.groqApiKey || configuracaoChat.groqApiKey.trim().length < 10) {
-        adicionarMensagem('bot', 'A chave de acesso ao assistente de inteligência artificial não está configurada. Por favor, solicite a configuração ao administrador do painel.');
-        return;
-      }
-
-      // Modelos em ordem de capacidade e resiliência
-      const modelos = [configuracaoChat.modeloIa || 'qwen/qwen3.8-27b', 'qwen/qwen3.6-27b'];
+      const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/chat-ia`;
+      const requestedModel = configuracaoChat.modeloIa || 'qwen/qwen3.8-27b';
 
       const promptSistema = `Você é o Assistente Virtual Oficial da Central de Pedidos e Atendimento da empresa "${configuracaoChat.nomeEmpresa}".
 Você possui RACIOCÍNIO ANALÍTICO PROFUNDO, EMPATIA, FLUÊNCIA NATURAL E TOTAL CONHECIMENTO OPERACIONAL.
@@ -1448,6 +1464,24 @@ REGRA ABSOLUTA DE IDENTIDADE E SIGILO TECNOLÓGICO (WHITE-LABEL COMPLETO):
 - Se o usuário perguntar qual IA você é, qual o seu modelo, quem te criou, se você é Qwen ou qual tecnologia está por trás, você DEVE responder obrigatoriamente:
   "Sou o Assistente Virtual Oficial da Central de Atendimento e Pedidos, desenvolvido especialmente para oferecer um atendimento ágil, inteligente e personalizado."
 - Mantenha sempre essa identidade profissional e acolhedora em todas as circunstâncias.
+
+================================================================================
+BLINDAGEM CONTRA TAREFAS FORA DE ESCOPO (GUARDRAILS & SEGURANÇA ESTRITA):
+================================================================================
+- VOCÊ É EXCLUSIVA E RIGOROSAMENTE O ASSISTENTE DA CENTRAL DE PEDIDOS E ATENDIMENTO.
+- É TERMINANTEMENTE PROIBIDO realizar qualquer tarefa alheia às atividades da empresa, tais como:
+  * Gerar, escrever ou criar códigos-fonte em qualquer linguagem (HTML, CSS, JavaScript, Python, PHP, etc.).
+  * Criar ou desenhar páginas web, scripts, templates ou documentos de programação.
+  * Agir como programador, desenvolvedor, compilador ou gerador de código.
+  * Escrever redações escolares, poemas, piadas, resumos de livros ou tarefas acadêmicas.
+  * Responder perguntas de conhecimentos gerais não relacionadas aos serviços ou funcionamento da nossa empresa.
+- SE O USUÁRIO SOLICITAR CRIAÇÃO DE PÁGINA HTML, CÓDIGO, PROGRAMAÇÃO OU QUALQUER ASSUNTO FORA DE ESCOPO:
+  * Você DEVE OBRIGATORIAMENTE recusar a solicitação com educação, firmeza e profissionalismo.
+  * OBRIGATORIAMENTE defina "acao": "RESPONDER_DUVIDA".
+  * Responda informando que seu propósito exclusivo é o autoatendimento da nossa Central de Pedidos (agendamentos, orçamentos, consulta de status e informações dos nossos serviços).
+  * Exemplo de resposta obrigatória:
+    "Como Assistente Virtual Oficial da nossa Central de Serviços, sou especializado exclusivamente em registrar novos pedidos, consultar o andamento das suas solicitações, fornecer orçamentos e esclarecer dúvidas sobre nossos serviços e atendimento. Não realizo tarefas de desenvolvimento de código ou criação de páginas web. Como posso te ajudar com nossos serviços hoje?"
+  * JAMAIS inclua tags HTML de programação (<!DOCTYPE, <html, <script, etc.) ou blocos de código na sua mensagem!
 
 ================================================================================
 ESTRUTURA OPERACIONAL & ONTOLOGIA DA CENTRAL:
@@ -1525,32 +1559,75 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
         { role: 'user', content: textoUsuario }
       ];
 
-      for (const modelo of modelos) {
-        try {
-          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${configuracaoChat.groqApiKey}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              model: modelo,
-              messages,
-              max_tokens: 500,
-              temperature: 0.1
-            })
-          });
+      const requestHeaders = {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      };
 
-          if (!res.ok) {
-            console.warn(`Modelo ${modelo} retornou status ${res.status}, tentando próximo...`);
-            continue;
+      if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
+        requestHeaders['x-groq-key'] = configuracaoChat.groqApiKey;
+      }
+
+      let json = null;
+      let sucesso = false;
+
+      // 1. Tenta prioritariamente a Supabase Edge Function (Chave protegida no servidor)
+      try {
+        const resEdge = await fetch(edgeFunctionUrl, {
+          method: 'POST',
+          headers: requestHeaders,
+          body: JSON.stringify({
+            model: requestedModel,
+            messages,
+            max_tokens: 500,
+            temperature: 0.1
+          })
+        });
+
+        if (resEdge.ok) {
+          json = await resEdge.json();
+          sucesso = true;
+        } else {
+          console.warn(`Edge Function chat-ia retornou status HTTP ${resEdge.status}`);
+        }
+      } catch (errEdge) {
+        console.warn('Erro ao conectar com Edge Function chat-ia:', errEdge);
+      }
+
+      // 2. Fallback caso a Edge Function não esteja publicada e haja chave no storage
+      if (!sucesso && configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
+        const modelosDirect = [requestedModel, 'qwen/qwen3.6-27b'];
+        for (const m of modelosDirect) {
+          try {
+            const resDirect = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${configuracaoChat.groqApiKey}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                model: m,
+                messages,
+                max_tokens: 500,
+                temperature: 0.1
+              })
+            });
+            if (resDirect.ok) {
+              json = await resDirect.json();
+              sucesso = true;
+              break;
+            }
+          } catch (eDirect) {
+            console.warn(`Erro no fallback direto modelo ${m}:`, eDirect);
           }
+        }
+      }
 
-          const json = await res.json();
-          const choice = json.choices?.[0]?.message;
-          const rawText = choice?.content;
-          if (!rawText) continue;
-
+      if (sucesso && json) {
+        const choice = json.choices?.[0]?.message;
+        const rawText = choice?.content;
+        if (rawText) {
           let respostaObj = null;
           try {
             let cleanJson = rawText;
@@ -1578,12 +1655,10 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
             await aplicarRespostaIA(respostaObj, textoUsuario);
             return;
           }
-        } catch (errModelo) {
-          console.warn(`Erro na chamada da IA modelo ${modelo}:`, errModelo);
         }
       }
 
-      // Fallback em caso de indisponibilidade geral de rede
+      // Fallback em caso de indisponibilidade temporária de rede
       adicionarMensagem('bot', 'Desculpe, tive uma instabilidade temporária ao me comunicar com a Central. Por favor, tente novamente ou clique no botão abaixo para falar com um atendente humano.');
       atualizarSugestoes([
         { texto: '💬 Falar no WhatsApp', valor: 'Quero falar com um atendente' },
@@ -1594,6 +1669,14 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
     // Aplicação da resposta inteligente da IA no estado e na interface
     async function aplicarRespostaIA(respostaObj, textoUsuario) {
       if (!respostaObj) return;
+
+      // Blindagem de segurança ativa contra geração indevida de código ou páginas web (Defesa em Profundidade)
+      const contemCodigoOuHtmlIndevido = /(?:<!doctype\s+html|<html[\s>]|<script[\s>]|```(?:html|js|javascript|python|css|php))/i.test(respostaObj.mensagem);
+      if (contemCodigoOuHtmlIndevido) {
+        respostaObj.mensagem = 'Como Assistente Virtual Oficial da nossa Central de Serviços, sou especializado exclusivamente em registrar novos pedidos, consultar o andamento das suas solicitações, fornecer orçamentos e esclarecer dúvidas sobre nossos serviços e atendimento. Não realizo desenvolvimento de código ou criação de páginas web. Como posso te ajudar com nossos serviços hoje?';
+        respostaObj.acao = 'RESPONDER_DUVIDA';
+        respostaObj.sugestoes = ['🛍️ Fazer Novo Pedido', '💰 Solicitar Orçamento', '🔍 Consultar Pedido'];
+      }
 
       // 1. Atualizar dados do pedido com inteligência analítica
       if (respostaObj.dadosAtualizados) {
