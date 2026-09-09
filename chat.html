@@ -403,6 +403,7 @@
     let estaGravando = false;
     let intervaloTimerGravacao = null;
     let segundosGravando = 0;
+    let aguardandoCorrecaoNome = false;
 
     let configuracaoChat = {
       nomeEmpresa: 'Nossa Empresa',
@@ -604,6 +605,7 @@
           dados: dadosPedidoEmConstrucao,
           etapa: etapaColetaAtual,
           historico: historicoMensagens.slice(-16),
+          aguardandoCorrecaoNome,
           timestamp: Date.now()
         };
         sessionStorage.setItem(STORAGE_KEY_SESSAO, JSON.stringify(sessao));
@@ -644,6 +646,7 @@
         if (sessao.dados) dadosPedidoEmConstrucao = sessao.dados;
         if (sessao.etapa) etapaColetaAtual = sessao.etapa;
         if (Array.isArray(sessao.historico)) historicoMensagens = sessao.historico;
+        if (sessao.aguardandoCorrecaoNome !== undefined) aguardandoCorrecaoNome = sessao.aguardandoCorrecaoNome;
 
         const banner = document.getElementById('banner-restaurar-sessao');
         if (banner) banner.classList.add('hidden');
@@ -1090,6 +1093,74 @@
     // MOTOR DE IA CONVERSACIONAL INTELIGENTE (NLP + GROQ QWEN 3.8 27B)
     // ==============================================================================
 
+    // Detector e Extrator Especializado de Correção de Nome
+    function extrairNovoNome(texto) {
+      const t = String(texto || '').trim();
+
+      const padroes = [
+        /(?:corrija|corrigir|mudar|mude|alterar|altere|trocar|troque)\s+(?:o\s+)?(?:meu\s+)?nome\s+(?:para|p\/|pra)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
+        /(?:errei|erado|errado|coloquei\s+errado|mandei\s+errado|escrevi\s+errado)\s+(?:o\s+)?(?:meu\s+)?nome[,\s:]+(?:(?:na\s+verdade|na\s+vdd)\s+(?:é\s+)?|é|o\s+nome\s+é|sou\s+o|sou\s+a|me\s+chamo|coloca|coloque|o\s+certo\s+é|era)\s*([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
+        /(?:meu\s+nome\s+(?:t[aá]\s+)?(?:est[aá]\s+)?errado|nome\s+errado)[,\s:]+(?:(?:na\s+verdade|na\s+vdd)\s+(?:é\s+)?|é|o\s+certo\s+é|me\s+chamo|sou|o\s+nome\s+é|era)\s*([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
+        /(?:n[aã]o\s+é\s+[A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+?[,\s]+(?:é|sou\s+o|sou\s+a|o\s+nome\s+é)\s+)([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
+        /(?:na\s+verdade|na\s+vdd)\s+(?:meu\s+nome\s+é|sou\s+o|sou\s+a|me\s+chamo|o\s+nome\s+é|é)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
+        /(?:meu\s+nome\s+(?:é|na\s+verdade\s+é))\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i,
+        /(?:meu\s+nome\s+é|me\s+chamo|sou\s+o|sou\s+a|falar\s+com)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+)/i
+      ];
+
+      for (const regex of padroes) {
+        const match = t.match(regex);
+        if (match && match[1]) {
+          let nome = match[1].trim();
+          nome = nome.replace(/^(?:na\s+verdade\s+é|na\s+verdade|na\s+vdd\s+é|na\s+vdd|sou\s+o|sou\s+a|sou|o\s+meu\s+nome\s+é|meu\s+nome\s+é|o\s+certo\s+é|é)\s*/i, '');
+          nome = nome.replace(/^(?:o|a)\s+/i, '');
+          nome = nome.split(/[,\.\n\?!;]/)[0].trim();
+          nome = nome.replace(/\s+(?:na verdade|por favor|pfv|pf|obrigado|valeu|ok|e meu|meu telefone|meu zap|telefone).*$/i, '').trim();
+          if (nome.length >= 2 && !/^(pedido|quero|gostaria|sim|nao|não|ok|errado|certo)$/i.test(nome)) {
+            return nome;
+          }
+        }
+      }
+
+      // Padrão flexível: 'errei meu nome, Carlos' ou 'nome errado: Carlos'
+      const matchFlex = t.match(/(?:errei\s+(?:o\s+)?(?:meu\s+)?nome|nome\s+errado|mandei\s+(?:o\s+)?(?:meu\s+)?nome\s+errado|coloquei\s+(?:o\s+)?(?:meu\s+)?nome\s+errado|escrevi\s+(?:o\s+)?(?:meu\s+)?nome\s+errado)[,\s:]+(?:(?:na\s+verdade|na\s+vdd)\s+(?:é\s+)?|é\s+|era\s+|o\s+certo\s+é\s+|coloca\s+|coloque\s+)?([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]{2,40})/i);
+      if (matchFlex && matchFlex[1]) {
+        let limpo = matchFlex[1].replace(/^(?:na\s+verdade\s+é|na\s+verdade|na\s+vdd\s+é|na\s+vdd|sou\s+o|sou\s+a|sou|é|era|o certo é|coloque|coloca)\s*/i, '');
+        limpo = limpo.replace(/^(?:o|a)\s+/i, '');
+        limpo = limpo.split(/[,\.\n\?!;]/)[0].trim();
+        if (limpo.length >= 2 && !/^(pedido|quero|gostaria|sim|nao|não|ok|errado|certo)$/i.test(limpo)) {
+          return limpo;
+        }
+      }
+
+      return null;
+    }
+
+    // Helper para retomar a conversa após correção de dados
+    function retomarFluxoAposCorrecao() {
+      if (etapaColetaAtual === 'inicio' || etapaColetaAtual === 'nome') {
+        etapaColetaAtual = 'telefone';
+        if (!dadosPedidoEmConstrucao.telefone) {
+          adicionarMensagem('bot', `Para continuarmos, qual é o seu <strong>número de WhatsApp ou telefone</strong>?`);
+          atualizarSugestoes([
+            { texto: '(11) 99999-8888', icone: '📱' },
+            { texto: 'Prefiro informar depois', icone: '⏩' }
+          ]);
+        }
+      } else if (etapaColetaAtual === 'telefone' && !dadosPedidoEmConstrucao.telefone) {
+        adicionarMensagem('bot', `Para prosseguirmos, por favor me informe seu <strong>número de WhatsApp com DDD</strong>.`);
+      } else if (etapaColetaAtual === 'servico' && !dadosPedidoEmConstrucao.servico) {
+        adicionarMensagem('bot', `Qual <strong>serviço ou produto</strong> você gostaria de solicitar?`);
+      } else if (etapaColetaAtual === 'setor') {
+        adicionarMensagem('bot', `A qual <strong>setor ou categoria</strong> pertence o seu pedido?`);
+      } else if (etapaColetaAtual === 'data' && !dadosPedidoEmConstrucao.data_pedido) {
+        adicionarMensagem('bot', `Para quando você gostaria de agendar esse pedido?`);
+      } else if (etapaColetaAtual === 'confirmacao') {
+        exibirCardResumoConfirmacao();
+      } else {
+        adicionarMensagem('bot', `Como podemos dar andamento ao seu pedido?`);
+      }
+    }
+
     // Extração inteligente de entidades via Regex / Padrões comuns em Português
     function extrairEntidadesTexto(texto) {
       const extraido = {};
@@ -1108,13 +1179,18 @@
         }
       }
 
-      // 2. Extração de Nome próprio ("Meu nome é...", "Sou o...", "Me chamo...")
-      const nomeRegex = /(?:meu\s+nome\s+é|me\s+chamo|sou\s+o|sou\s+a|falar\s+com)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+?)(?=\s+(?:e\s+meu|e\s+o|meu\s+whatsapp|meu\s+zap|meu\s+tel|telefone|whatsapp|zap|contato|\(|\d)|[,\.\n]|$)/i;
-      const matchNome = texto.match(nomeRegex);
-      if (matchNome && matchNome[1]) {
-        const limpo = matchNome[1].split(/[,\.\n]/)[0].trim();
-        if (limpo.length > 2 && !limpo.includes('pedido') && !limpo.includes('gostaria')) {
-          extraido.cliente = limpo;
+      // 2. Extração de Nome próprio ("Meu nome é...", "Sou o...", "Me chamo..." ou Correção de Nome)
+      const nomeCorrigido = extrairNovoNome(texto);
+      if (nomeCorrigido) {
+        extraido.cliente = nomeCorrigido;
+      } else {
+        const nomeRegex = /(?:meu\s+nome\s+é|me\s+chamo|sou\s+o|sou\s+a|falar\s+com)\s+([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇa-záéíóúâêîôûãõç\s]+?)(?=\s+(?:e\s+meu|e\s+o|meu\s+whatsapp|meu\s+zap|meu\s+tel|telefone|whatsapp|zap|contato|\(|\d)|[,\.\n]|$)/i;
+        const matchNome = texto.match(nomeRegex);
+        if (matchNome && matchNome[1]) {
+          const limpo = matchNome[1].split(/[,\.\n]/)[0].trim();
+          if (limpo.length > 2 && !limpo.includes('pedido') && !limpo.includes('gostaria')) {
+            extraido.cliente = limpo;
+          }
         }
       }
 
@@ -1300,6 +1376,51 @@
     async function executarLogicaRespostaIA(texto) {
       const textoLower = texto.toLowerCase();
       const entidades = extrairEntidadesTexto(texto);
+
+      // 0. VERIFICAÇÃO PRIORITÁRIA DE CORREÇÃO DE NOME OU DADOS
+      const novoNome = extrairNovoNome(texto);
+      const pediuCorrecaoNome = /(?:errei|errado|errada|corrigir|corrija|mudar|mude|trocar|alterar)\s+(?:o\s+)?(?:meu\s+)?nome/i.test(texto) ||
+                                /(?:meu\s+nome\s+(?:t[aá]\s+)?(?:est[aá]\s+)?errado)/i.test(texto) ||
+                                /(?:mandei|coloquei|escrevi)\s+(?:o\s+)?(?:meu\s+)?nome\s+errado/i.test(texto) ||
+                                /(?:nome\s+errado)/i.test(texto);
+
+      // Se o assistente solicitou o nome correto na mensagem anterior
+      if (aguardandoCorrecaoNome) {
+        let limpo = texto.replace(/^(?:na\s+verdade\s+é|na\s+verdade|na\s+vdd\s+é|na\s+vdd|sou\s+o|sou\s+a|sou|o\s+meu\s+nome\s+é|meu\s+nome\s+é|o\s+certo\s+é|é|coloque|coloca)\s*/i, '').trim();
+        limpo = limpo.replace(/^(?:o|a)\s+/i, '').split(/[,\.\n\?!;]/)[0].trim();
+        if (limpo.length >= 2 && !/^(pedido|quero|gostaria|sim|nao|não|ok|cancelar)$/i.test(limpo)) {
+          dadosPedidoEmConstrucao.cliente = limpo;
+          aguardandoCorrecaoNome = false;
+          salvarSessaoNoStorage();
+          adicionarMensagemComEfeito(`Nome corrigido com sucesso para <strong>${escapeHtml(limpo)}</strong>! ✨`);
+          if (etapaColetaAtual === 'confirmacao') {
+            exibirCardResumoConfirmacao();
+          } else {
+            retomarFluxoAposCorrecao();
+          }
+          return;
+        }
+      }
+
+      // Se o usuário solicitou correção de nome com o novo nome informado
+      if (novoNome && (pediuCorrecaoNome || dadosPedidoEmConstrucao.cliente)) {
+        dadosPedidoEmConstrucao.cliente = novoNome;
+        aguardandoCorrecaoNome = false;
+        salvarSessaoNoStorage();
+        adicionarMensagemComEfeito(`Entendido! Já atualizei seu nome para <strong>${escapeHtml(novoNome)}</strong>. 😊<br/>O cadastro do seu pedido foi corrigido.`);
+        if (etapaColetaAtual === 'confirmacao') {
+          exibirCardResumoConfirmacao();
+        } else {
+          retomarFluxoAposCorrecao();
+        }
+        return;
+      } else if (pediuCorrecaoNome && !novoNome) {
+        // Usuário avisou que errou o nome mas não digitou o novo ainda
+        aguardandoCorrecaoNome = true;
+        salvarSessaoNoStorage();
+        adicionarMensagemComEfeito(`Sem problemas, vamos arrumar isso agora! Por favor, <strong>qual é o seu nome correto</strong>?`);
+        return;
+      }
 
       // Se a IA tiver chave do Groq configurada, processar com Qwen 3.8 27B em nível máximo de raciocínio
       if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.trim().length > 10) {
@@ -1954,6 +2075,14 @@ ONTOLOGIA DO SISTEMA & ESTRUTURA OPERACIONAL
    ${(configuracaoChat.tabelaPrecos || []).map(p => `- [${p.setor}] ${p.servico}: R$ ${p.valor},00 (Prazo: ${p.prazo})`).join('\n   ')}
    Quando o cliente perguntar valores ou solicitar orçamento, use esses valores de referência para dar estimativas precisas e preencher o campo "valor" no JSON!
 
+5. CORREÇÃO E ATUALIZAÇÃO DE DADOS (PRIORIDADE MÁXIMA):
+   - Se o cliente informar que errou o nome, que o nome foi enviado errado, ou pedir para corrigir/mudar o nome (ex: "mandei meu nome errado", "errei meu nome, é Carlos", "meu nome não é João, é Lucas", "corrija meu nome para Carlos", "na verdade me chamo Pedro", "muda meu nome para Arthur"):
+     * OBRIGATORIAMENTE defina "acao": "EDITAR_PEDIDO".
+     * OBRIGATORIAMENTE atualize o campo "dadosAtualizados.cliente" com o NOVO nome correto informado pelo cliente!
+     * Na sua "mensagem", confirme com clareza que o nome foi corrigido com sucesso para o novo nome (ex: "Nome atualizado para Carlos!").
+     * Se o cliente apenas disser "mandei meu nome errado" sem fornecer o novo nome ainda, pergunte carinhosamente qual é o nome correto.
+   - O mesmo princípio se aplica a correções de telefone, data, serviço, setor ou observações!
+
 =========================================
 ESTADO ATUAL DO PEDIDO EM CONSTRUÇÃO
 =========================================
@@ -1966,7 +2095,7 @@ Classifique a intenção no campo "acao":
 - "CONSULTAR_PEDIDO": Se o cliente quer consultar ou rastrear o andamento de um pedido existente (ex: "como está meu pedido #38?", "rastrear pedido 38", "consultar pedido").
 - "RESPONDER_DUVIDA": Se o cliente tem dúvidas sobre formas de pagamento, horários, localização, garantias, prazos gerais, etc.
 - "CRIAR_PEDIDO": Se o cliente está solicitando um novo serviço, orçamento ou informando dados para um novo pedido.
-- "EDITAR_PEDIDO": Se o cliente está alterando algum dado do pedido em construção.
+- "EDITAR_PEDIDO": Se o cliente está alterando ou corrigindo qualquer dado do pedido em construção (ex: corrigindo nome que enviou errado, alterando telefone, trocando serviço, data, setor ou valor).
 
 =========================================
 FORMATO ESTRITO DE RESPOSTA (JSON):
@@ -2112,10 +2241,21 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem 
 
             // Fallback de segurança com o extrator local
             const entidadesLocais = extrairEntidadesTexto(textoUsuario);
-            if (entidadesLocais.cliente && !dadosPedidoEmConstrucao.cliente) dadosPedidoEmConstrucao.cliente = entidadesLocais.cliente;
+            const novoNomeLocal = extrairNovoNome(textoUsuario);
+            if (novoNomeLocal) {
+              dadosPedidoEmConstrucao.cliente = novoNomeLocal;
+              aguardandoCorrecaoNome = false;
+            } else if (entidadesLocais.cliente && !dadosPedidoEmConstrucao.cliente) {
+              dadosPedidoEmConstrucao.cliente = entidadesLocais.cliente;
+            }
+
             if (entidadesLocais.telefone && !dadosPedidoEmConstrucao.telefone) dadosPedidoEmConstrucao.telefone = entidadesLocais.telefone;
             if (entidadesLocais.data_pedido && !dadosPedidoEmConstrucao.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidadesLocais.data_pedido;
             if (entidadesLocais.setor && dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = entidadesLocais.setor;
+
+            if (respostaObj.acao === 'EDITAR_PEDIDO' || novoNomeLocal) {
+              salvarSessaoNoStorage();
+            }
 
             // Se o cliente confirmou o pedido via raciocínio analítico
             if (respostaObj.clienteConfirmou) {
