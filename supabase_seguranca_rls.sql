@@ -74,6 +74,60 @@ DROP POLICY IF EXISTS "pedidos_chatbot_anon_select_policy" ON pedidos;
 CREATE POLICY "pedidos_chatbot_anon_select_policy" ON pedidos
 FOR SELECT
 TO anon
-USING (true);
+USING (
+  status IN ('Pendente', 'Agendado', 'Em andamento', 'Em produção', 'Concluído', 'Cancelado')
+);
+
+-- 9. FUNÇÃO SEGURA RPC PARA CONSULTA DE PEDIDO NO CHATBOT (PROTEÇÃO CONTRA VAZAMENTO):
+-- - Exige que o cliente forneça o ID numérico exato ou o número de WhatsApp
+--   evitando qualquer varredura em massa da tabela por usuários anônimos.
+CREATE OR REPLACE FUNCTION consultar_pedido_publico(
+  p_id INT DEFAULT NULL,
+  p_telefone TEXT DEFAULT NULL
+)
+RETURNS TABLE (
+  id INT,
+  cliente TEXT,
+  servico TEXT,
+  setor TEXT,
+  data_pedido TEXT,
+  status TEXT,
+  valor NUMERIC,
+  observacoes TEXT,
+  created_at TIMESTAMPTZ
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  IF p_id IS NOT NULL AND p_id > 0 THEN
+    RETURN QUERY
+    SELECT p.id, p.cliente, p.servico, p.setor, p.data_pedido, p.status, p.valor, p.observacoes, p.created_at
+    FROM pedidos p
+    WHERE p.id = p_id;
+  ELSIF p_telefone IS NOT NULL AND LENGTH(REGEXP_REPLACE(p_telefone, '\D', '', 'g')) >= 8 THEN
+    RETURN QUERY
+    SELECT p.id, p.cliente, p.servico, p.setor, p.data_pedido, p.status, p.valor, p.observacoes, p.created_at
+    FROM pedidos p
+    WHERE p.telefone ILIKE '%' || RIGHT(REGEXP_REPLACE(p_telefone, '\D', '', 'g'), 8) || '%'
+    ORDER BY p.id DESC
+    LIMIT 1;
+  END IF;
+END;
+$$;
+
+-- 10. CONFIGURAÇÃO DE BUCKET DE ANEXOS / FOTOS (SUPABASE STORAGE):
+-- - Crie um bucket público chamado 'pedidos-anexos' no menu Storage do Supabase
+--   e configure as políticas de upload público (INSERT) para visitantes:
+--
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('pedidos-anexos', 'pedidos-anexos', true)
+-- ON CONFLICT (id) DO NOTHING;
+--
+-- CREATE POLICY "anexos_public_insert" ON storage.objects
+-- FOR INSERT TO anon WITH CHECK (bucket_id = 'pedidos-anexos');
+--
+-- CREATE POLICY "anexos_public_select" ON storage.objects
+-- FOR SELECT TO anon USING (bucket_id = 'pedidos-anexos');
+
 
 

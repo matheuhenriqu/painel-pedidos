@@ -221,6 +221,27 @@
       </div>
     </header>
 
+    <!-- BANNER DE RESTAURAÇÃO DE ATENDIMENTO ANTERIOR (SESSIONSTORAGE) -->
+    <div id="banner-restaurar-sessao" class="hidden mx-3 sm:mx-6 mt-3 p-3 sm:p-3.5 bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm animate-msg">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <p class="text-xs font-extrabold text-indigo-950 dark:text-indigo-200">Atendimento anterior localizado!</p>
+          <p class="text-[11px] text-indigo-800 dark:text-indigo-400">Você possui um atendimento em andamento. Deseja continuar?</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+        <button type="button" onclick="restaurarSessaoAnterior()" class="flex-1 sm:flex-initial py-1.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer">
+          Continuar
+        </button>
+        <button type="button" onclick="descartarSessaoAnterior()" class="flex-1 sm:flex-initial py-1.5 px-3 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer">
+          Novo
+        </button>
+      </div>
+    </div>
+
     <!-- ÁREA DE MENSAGENS DO CHAT -->
     <div 
       id="chat-mensagens-container" 
@@ -244,8 +265,41 @@
 
     <!-- BARRA INFERIOR DE ENVIO DE MENSAGEM (COM SAFE AREA PARA IPHONES/ANDROID) -->
     <footer class="p-2.5 sm:p-4 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200/80 dark:border-slate-800/80 shrink-0 pb-[max(0.65rem,env(safe-area-inset-bottom))]">
+      <!-- PREVIEW FLUTUANTE DE FOTO / ANEXO SELECIONADO -->
+      <div id="chat-anexo-preview-container" class="hidden mb-2 p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-between gap-2 max-w-sm animate-msg">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <img id="chat-anexo-preview-thumb" src="" class="w-9 h-9 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" alt="Preview" />
+          <div class="truncate text-xs text-slate-700 dark:text-slate-200 font-medium">
+            <span id="chat-anexo-preview-nome" class="truncate block">foto.jpg</span>
+            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">✓ Imagem anexada</span>
+          </div>
+        </div>
+        <button type="button" onclick="removerAnexo()" class="w-7 h-7 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-rose-100 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition cursor-pointer" title="Remover anexo">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- FORMULÁRIO DE ENVIO COM BOTÕES DE ANEXO E ÁUDIO -->
       <form id="form-chat-envio" onsubmit="enviarMensagemUsuario(event)" class="flex items-center gap-1.5 sm:gap-2">
-        <div class="relative flex-1">
+        <!-- Input de arquivo oculto -->
+        <input type="file" id="chat-file-input" accept="image/*" class="hidden" onchange="processarArquivoSelecionado(event)" />
+
+        <!-- Botão de Anexo / Foto -->
+        <button 
+          type="button" 
+          id="btn-anexo"
+          onclick="document.getElementById('chat-file-input').click()"
+          class="h-10 sm:h-11 w-10 sm:w-11 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer"
+          title="Anexar foto ou imagem"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </button>
+
+        <!-- Container do Input de Texto Normal -->
+        <div id="chat-input-wrapper" class="relative flex-1">
           <input 
             type="text" 
             id="chat-input-texto"
@@ -264,6 +318,32 @@
           </button>
         </div>
 
+        <!-- Container de Gravação de Áudio Ativa (Oculta o input quando gravando) -->
+        <div id="chat-gravando-container" class="hidden flex-1 flex items-center justify-between px-3 sm:px-4 py-2 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/80 rounded-2xl text-xs text-rose-700 dark:text-rose-300">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-ping"></span>
+            <span class="font-bold">Gravando áudio...</span>
+            <span id="timer-gravacao" class="font-mono text-[11px] bg-rose-100 dark:bg-rose-900/60 px-1.5 py-0.5 rounded-md font-bold">0:00</span>
+          </div>
+          <button type="button" onclick="pararGravacaoAudio()" class="text-xs font-extrabold text-rose-600 hover:text-rose-800 dark:text-rose-400 underline cursor-pointer">
+            Concluir
+          </button>
+        </div>
+
+        <!-- Botão de Gravação de Áudio (Groq Whisper) -->
+        <button 
+          type="button" 
+          id="btn-gravar-audio"
+          onclick="alternarGravacaoAudio()"
+          class="h-10 sm:h-11 w-10 sm:w-11 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0 transition active:scale-95 cursor-pointer"
+          title="Gravar Mensagem de Voz (IA Whisper)"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+          </svg>
+        </button>
+
+        <!-- Botão de Envio Principal -->
         <button 
           type="submit" 
           id="btn-enviar-msg"
@@ -276,6 +356,7 @@
           </svg>
         </button>
       </form>
+
 
       <div class="flex items-center justify-between mt-1.5 sm:mt-2 px-1 text-[10px] text-slate-400 dark:text-slate-500 gap-2">
         <span class="hidden sm:inline truncate">Seu pedido é enviado diretamente para o sistema com confirmação instantânea.</span>
@@ -312,11 +393,37 @@
     let etapaColetaAtual = 'inicio'; // 'inicio', 'nome', 'telefone', 'servico', 'setor', 'data', 'confirmacao', 'finalizado'
     let historicoMensagens = [];
     let somHabilitado = true;
+    const STORAGE_KEY_SESSAO = 'painel_pedidos_chatbot_sessao_v1';
+
+    // ESTADOS DE ANEXO (FOTO/IMAGEM) E GRAVAÇÃO DE ÁUDIO (GROQ WHISPER)
+    let anexoImagemAtual = null; // { base64: string, nome: string, tamanhoKb: number }
+    let gravadorAudio = null;
+    let streamAudio = null;
+    let pedacosAudio = [];
+    let estaGravando = false;
+    let intervaloTimerGravacao = null;
+    let segundosGravando = 0;
+
     let configuracaoChat = {
       nomeEmpresa: 'Nossa Empresa',
       groqApiKey: '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',
       modeloIa: 'qwen/qwen3.8-27b',
-      setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']
+      setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'],
+      tabelaPrecos: [
+        { setor: 'Oficina', servico: 'Troca de Óleo e Filtro', valor: 180, prazo: '1 a 2 horas' },
+        { setor: 'Oficina', servico: 'Revisão de Freios e Pastilhas', valor: 250, prazo: '1 dia útil' },
+        { setor: 'Oficina', servico: 'Alinhamento e Balanceamento', valor: 120, prazo: '1 a 2 horas' },
+        { setor: 'Pet Shop', servico: 'Banho e Tosa Completa', valor: 85, prazo: '2 a 3 horas' },
+        { setor: 'Pet Shop', servico: 'Consulta Veterinária', valor: 140, prazo: 'Sob agendamento' },
+        { setor: 'Pet Shop', servico: 'Vacinação Polivalente', valor: 95, prazo: 'Imediato' },
+        { setor: 'Informática', servico: 'Formatação e Instalação de Windows/SSD', valor: 150, prazo: '24 horas' },
+        { setor: 'Informática', servico: 'Limpeza Interna e Troca de Pasta Térmica', valor: 120, prazo: '24 horas' },
+        { setor: 'Informática', servico: 'Upgrade de Memória RAM / SSD', valor: 90, prazo: 'Mesmo dia' },
+        { setor: 'Design', servico: 'Criação de Logotipo / Identidade Visual', valor: 350, prazo: '2 a 3 dias úteis' },
+        { setor: 'Design', servico: 'Arte para Banner ou Panfleto', valor: 120, prazo: '24 horas' },
+        { setor: 'Manutenção', servico: 'Visita Técnica / Diagnóstico no Local', valor: 100, prazo: 'Agendamento' },
+        { setor: 'Vendas', servico: 'Pedido Comercial de Produtos em Catálogo', valor: 0, prazo: 'Imediato' }
+      ]
     };
 
     // ==============================================================================
@@ -484,6 +591,334 @@
         .replace(/'/g, '&#039;');
     }
 
+    // ==============================================================================
+    // PERSISTÊNCIA DE SESSÃO DO ATENDIMENTO (SESSIONSTORAGE)
+    // ==============================================================================
+    function salvarSessaoNoStorage() {
+      try {
+        if (etapaColetaAtual === 'finalizado') {
+          sessionStorage.removeItem(STORAGE_KEY_SESSAO);
+          return;
+        }
+        const sessao = {
+          dados: dadosPedidoEmConstrucao,
+          etapa: etapaColetaAtual,
+          historico: historicoMensagens.slice(-16),
+          timestamp: Date.now()
+        };
+        sessionStorage.setItem(STORAGE_KEY_SESSAO, JSON.stringify(sessao));
+      } catch (e) {
+        // Ignora silenciosamente caso sessionStorage indisponível
+      }
+    }
+
+    function verificarSessaoExistente() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY_SESSAO);
+        if (!raw) return false;
+
+        const sessao = JSON.parse(raw);
+        const dozeHoras = 12 * 60 * 60 * 1000;
+        if (Date.now() - (sessao.timestamp || 0) > dozeHoras) {
+          sessionStorage.removeItem(STORAGE_KEY_SESSAO);
+          return false;
+        }
+
+        if (sessao.historico && sessao.historico.length > 0 && sessao.etapa !== 'finalizado') {
+          const banner = document.getElementById('banner-restaurar-sessao');
+          if (banner) banner.classList.remove('hidden');
+          return true;
+        }
+      } catch (e) {
+        console.warn('Erro ao verificar sessão salva:', e);
+      }
+      return false;
+    }
+
+    function restaurarSessaoAnterior() {
+      try {
+        const raw = sessionStorage.getItem(STORAGE_KEY_SESSAO);
+        if (!raw) return;
+        const sessao = JSON.parse(raw);
+
+        if (sessao.dados) dadosPedidoEmConstrucao = sessao.dados;
+        if (sessao.etapa) etapaColetaAtual = sessao.etapa;
+        if (Array.isArray(sessao.historico)) historicoMensagens = sessao.historico;
+
+        const banner = document.getElementById('banner-restaurar-sessao');
+        if (banner) banner.classList.add('hidden');
+
+        const container = document.getElementById('chat-mensagens-container');
+        if (container) {
+          container.innerHTML = '';
+          for (const msg of historicoMensagens) {
+            adicionarMensagem(msg.role === 'assistant' ? 'bot' : 'usuario', msg.content, { skipSave: true });
+          }
+        }
+
+        adicionarMensagem('bot', 'Conversa anterior recuperada com sucesso! Seus dados já estão salvos. Como gostaria de prosseguir? ✨');
+
+        if (etapaColetaAtual === 'confirmacao') {
+          exibirCardResumoConfirmacao();
+        } else {
+          atualizarSugestoes([
+            { texto: '🛍️ Continuar Pedido', valor: 'Continuar meu pedido' },
+            { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' },
+            { texto: '🔄 Recomeçar do Zero', valor: 'Recomeçar' }
+          ]);
+        }
+      } catch (e) {
+        console.error('Erro ao restaurar sessão:', e);
+      }
+    }
+
+    function descartarSessaoAnterior() {
+      try {
+        sessionStorage.removeItem(STORAGE_KEY_SESSAO);
+        const banner = document.getElementById('banner-restaurar-sessao');
+        if (banner) banner.classList.add('hidden');
+      } catch (e) {}
+    }
+
+    // ==============================================================================
+    // GESTÃO E COMPRESSÃO CLIENT-SIDE DE FOTOS / ANEXOS COM CANVAS
+    // ==============================================================================
+    function processarArquivoSelecionado(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione um arquivo de imagem (JPEG, PNG, WebP).');
+        event.target.value = '';
+        return;
+      }
+
+      const leitor = new FileReader();
+      leitor.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          // Redimensionamento inteligente mantendo proporção com limite máx de 800px
+          const maxDim = 800;
+          let largura = img.width;
+          let altura = img.height;
+
+          if (largura > maxDim || altura > maxDim) {
+            if (largura > altura) {
+              altura = Math.round((altura * maxDim) / largura);
+              largura = maxDim;
+            } else {
+              largura = Math.round((largura * maxDim) / altura);
+              altura = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = largura;
+          canvas.height = altura;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, largura, altura);
+
+          // Gera WebP ou JPEG comprimido e leve (~30KB a 50KB)
+          let base64Otimizado = '';
+          try {
+            base64Otimizado = canvas.toDataURL('image/webp', 0.72);
+          } catch (errWebp) {
+            base64Otimizado = canvas.toDataURL('image/jpeg', 0.72);
+          }
+
+          const tamanhoKb = Math.round((base64Otimizado.length * 3) / 4 / 1024);
+
+          anexoImagemAtual = {
+            base64: base64Otimizado,
+            nome: file.name,
+            tamanhoKb
+          };
+
+          exibirPreviewAnexo();
+        };
+        img.src = e.target.result;
+      };
+      leitor.readAsDataURL(file);
+    }
+
+    function exibirPreviewAnexo() {
+      const container = document.getElementById('chat-anexo-preview-container');
+      const thumb = document.getElementById('chat-anexo-preview-thumb');
+      const nomeEl = document.getElementById('chat-anexo-preview-nome');
+
+      if (anexoImagemAtual && container && thumb && nomeEl) {
+        thumb.src = anexoImagemAtual.base64;
+        nomeEl.textContent = `${anexoImagemAtual.nome} (${anexoImagemAtual.tamanhoKb}KB)`;
+        container.classList.remove('hidden');
+      }
+    }
+
+    function removerAnexo() {
+      anexoImagemAtual = null;
+      const input = document.getElementById('chat-file-input');
+      if (input) input.value = '';
+      const container = document.getElementById('chat-anexo-preview-container');
+      if (container) container.classList.add('hidden');
+    }
+
+    // ==============================================================================
+    // GRAVAÇÃO DE ÁUDIO DE VOZ & TRANSCRIÇÃO INSTANTÂNEA COM GROQ WHISPER
+    // ==============================================================================
+    async function alternarGravacaoAudio() {
+      if (estaGravando) {
+        pararGravacaoAudio();
+      } else {
+        await iniciarGravacaoAudio();
+      }
+    }
+
+    async function iniciarGravacaoAudio() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Seu navegador não possui suporte para gravação de áudio direto.');
+        return;
+      }
+
+      try {
+        streamAudio = await navigator.mediaDevices.getUserMedia({ audio: true });
+        pedacosAudio = [];
+
+        let mimeType = 'audio/webm';
+        if (typeof MediaRecorder.isTypeSupported === 'function') {
+          if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            mimeType = 'audio/webm;codecs=opus';
+          } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+            mimeType = 'audio/ogg;codecs=opus';
+          } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            mimeType = 'audio/mp4';
+          }
+        }
+
+        gravadorAudio = new MediaRecorder(streamAudio, { mimeType });
+
+        gravadorAudio.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            pedacosAudio.push(e.data);
+          }
+        };
+
+        gravadorAudio.onstop = async () => {
+          if (pedacosAudio.length > 0) {
+            const audioBlob = new Blob(pedacosAudio, { type: gravadorAudio.mimeType || 'audio/webm' });
+            await transcreverAudioComGroqWhisper(audioBlob);
+          }
+        };
+
+        gravadorAudio.start(250);
+        estaGravando = true;
+        segundosGravando = 0;
+
+        // Atualiza elementos visuais da UI
+        const wrapper = document.getElementById('chat-input-wrapper');
+        const gravandoBox = document.getElementById('chat-gravando-container');
+        const btnGravar = document.getElementById('btn-gravar-audio');
+        const timerEl = document.getElementById('timer-gravacao');
+
+        if (wrapper) wrapper.classList.add('hidden');
+        if (gravandoBox) gravandoBox.classList.remove('hidden');
+        if (btnGravar) {
+          btnGravar.classList.add('bg-rose-500', 'text-white', 'animate-pulse');
+          btnGravar.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+        }
+
+        if (timerEl) timerEl.textContent = '0:00';
+
+        intervaloTimerGravacao = setInterval(() => {
+          segundosGravando++;
+          const mins = Math.floor(segundosGravando / 60);
+          const segs = segundosGravando % 60;
+          if (timerEl) {
+            timerEl.textContent = `${mins}:${segs < 10 ? '0' : ''}${segs}`;
+          }
+          if (segundosGravando >= 90) {
+            pararGravacaoAudio(); // Limite preventivo
+          }
+        }, 1000);
+
+      } catch (err) {
+        console.error('Erro ao acessar microfone:', err);
+        alert('Não foi possível acessar o microfone. Por favor, autorize a permissão no navegador.');
+      }
+    }
+
+    function pararGravacaoAudio() {
+      if (!estaGravando) return;
+      estaGravando = false;
+
+      clearInterval(intervaloTimerGravacao);
+      intervaloTimerGravacao = null;
+
+      if (gravadorAudio && gravadorAudio.state !== 'inactive') {
+        gravadorAudio.stop();
+      }
+
+      if (streamAudio) {
+        streamAudio.getTracks().forEach(t => t.stop());
+        streamAudio = null;
+      }
+
+      // Restaura UI
+      const wrapper = document.getElementById('chat-input-wrapper');
+      const gravandoBox = document.getElementById('chat-gravando-container');
+      const btnGravar = document.getElementById('btn-gravar-audio');
+
+      if (wrapper) wrapper.classList.remove('hidden');
+      if (gravandoBox) gravandoBox.classList.add('hidden');
+      if (btnGravar) {
+        btnGravar.classList.remove('bg-rose-500', 'text-white', 'animate-pulse');
+        btnGravar.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+      }
+    }
+
+    async function transcreverAudioComGroqWhisper(blob) {
+      if (!configuracaoChat.groqApiKey) {
+        adicionarMensagem('bot', '⚠️ A gravação de voz requer a chave Groq para transcrição automática via Whisper.');
+        return;
+      }
+
+      exibirDigitando(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', blob, 'gravacao.webm');
+        formData.append('model', 'whisper-large-v3-turbo');
+        formData.append('language', 'pt');
+        formData.append('response_format', 'json');
+
+        const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${configuracaoChat.groqApiKey}`
+          },
+          body: formData
+        });
+
+        if (!res.ok) {
+          throw new Error(`Groq Whisper retornou status HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const textoTranscrito = data.text ? data.text.trim() : '';
+
+        if (textoTranscrito) {
+          processarEnvioMensagem(textoTranscrito);
+        } else {
+          adicionarMensagem('bot', '🎤 Não consegui identificar a fala com clareza no áudio. Você pode tentar falar novamente ou digitar sua mensagem.');
+        }
+      } catch (err) {
+        console.error('Erro na transcrição Whisper:', err);
+        adicionarMensagem('bot', '🎤 Tive uma instabilidade ao transcrever seu áudio. Pode enviar por texto, por favor?');
+      } finally {
+        exibirDigitando(false);
+      }
+    }
+
+    // ==============================================================================
+    // RENDERIZAÇÃO DE MENSAGENS E BALÕES
+    // ==============================================================================
     // Adiciona mensagem no histórico e na tela
     function adicionarMensagem(remetente, conteudoHtml, meta = {}) {
       const container = document.getElementById('chat-mensagens-container');
@@ -491,7 +926,7 @@
 
       // Salva no histórico de memória multi-turn (texto limpo de tags HTML)
       const textoPlano = String(conteudoHtml).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      if (textoPlano) {
+      if (textoPlano && !meta.skipSave) {
         historicoMensagens.push({
           role: remetente === 'bot' ? 'assistant' : 'user',
           content: textoPlano.slice(0, 350)
@@ -499,6 +934,7 @@
         if (historicoMensagens.length > 16) {
           historicoMensagens = historicoMensagens.slice(-16);
         }
+        salvarSessaoNoStorage();
       }
 
       const hora = formatarHoraAtual();
@@ -519,10 +955,21 @@
         `;
         emitirSom('msg');
       } else {
+        const anexoHtml = meta.anexo && meta.anexo.base64 ? `
+          <div class="mb-2 max-w-xs rounded-xl overflow-hidden border border-white/20 shadow-xs">
+            <img src="${meta.anexo.base64}" alt="${escapeHtml(meta.anexo.nome || 'Anexo')}" class="w-full max-h-48 object-cover cursor-pointer hover:opacity-95 transition" onclick="window.open('${meta.anexo.base64}')" />
+            <div class="px-2 py-1 bg-black/40 text-[10px] text-white/90 truncate flex items-center justify-between backdrop-blur-xs">
+              <span class="truncate">📷 ${escapeHtml(meta.anexo.nome || 'Foto')}</span>
+              <span class="text-[9px] text-emerald-300 font-mono ml-1 font-bold">${meta.anexo.tamanhoKb || ''}KB</span>
+            </div>
+          </div>
+        ` : '';
+
         divMsg.innerHTML = `
           <div class="max-w-[92%] sm:max-w-[80%] space-y-1 flex flex-col items-end">
             <div class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl rounded-tr-sm p-3 sm:p-4 shadow-md shadow-indigo-600/20 leading-relaxed break-words">
-              ${escapeHtml(conteudoHtml)}
+              ${anexoHtml}
+              ${conteudoHtml ? `<div>${escapeHtml(conteudoHtml)}</div>` : ''}
             </div>
             <div class="text-[10px] text-slate-400 dark:text-slate-500 pr-1">${hora} &bull; Você</div>
           </div>
@@ -534,6 +981,62 @@
 
       container.appendChild(divMsg);
       rolarParaFim();
+    }
+
+    // EFEITO TYPEWRITER STREAMING PARA RESPOSTAS DO BOT (ANIMAÇÃO FLUIDA)
+    function adicionarMensagemComEfeito(conteudoHtml, meta = {}) {
+      const container = document.getElementById('chat-mensagens-container');
+      if (!container) return;
+
+      // Se possuir estrutura HTML rica (cards, botões, tabelas, steps), renderiza direto
+      if (conteudoHtml.includes('<div') || conteudoHtml.includes('<table') || conteudoHtml.includes('<button') || conteudoHtml.includes('<svg')) {
+        adicionarMensagem('bot', conteudoHtml, meta);
+        return;
+      }
+
+      const hora = formatarHoraAtual();
+      const divMsg = document.createElement('div');
+      divMsg.className = 'flex gap-2.5 sm:gap-3 animate-msg justify-start';
+
+      divMsg.innerHTML = `
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div class="max-w-[92%] sm:max-w-[80%] space-y-1">
+          <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl rounded-tl-sm p-3 sm:p-4 text-slate-800 dark:text-slate-100 shadow-sm space-y-2">
+            <div class="leading-relaxed typewriter-area"></div>
+          </div>
+          <div class="text-[10px] text-slate-400 dark:text-slate-500 pl-1">${hora} &bull; Assistente IA</div>
+        </div>
+      `;
+
+      container.appendChild(divMsg);
+      rolarParaFim();
+      emitirSom('msg');
+
+      const area = divMsg.querySelector('.typewriter-area');
+      const textoFormatado = conteudoHtml.replace(/<br\s*\/?>/gi, '\n');
+      let idx = 0;
+      const incremento = 3;
+
+      function digitar() {
+        if (idx < textoFormatado.length) {
+          idx = Math.min(idx + incremento, textoFormatado.length);
+          area.innerHTML = textoFormatado.slice(0, idx).replace(/\n/g, '<br/>');
+          rolarParaFim();
+          requestAnimationFrame(digitar);
+        } else {
+          // Salva no histórico de mensagens e sessionStorage ao término da animação
+          const textoPlano = String(conteudoHtml).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          if (textoPlano && !meta.skipSave) {
+            historicoMensagens.push({ role: 'assistant', content: textoPlano.slice(0, 350) });
+            if (historicoMensagens.length > 16) historicoMensagens = historicoMensagens.slice(-16);
+            salvarSessaoNoStorage();
+          }
+        }
+      }
+
+      requestAnimationFrame(digitar);
     }
 
 
@@ -638,6 +1141,27 @@
         }
       }
 
+      // 6. Mapeamento Automático com Tabela de Preços de Referência & Orçamentos
+      if (Array.isArray(configuracaoChat.tabelaPrecos)) {
+        const tLower = texto.toLowerCase();
+        for (const item of configuracaoChat.tabelaPrecos) {
+          const sLower = item.servico.toLowerCase();
+          const palavrasChave = sLower.split(/\s+/).filter(w => w.length > 3);
+          const coincide = palavrasChave.some(p => tLower.includes(p));
+          if (coincide) {
+            if (!extraido.servico && !dadosPedidoEmConstrucao.servico) {
+              extraido.servico = item.servico;
+            }
+            if (!extraido.setor && dadosPedidoEmConstrucao.setor === 'Geral') {
+              extraido.setor = item.setor;
+            }
+            if (!extraido.valor && !dadosPedidoEmConstrucao.valor && item.valor > 0) {
+              extraido.valor = item.valor;
+            }
+          }
+        }
+      }
+
       return extraido;
     }
 
@@ -682,22 +1206,29 @@
           observacoes: ''
         };
         etapaColetaAtual = 'inicio';
+        descartarSessaoAnterior();
+        removerAnexo();
         iniciarConversa();
       }
     }
 
-    // ENVIO DE MENSAGEM PELO FORMULÁRIO
+    // ENVIO DE MENSAGEM PELO FORMULÁRIO (COM SUPORTE A TEXTO E FOTOS)
     function enviarMensagemUsuario(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('chat-input-texto');
       const texto = input.value.trim();
-      if (!texto) return;
+      const anexo = anexoImagemAtual;
+
+      if (!texto && !anexo) return;
 
       input.value = '';
       const btnLimpar = document.getElementById('btn-limpar-input');
       if (btnLimpar) btnLimpar.classList.add('hidden');
 
-      processarEnvioMensagem(texto);
+      processarEnvioMensagem(texto, anexo);
+      if (anexo) {
+        removerAnexo();
+      }
     }
 
     function limparInputTexto() {
@@ -709,10 +1240,13 @@
       }
     }
 
-    // Listener para exibir botão limpar
-    document.addEventListener('DOMContentLoaded', () => {
-      carregarConfiguracoes();
-      iniciarConversa();
+    // Listener de Inicialização com Verificação de Sessão Salva
+    document.addEventListener('DOMContentLoaded', async () => {
+      await carregarConfiguracoes();
+      const temSessao = verificarSessaoExistente();
+      if (!temSessao) {
+        iniciarConversa();
+      }
 
       const input = document.getElementById('chat-input-texto');
       const btnLimpar = document.getElementById('btn-limpar-input');
@@ -727,8 +1261,8 @@
       }
     });
 
-    // Processamento central da mensagem
-    async function processarEnvioMensagem(texto) {
+    // Processamento central da mensagem (com suporte a anexo e streaming de IA)
+    async function processarEnvioMensagem(texto, anexo = null) {
       // Extrai as iniciais do nome se já tiver cliente
       let iniciais = 'EU';
       if (dadosPedidoEmConstrucao.cliente) {
@@ -736,21 +1270,30 @@
         iniciais = p.length > 1 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : p[0].slice(0, 2).toUpperCase();
       }
 
-      adicionarMensagem('usuario', texto, { iniciais });
+      if (anexo) {
+        if (!dadosPedidoEmConstrucao.observacoes.includes('[Foto Anexa]')) {
+          dadosPedidoEmConstrucao.observacoes = (dadosPedidoEmConstrucao.observacoes ? dadosPedidoEmConstrucao.observacoes + ' ' : '') + `[Foto Anexa: ${anexo.nome}]`;
+        }
+      }
+
+      adicionarMensagem('usuario', texto, { iniciais, anexo });
       exibirDigitando(true);
       atualizarSugestoes([]);
 
       // Simulação de processamento inteligente da IA (latência natural de diálogo)
       setTimeout(async () => {
         try {
-          await executarLogicaRespostaIA(texto);
+          const textoParaIa = anexo 
+            ? (texto ? `${texto} (Enviei uma foto/anexo: ${anexo.nome})` : `Enviei uma imagem em anexo (${anexo.nome}) para análise do meu pedido.`)
+            : texto;
+          await executarLogicaRespostaIA(textoParaIa);
         } catch (err) {
           console.error('Erro na resposta da IA:', err);
           adicionarMensagem('bot', 'Desculpe, tive uma instabilidade momentânea ao processar sua resposta. Pode repetir, por favor?');
         } finally {
           exibirDigitando(false);
         }
-      }, 700);
+      }, 600);
     }
 
     // LÓGICA CONVERSACIONAL DE COLETA DE DADOS DO PEDIDO
@@ -1191,9 +1734,25 @@
         let buscaPor = '';
         const termoLimpo = String(idOuTelefone || '').trim();
         const matchId = termoLimpo.match(/#?(\d+)/);
+        const idNum = (matchId && matchId[1] && (termoLimpo.length <= 6 || termoLimpo.startsWith('#') || termoLimpo.toLowerCase().includes('pedido'))) ? parseInt(matchId[1], 10) : null;
+        const digitos = termoLimpo.replace(/\D/g, '');
 
-        if (matchId && matchId[1] && (termoLimpo.length <= 6 || termoLimpo.startsWith('#') || termoLimpo.toLowerCase().includes('pedido'))) {
-          const idNum = parseInt(matchId[1], 10);
+        // 1. Tenta consulta segura e blindada via Stored Procedure RPC (PostgreSQL RLS Hardening)
+        try {
+          const { data: rpcData, error: rpcErr } = await supabaseClient.rpc('consultar_pedido_publico', {
+            p_id: idNum,
+            p_telefone: digitos.length >= 8 ? digitos : null
+          });
+          if (!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
+            pedido = rpcData[0];
+            buscaPor = idNum ? `ID #${idNum}` : `WhatsApp ${termoLimpo}`;
+          }
+        } catch (eRpc) {
+          // Fallback gracioso caso a RPC ainda não tenha sido rodada no SQL Editor
+        }
+
+        // 2. Fallback direto caso a RPC não tenha sido instalada
+        if (!pedido && idNum) {
           buscaPor = `ID #${idNum}`;
           const { data, error } = await supabaseClient
             .from('pedidos')
@@ -1206,20 +1765,17 @@
           }
         }
 
-        if (!pedido) {
-          const digitos = termoLimpo.replace(/\D/g, '');
-          if (digitos.length >= 8) {
-            buscaPor = `WhatsApp ${termoLimpo}`;
-            const { data, error } = await supabaseClient
-              .from('pedidos')
-              .select('*')
-              .ilike('telefone', `%${digitos.slice(-8)}%`)
-              .order('id', { ascending: false })
-              .limit(1);
+        if (!pedido && digitos.length >= 8) {
+          buscaPor = `WhatsApp ${termoLimpo}`;
+          const { data, error } = await supabaseClient
+            .from('pedidos')
+            .select('*')
+            .ilike('telefone', `%${digitos.slice(-8)}%`)
+            .order('id', { ascending: false })
+            .limit(1);
 
-            if (!error && data && data.length > 0) {
-              pedido = data[0];
-            }
+          if (!error && data && data.length > 0) {
+            pedido = data[0];
           }
         }
 
@@ -1284,6 +1840,7 @@
         const idGerado = novoPedido ? novoPedido.id : Math.floor(1000 + Math.random() * 9000);
 
         etapaColetaAtual = 'finalizado';
+        salvarSessaoNoStorage(); // Limpa sessão do storage
         emitirSom('sucesso');
 
         // Dispara celebração de confetes
@@ -1392,6 +1949,10 @@ ONTOLOGIA DO SISTEMA & ESTRUTURA OPERACIONAL
    - Garantia: 90 dias de garantia legal com suporte pós-atendimento garantido pelo painel.
    - Prazos: 24h a 48h úteis para serviços regulares; pedidos urgentes sinalizados com prioridade máxima.
    - Orçamentos: Gratuitos e sem compromisso.
+
+4. TABELA DE PREÇOS DE REFERÊNCIA & ORÇAMENTOS ESTIMADOS:
+   ${(configuracaoChat.tabelaPrecos || []).map(p => `- [${p.setor}] ${p.servico}: R$ ${p.valor},00 (Prazo: ${p.prazo})`).join('\n   ')}
+   Quando o cliente perguntar valores ou solicitar orçamento, use esses valores de referência para dar estimativas precisas e preencher o campo "valor" no JSON!
 
 =========================================
 ESTADO ATUAL DO PEDIDO EM CONSTRUÇÃO
@@ -1524,7 +2085,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem 
 
             // 2. AÇÃO: RESPONDER_DUVIDA
             if (respostaObj.acao === 'RESPONDER_DUVIDA') {
-              adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
+              adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
               if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
                 atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
               } else {
@@ -1562,8 +2123,8 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem 
               return true;
             }
 
-            // Renderiza a resposta do assistente
-            adicionarMensagem('bot', respostaObj.mensagem.replace(/\n/g, '<br/>'));
+            // Renderiza a resposta do assistente com efeito typewriter streaming
+            adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
 
             if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
               atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
