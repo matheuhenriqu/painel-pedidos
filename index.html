@@ -22,25 +22,66 @@
             sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
           },
           colors: {
+            // Paleta Executiva Corporativa - Cores duras, sólidas e profissionais (alto contraste)
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b',
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#475569',
+              600: '#334155',
+              700: '#1e293b',
+              800: '#0f172a',
+              900: '#020617',
+              950: '#000000',
+            },
+            // Remapeamento de classes utilitárias para Slate/Zinc/Steel corporativo
+            indigo: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#64748b',
+              500: '#334155',
+              600: '#1e293b',
+              700: '#0f172a',
+              800: '#020617',
+              900: '#020617',
+              950: '#000000',
+            },
+            purple: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#64748b',
+              500: '#475569',
+              600: '#334155',
+              700: '#1e293b',
+              800: '#0f172a',
+              900: '#020617',
+              950: '#000000',
+            },
+            violet: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#64748b',
+              500: '#475569',
+              600: '#334155',
+              700: '#1e293b',
+              800: '#0f172a',
+              900: '#020617',
+              950: '#000000',
             }
           },
           boxShadow: {
-            'glow': '0 0 25px -5px rgba(99, 102, 241, 0.35)',
-            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.35)',
-            'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.35)',
-            'glow-rose': '0 0 25px -5px rgba(244, 63, 94, 0.35)'
+            'glow': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+            'glow-emerald': '0 1px 3px 0 rgba(16, 185, 129, 0.15)',
+            'glow-amber': '0 1px 3px 0 rgba(245, 158, 11, 0.15)',
+            'glow-rose': '0 1px 3px 0 rgba(244, 63, 94, 0.15)'
           }
         }
       }
@@ -56,13 +97,13 @@
       font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
     }
 
-    /* Foco Acessível Universal (WCAG 2.1 AA) */
+    /* Foco Acessível Universal (WCAG 2.1 AA) - Linhas Duras e Alto Contraste */
     *:focus-visible {
-      outline: 2px solid #6366f1 !important;
+      outline: 2px solid #0f172a !important;
       outline-offset: 2px !important;
     }
     .dark *:focus-visible {
-      outline-color: #818cf8 !important;
+      outline-color: #f1f5f9 !important;
     }
 
     /* Estilização da Barra de Rolagem */
@@ -95,23 +136,23 @@
       animation: authShake 0.4s ease-in-out;
     }
 
-    /* Efeitos Visuais Premium & Glassmorphism */
+    /* Efeitos Visuais Corporativos & Superfícies de Alto Contraste */
     .glass-surface {
-      background: rgba(255, 255, 255, 0.84);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
     .dark .glass-surface {
-      background: rgba(11, 15, 25, 0.84);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.45); }
-      50% { box-shadow: 0 0 0 7px rgba(99, 102, 241, 0); }
+      0%, 100% { box-shadow: 0 0 0 0 rgba(15, 23, 42, 0.25); }
+      50% { box-shadow: 0 0 0 4px rgba(15, 23, 42, 0); }
     }
-    .pulse-glow { animation: pulseGlow 2s infinite cubic-bezier(0.4, 0, 0.6, 1); }
+    .pulse-glow { animation: pulseGlow 2.5s infinite cubic-bezier(0.4, 0, 0.6, 1); }
 
     /* Barra de Navegação Dock Mobile Inferior */
     #mobile-dock-nav {
@@ -144,12 +185,12 @@
     }
   </style>
 </head>
-<body class="min-h-full flex flex-col font-sans bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+<body class="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-slate-900 selection:text-white dark:selection:bg-slate-100 dark:selection:text-slate-900 transition-colors duration-200">
 
   <!-- LINK ACESSÍVEL: PULAR PARA O CONTEÚDO PRINCIPAL (WCAG 2.1) -->
   <a 
     href="#conteudo-principal" 
-    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-indigo-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs font-bold transition"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-slate-900 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 text-xs font-bold transition"
   >
     Pular para o conteúdo principal
   </a>
@@ -162,10 +203,9 @@
   <!-- ========================================== -->
   <section id="tela-autenticacao" class="relative min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-10 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200" aria-label="Tela de Acesso e Login">
     
-    <!-- Elementos Decorativos de Fundo (Glow / Efeito Visual) -->
-    <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/20 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
-    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-violet-500/20 dark:bg-violet-600/15 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-500/10 dark:bg-pink-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+    <!-- Elementos Decorativos de Fundo Corporativos -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-slate-200/50 dark:bg-slate-800/20 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-slate-300/40 dark:bg-slate-900/40 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
 
     <!-- Botões Flutuantes no Topo da Tela de Login -->
     <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
@@ -173,11 +213,11 @@
         href="chat.html"
         aria-label="Fazer Pedido Online com Assistente Virtual IA"
         title="Fazer Pedido Online com Assistente IA"
-        class="py-1.5 px-2.5 sm:py-2 sm:px-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-2xl shadow-md shadow-indigo-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5 text-xs font-bold"
+        class="py-1.5 px-2.5 sm:py-2 sm:px-3.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white rounded-xl shadow-xs border border-slate-900 dark:border-slate-200 transition active:scale-95 cursor-pointer flex items-center gap-1.5 text-xs font-bold"
       >
         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-        <span class="hidden xs:inline sm:inline">Fazer Pedido com IA ✨</span>
-        <span class="xs:hidden">Chatbot IA ✨</span>
+        <span class="hidden xs:inline sm:inline">Fazer Pedido com IA</span>
+        <span class="xs:hidden">Chatbot IA</span>
       </a>
 
       <button 
@@ -185,7 +225,7 @@
         onclick="alternarTema()"
         aria-label="Alternar entre tema claro e tema escuro"
         title="Alternar Tema Claro / Escuro"
-        class="p-2 sm:p-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-2xl shadow-sm hover:shadow transition active:scale-95 cursor-pointer flex items-center gap-1.5 sm:gap-2 text-xs font-semibold"
+        class="p-2 sm:p-2.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl shadow-xs transition active:scale-95 cursor-pointer flex items-center gap-1.5 sm:gap-2 text-xs font-semibold"
       >
         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
@@ -201,8 +241,8 @@
         
         <!-- Header Showcase -->
         <div class="space-y-4">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold">
-            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-slate-600 dark:bg-slate-400"></span>
             Plataforma Operacional 2.0 &bull; Supabase Realtime
           </div>
 
@@ -217,16 +257,16 @@
 
         <!-- Cards de Destaques Operacionais -->
         <div class="grid grid-cols-2 gap-3.5 max-w-lg">
-          <div class="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-1.5">
-            <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1.5">
+            <div class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold border border-slate-200 dark:border-slate-700">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
             <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Sincronização Ao Vivo</p>
             <p class="text-[11px] text-slate-400">Notificações sonoras e atualizações de pedidos via Supabase Realtime sem recarregar a página.</p>
           </div>
 
-          <div class="p-4 rounded-2xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/80 dark:border-slate-800/80 shadow-sm space-y-1.5">
-            <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">
+          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-1.5">
+            <div class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold border border-slate-200 dark:border-slate-700">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg>
             </div>
             <p class="text-xs font-bold text-slate-800 dark:text-slate-200">5 Modos Operacionais</p>
@@ -234,9 +274,9 @@
           </div>
 
           <!-- Destaque do Chatbot Público com IA -->
-          <div class="col-span-2 p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50/90 to-purple-50/90 dark:from-indigo-950/40 dark:to-purple-950/40 backdrop-blur-md border border-indigo-200/80 dark:border-indigo-800/80 shadow-sm flex items-center justify-between gap-3">
+          <div class="col-span-2 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 shadow-xs flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-bold shadow-sm shrink-0">
+              <div class="w-9 h-9 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 flex items-center justify-center font-bold shadow-xs shrink-0 border border-slate-700/50">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               </div>
               <div>
@@ -244,16 +284,16 @@
                 <p class="text-[11px] text-slate-500 dark:text-slate-400">Seus clientes solicitam pedidos 24/7 de forma conversacional, registrados automaticamente no Supabase.</p>
               </div>
             </div>
-            <a href="chat.html" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">Testar Chatbot</a>
+            <a href="chat.html" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white text-xs font-bold rounded-xl shadow-xs transition shrink-0">Testar Chatbot</a>
           </div>
         </div>
 
         <!-- Indicador de Confiança -->
-        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800/60 max-w-lg">
+        <div class="flex items-center gap-3 p-3.5 rounded-2xl bg-white/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 max-w-lg">
           <div class="flex -space-x-2">
-            <div class="w-7 h-7 rounded-full bg-indigo-500 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">JD</div>
-            <div class="w-7 h-7 rounded-full bg-violet-500 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">AS</div>
-            <div class="w-7 h-7 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">MH</div>
+            <div class="w-7 h-7 rounded-full bg-slate-700 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">JD</div>
+            <div class="w-7 h-7 rounded-full bg-slate-800 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">AS</div>
+            <div class="w-7 h-7 rounded-full bg-slate-900 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] text-white font-bold">MH</div>
           </div>
           <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400">
             Painel otimizado para operações ágeis com <strong class="text-slate-900 dark:text-white">gestão de caixa, PIX integrado e WhatsApp</strong>.
@@ -264,14 +304,14 @@
 
       <!-- COLUNA DIREITA: CARD PRINCIPAL DE AUTENTICAÇÃO -->
       <div class="lg:col-span-6 xl:col-span-5 w-full">
-        <div id="card-auth-container" class="relative w-full max-w-md mx-auto bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl rounded-3xl p-4 sm:p-8 transition-all duration-300">
+        <div id="card-auth-container" class="relative w-full max-w-md mx-auto bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 shadow-xl rounded-3xl p-4 sm:p-8 transition-all duration-300">
           
-          <!-- Linha Gradiente Decorativa no Topo do Card -->
-          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-pink-500 rounded-t-3xl"></div>
+          <!-- Linha Sólida Estrutural no Topo do Card -->
+          <div class="absolute top-0 left-0 right-0 h-1 bg-slate-900 dark:bg-slate-300 rounded-t-3xl"></div>
 
           <!-- Cabeçalho do Card (Logo e Título) -->
           <div class="text-center space-y-2 mb-4 pt-1">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 mb-1">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 border border-slate-700/60 shadow-xs mb-1">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
@@ -281,10 +321,10 @@
           </div>
 
           <!-- CARD DE ACESSO AO CHATBOT PÚBLICO DE PEDIDOS -->
-          <div class="mb-4 p-3.5 rounded-2xl bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-violet-950/40 border border-indigo-200/80 dark:border-indigo-800/80 flex items-center justify-between gap-3 shadow-xs">
+          <div class="mb-4 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 flex items-center justify-between gap-3 shadow-xs">
             <div class="space-y-0.5">
-              <span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 Atendimento Rápido sem Login
               </span>
               <p class="text-xs font-bold text-slate-900 dark:text-white">É cliente e quer fazer um pedido?</p>
@@ -292,7 +332,7 @@
             </div>
             <a 
               href="chat.html"
-              class="shrink-0 py-2 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
+              class="shrink-0 py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white font-bold rounded-xl text-xs shadow-xs transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
             >
               <span>Pedir com IA</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -440,7 +480,7 @@
             <button 
               id="btn-submit-login"
               type="submit"
-              class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-indigo-500/25 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              class="w-full mt-2 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white font-bold rounded-xl text-xs sm:text-sm shadow-xs border border-slate-900 dark:border-slate-100 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
               <span id="btn-text-login">Entrar no Painel</span>
               <svg id="btn-spinner-login" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -645,7 +685,7 @@
             <button 
               id="btn-submit-registro"
               type="submit"
-              class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-bold rounded-xl text-xs sm:text-sm shadow-md shadow-emerald-500/20 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              class="w-full mt-2 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white font-bold rounded-xl text-xs sm:text-sm shadow-xs border border-slate-900 dark:border-slate-100 transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
               <span id="btn-text-registro">Criar Minha Conta</span>
               <svg id="btn-spinner-registro" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -825,7 +865,7 @@
         
         <!-- Logo & Título -->
         <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 sm:flex-initial">
-          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 flex items-center justify-center border border-slate-700/50 shadow-xs shrink-0">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
@@ -1074,13 +1114,13 @@
               class="flex items-center gap-2 max-w-[130px] sm:max-w-[200px] p-1 -m-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer group text-left" 
               title="Configurações e Perfil da Conta (Atalho: C)"
             >
-              <div id="avatar-usuario" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0 ring-2 ring-indigo-500/20 group-hover:ring-indigo-500/50 transition">
+              <div id="avatar-usuario" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0 ring-1 ring-slate-400/40 dark:ring-slate-600/50 transition">
                 US
               </div>
               <div class="hidden md:block truncate text-left leading-tight">
                 <div class="flex items-center gap-1.5">
-                  <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition">Usuário</p>
-                  <span id="badge-cargo-header" class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800 shrink-0">Admin</span>
+                  <p id="nome-usuario-header" class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate transition">Usuário</p>
+                  <span id="badge-cargo-header" class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded-md bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 shrink-0">Admin</span>
                 </div>
                 <div class="flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -1239,7 +1279,7 @@
         <!-- Barra de Progresso da Meta Diária -->
         <div id="container-meta-diaria" class="mt-1.5 sm:mt-2 space-y-1">
           <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <div id="barra-progresso-meta" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+            <div id="barra-progresso-meta" class="h-full bg-slate-900 dark:bg-slate-300 rounded-full transition-all duration-500" style="width: 0%"></div>
           </div>
           <div class="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-400">
             <span id="label-meta-faturamento" class="truncate">Meta: R$ 2.000</span>
@@ -1692,7 +1732,7 @@
   <button 
     id="fab-novo-pedido-mobile"
     onclick="abrirModalNovoPedido()"
-    class="sm:hidden fixed bottom-5 right-4 z-35 w-13 h-13 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-600/40 flex items-center justify-center active:scale-90 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-4 focus:ring-indigo-400/30"
+    class="sm:hidden fixed bottom-5 right-4 z-35 w-13 h-13 rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xl border border-slate-800 dark:border-slate-200 flex items-center justify-center active:scale-90 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-4 focus:ring-slate-400/30"
     title="Novo Pedido"
     aria-label="Novo Pedido"
   >
@@ -1713,34 +1753,38 @@
       <!-- Alça de Toque para Mobile -->
       <div class="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700 mx-auto mt-2.5 -mb-2 sm:hidden"></div>
 
-      <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span id="modal-det-setor" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Setor</span>
-          <span id="modal-det-status" class="px-2.5 py-0.5 text-xs font-semibold rounded-full border">Status</span>
+      <!-- Cabeçalho do Modal -->
+      <div class="flex items-center justify-between p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-700 dark:bg-slate-300"></span>
+          <span class="font-extrabold text-xs uppercase tracking-wider text-slate-400">Detalhes do Pedido</span>
         </div>
-        <button onclick="fecharModalDetalhes()" aria-label="Fechar detalhes do pedido" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+        <div class="flex items-center gap-2">
+          <span id="modal-det-status" class="px-2.5 py-1 rounded-full text-xs font-bold border">Status</span>
+          <button type="button" onclick="fecharModalDetalhes()" class="p-1.5 -m-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer" aria-label="Fechar janela de detalhes">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
       </div>
 
       <div class="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
         
         <!-- RASTREADOR VISUAL DE STATUS DO PEDIDO (ORDER TRACKING STEPPER) -->
-        <div class="bg-gradient-to-br from-slate-50 to-indigo-50/40 dark:from-slate-850 dark:to-slate-900/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+        <div class="bg-slate-100 dark:bg-slate-900/80 p-3.5 sm:p-4 rounded-2xl border border-slate-300 dark:border-slate-800 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
               <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-slate-700 dark:bg-slate-300"></span>
               </span>
               Rastreador de Status &bull; Avançar Fase
             </span>
-            <span id="tracker-etapa-indicador" class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">Fase 1 de 4</span>
+            <span id="tracker-etapa-indicador" class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Fase 1 de 4</span>
           </div>
 
           <!-- Barra de progresso da linha do tempo -->
           <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
-            <div id="tracker-barra-progresso" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500 transition-all duration-500 rounded-full" style="width: 25%"></div>
+            <div id="tracker-barra-progresso" class="h-full bg-slate-900 dark:bg-slate-300 transition-all duration-500 rounded-full" style="width: 25%"></div>
           </div>
 
           <div class="grid grid-cols-4 gap-1 sm:gap-1.5 text-center">
@@ -1786,9 +1830,9 @@
         </div>
 
         <!-- WIDGET DE COBRANÇA PIX COM QR CODE DINÂMICO -->
-        <div class="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/40 dark:to-slate-900 p-3.5 sm:p-4 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-2.5">
+        <div class="bg-slate-100 dark:bg-slate-900/80 p-3.5 sm:p-4 rounded-2xl border border-slate-300 dark:border-slate-800 space-y-2.5">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-800 dark:text-indigo-300 flex items-center gap-1.5">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
               Cobrança PIX
             </span>
@@ -2325,20 +2369,20 @@
         <div id="painel-cfg-perfil" class="space-y-4">
           
           <!-- Card de Apresentação do Perfil -->
-          <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-gradient-to-r from-indigo-50/80 to-slate-50 dark:from-indigo-950/30 dark:to-slate-800/40 border border-indigo-100/80 dark:border-indigo-900/40">
-            <div id="cfg-avatar-preview" class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-extrabold text-base flex items-center justify-center shadow-sm shrink-0 ring-4 ring-white dark:ring-slate-800">
+          <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700">
+            <div id="cfg-avatar-preview" class="w-12 h-12 rounded-full bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 font-extrabold text-base flex items-center justify-center shadow-xs shrink-0 ring-2 ring-slate-300 dark:ring-slate-700">
               US
             </div>
             <div class="truncate flex-1 min-w-0">
               <h4 id="cfg-nome-preview" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">Nome do Usuário</h4>
               <p id="cfg-email-preview" class="text-xs text-slate-500 dark:text-slate-400 truncate">email@exemplo.com</p>
               <div class="flex items-center gap-2 mt-1">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                   Conta Ativa
                 </span>
-                <span id="cfg-cargo-preview" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800">
-                  👑 Administrador
+                <span id="cfg-cargo-preview" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-800 dark:bg-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600">
+                  Administrador
                 </span>
               </div>
             </div>
@@ -2707,7 +2751,7 @@
           <button 
             type="submit" 
             id="btn-salvar-cfg-chat"
-            class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5"
+            class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white font-bold rounded-xl shadow-xs transition active:scale-95 cursor-pointer flex items-center gap-1.5"
           >
             <span>Salvar Configurações</span>
           </button>
@@ -2986,10 +3030,10 @@
 
     <!-- Botão Central: Novo Pedido (+) -->
     <button onclick="abrirModalNovoPedido()" aria-label="Abrir formulário de novo pedido" class="flex flex-col items-center -mt-5 group cursor-pointer" title="Criar Novo Pedido">
-      <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/40 group-active:scale-90 transition-transform ring-4 ring-white dark:ring-slate-900">
+      <div class="w-12 h-12 rounded-full bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 flex items-center justify-center shadow-lg border border-slate-700/50 group-active:scale-90 transition-transform ring-4 ring-white dark:ring-slate-900">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
       </div>
-      <span class="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">Novo</span>
+      <span class="text-[9px] font-bold text-slate-900 dark:text-slate-100 mt-0.5">Novo</span>
     </button>
 
     <!-- Tab Notificações -->
@@ -5554,7 +5598,7 @@
               <span class="text-indigo-600 dark:text-indigo-400 font-extrabold">${formatarMoeda(valor)}</span>
             </div>
             <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+              <div class="h-full bg-slate-800 dark:bg-slate-300 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
             </div>
             <div class="flex items-center justify-between text-[11px] text-slate-400 font-medium">
               <span>${qtd} ${qtd === 1 ? 'pedido' : 'pedidos'}</span>
@@ -5824,24 +5868,24 @@
     function badgeStatus(status) {
       const s = removerAcentos(status);
       if (s.includes('conclu') || s.includes('finaliz') || s.includes('pago') || s.includes('entreg')) {
-        return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800';
+        return 'bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700 font-semibold';
       }
       if (s.includes('cancel') || s.includes('recus')) {
-        return 'bg-rose-50 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border-rose-200/80 dark:border-rose-800';
+        return 'bg-rose-100 text-rose-900 dark:bg-rose-950 dark:text-rose-200 border-rose-300 dark:border-rose-700 font-semibold';
       }
       if (s.includes('confirm')) {
-        return 'bg-blue-50 text-blue-700 dark:bg-blue-950/70 dark:text-blue-300 border-blue-200/80 dark:border-blue-800';
+        return 'bg-blue-100 text-blue-900 dark:bg-blue-950 dark:text-blue-200 border-blue-300 dark:border-blue-700 font-semibold';
       }
       if (s.includes('agend')) {
-        return 'bg-violet-50 text-violet-700 dark:bg-violet-950/70 dark:text-violet-300 border-violet-200/80 dark:border-violet-800';
+        return 'bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-slate-100 border-slate-400 dark:border-slate-600 font-semibold';
       }
       if (s.includes('andamento') || s.includes('produ') || s.includes('prepar')) {
-        return 'bg-amber-50 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border-amber-200/80 dark:border-amber-800';
+        return 'bg-amber-100 text-amber-950 dark:bg-amber-950 dark:text-amber-200 border-amber-300 dark:border-amber-700 font-semibold';
       }
       if (s.includes('pendente') || s.includes('aguard')) {
-        return 'bg-orange-50 text-orange-700 dark:bg-orange-950/70 dark:text-orange-300 border-orange-200/80 dark:border-orange-800';
+        return 'bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100 border-zinc-400 dark:border-zinc-600 font-semibold';
       }
-      return 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200/80 dark:border-slate-700';
+      return 'bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 font-semibold';
     }
 
     function linkWhatsApp(telefone, cliente, servico) {
@@ -5925,8 +5969,8 @@
         const observacoes = destacarTexto(observacoesRaw, termoBusca);
 
         return `
-          <article class="card-pedido group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-200 p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden">
-            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <article class="card-pedido group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs hover:shadow-md hover:border-slate-400 dark:hover:border-slate-600 transition-all duration-200 p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-slate-900 dark:bg-slate-300 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
             <div>
               <div class="flex items-center justify-between gap-2 mb-3">

@@ -22,24 +22,65 @@
             sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
           },
           colors: {
+            // Paleta Executiva Corporativa - Cores duras, sólidas e profissionais (alto contraste)
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b',
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#475569',
+              600: '#334155',
+              700: '#1e293b',
+              800: '#0f172a',
+              900: '#020617',
+              950: '#000000',
+            },
+            // Remapeamento de classes utilitárias para Slate/Zinc/Steel corporativo
+            indigo: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#64748b',
+              500: '#334155',
+              600: '#1e293b',
+              700: '#0f172a',
+              800: '#020617',
+              900: '#020617',
+              950: '#000000',
+            },
+            purple: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#64748b',
+              500: '#475569',
+              600: '#334155',
+              700: '#1e293b',
+              800: '#0f172a',
+              900: '#020617',
+              950: '#000000',
+            },
+            violet: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#64748b',
+              500: '#475569',
+              600: '#334155',
+              700: '#1e293b',
+              800: '#0f172a',
+              900: '#020617',
+              950: '#000000',
             }
           },
           boxShadow: {
-            'glow': '0 0 25px -5px rgba(99, 102, 241, 0.35)',
-            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.35)',
-            'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.35)'
+            'glow': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+            'glow-emerald': '0 1px 3px 0 rgba(16, 185, 129, 0.15)',
+            'glow-amber': '0 1px 3px 0 rgba(245, 158, 11, 0.15)'
           }
         }
       }
@@ -58,13 +99,13 @@
       font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
     }
 
-    /* Foco Acessível Universal (WCAG 2.1 AA) */
+    /* Foco Acessível Universal (WCAG 2.1 AA) - Linhas Duras e Alto Contraste */
     *:focus-visible {
-      outline: 2px solid #6366f1 !important;
+      outline: 2px solid #0f172a !important;
       outline-offset: 2px !important;
     }
     .dark *:focus-visible {
-      outline-color: #818cf8 !important;
+      outline-color: #f1f5f9 !important;
     }
 
     /* Altura Dinâmica e Safe-Area Insets para Mobile */
@@ -86,23 +127,23 @@
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-    /* Efeitos de Glassmorphism & Superfícies */
+    /* Efeitos Corporativos & Superfícies */
     .glass-surface {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .dark .glass-surface {
-      background: rgba(11, 15, 25, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     /* Animação suave para novas mensagens */
     @keyframes messageSlideIn {
       from {
         opacity: 0;
-        transform: translateY(12px) scale(0.98);
+        transform: translateY(8px) scale(0.99);
       }
       to {
         opacity: 1;
@@ -110,28 +151,32 @@
       }
     }
     .animate-msg {
-      animation: messageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: messageSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* Animação de pulso para o status de IA */
     @keyframes pulseAi {
       0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.15); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 0.85; }
     }
     .pulse-ai {
-      animation: pulseAi 2s infinite ease-in-out;
+      animation: pulseAi 2.5s infinite ease-in-out;
     }
 
-    /* Indicador de digitação */
+    /* Indicador de digitação corporativo */
     .dot-flashing {
       position: relative;
       width: 6px;
       height: 6px;
       border-radius: 5px;
-      background-color: #6366f1;
-      color: #6366f1;
+      background-color: #334155;
+      color: #334155;
       animation: dotFlashing 1s infinite linear alternate;
       animation-delay: .5s;
+    }
+    .dark .dot-flashing {
+      background-color: #94a3b8;
+      color: #94a3b8;
     }
     .dot-flashing::before, .dot-flashing::after {
       content: '';
@@ -141,8 +186,8 @@
       width: 6px;
       height: 6px;
       border-radius: 5px;
-      background-color: #6366f1;
-      color: #6366f1;
+      background-color: inherit;
+      color: inherit;
     }
     .dot-flashing::before {
       left: -10px;
@@ -155,8 +200,8 @@
       animation-delay: 1s;
     }
     @keyframes dotFlashing {
-      0% { background-color: #6366f1; }
-      50%, 100% { background-color: rgba(99, 102, 241, 0.2); }
+      0% { opacity: 1; }
+      50%, 100% { opacity: 0.25; }
     }
 
     /* Barras Animadas de Onda de Áudio no Microfone (Groq Whisper) */
@@ -176,19 +221,19 @@
     .wave-bar:nth-child(4) { animation-delay: 0.45s; }
   </style>
 </head>
-<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-slate-900 selection:text-white dark:selection:bg-slate-100 dark:selection:text-slate-900 transition-colors duration-200">
 
   <!-- LINK ACESSÍVEL: PULAR PARA O CONTEÚDO PRINCIPAL (WCAG 2.1) -->
   <a 
     href="#chat-mensagens-container" 
-    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-indigo-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 text-xs font-bold transition"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2.5 focus:bg-slate-900 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 text-xs font-bold transition"
   >
     Pular para as mensagens do atendimento
   </a>
 
-  <!-- Glows de Fundo Decorativos -->
-  <div class="fixed -top-40 -left-40 w-96 h-96 bg-indigo-500/15 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
-  <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-violet-500/15 dark:bg-violet-600/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <!-- Glows de Fundo Decorativos Corporativos -->
+  <div class="fixed -top-40 -left-40 w-96 h-96 bg-slate-200/50 dark:bg-slate-800/20 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
+  <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-slate-300/40 dark:bg-slate-900/30 rounded-full blur-3xl pointer-events-none" aria-hidden="true"></div>
 
   <!-- CONTAINER PRINCIPAL DO CHATBOT (100dvh sem saltos no mobile) -->
   <div class="relative z-10 flex flex-col h-[100dvh] max-w-3xl w-full mx-auto shadow-2xl sm:my-3 sm:h-[calc(100dvh-1.5rem)] sm:rounded-3xl border-x-0 sm:border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl overflow-hidden">
@@ -198,7 +243,7 @@
       <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
         <!-- Avatar IA com Indicador de Status -->
         <div class="relative shrink-0" aria-hidden="true">
-          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-violet-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
+          <div class="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 flex items-center justify-center border border-slate-700/50 shadow-xs">
             <svg class="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
@@ -211,8 +256,8 @@
             <h1 id="chat-empresa-titulo" class="text-xs sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
               Atendimento Inteligente
             </h1>
-            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 dark:from-indigo-950/60 dark:to-violet-950/60 border border-indigo-300/60 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 shadow-xs shrink-0" aria-label="Assistente Virtual Oficial Conectado">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+            <span class="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 shadow-xs shrink-0" aria-label="Assistente Virtual Oficial Conectado">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true"></span>
               <span class="hidden sm:inline">Assistente Virtual Oficial</span>
               <span class="sm:hidden">IA Oficial</span>
             </span>
@@ -427,7 +472,7 @@
           type="submit" 
           id="btn-enviar-msg"
           aria-label="Enviar mensagem"
-          class="h-10 sm:h-11 px-3.5 sm:px-5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-2xl shadow-md shadow-indigo-500/25 transition active:scale-95 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+          class="h-10 sm:h-11 px-3.5 sm:px-5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white font-bold rounded-2xl shadow-xs border border-slate-900 dark:border-slate-100 transition active:scale-95 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           title="Enviar mensagem"
         >
           <span class="hidden sm:inline text-xs">Enviar</span>
@@ -1047,7 +1092,7 @@
 
       if (remetente === 'bot') {
         divMsg.innerHTML = `
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 flex items-center justify-center shrink-0 shadow-xs border border-slate-700/50 mt-0.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
           <div class="max-w-[92%] sm:max-w-[80%] space-y-1">
@@ -1071,13 +1116,13 @@
 
         divMsg.innerHTML = `
           <div class="max-w-[92%] sm:max-w-[80%] space-y-1 flex flex-col items-end">
-            <div class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl rounded-tr-sm p-3 sm:p-4 shadow-md shadow-indigo-600/20 leading-relaxed break-words">
+            <div class="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 rounded-2xl rounded-tr-sm p-3 sm:p-4 shadow-xs border border-slate-800 dark:border-slate-200 leading-relaxed break-words font-medium">
               ${anexoHtml}
               ${conteudoHtml ? `<div>${escapeHtml(conteudoHtml)}</div>` : ''}
             </div>
             <div class="text-[10px] text-slate-400 dark:text-slate-500 pr-1">${hora} &bull; Você</div>
           </div>
-          <div class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-200 flex items-center justify-center shrink-0 shadow-sm mt-0.5 font-bold text-xs">
+          <div class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-xs mt-0.5 font-bold text-xs">
             ${meta.iniciais || 'EU'}
           </div>
         `;
@@ -1103,7 +1148,7 @@
       divMsg.className = 'flex gap-2.5 sm:gap-3 animate-msg justify-start';
 
       divMsg.innerHTML = `
-        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+        <div class="w-8 h-8 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 flex items-center justify-center shrink-0 shadow-xs border border-slate-700/50 mt-0.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </div>
         <div class="max-w-[92%] sm:max-w-[80%] space-y-1">
@@ -1826,7 +1871,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
             <button 
               type="button" 
               onclick="confirmarECriarPedidoNoSupabase()"
-              class="w-full sm:w-auto flex-1 py-2.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+              class="w-full sm:w-auto flex-1 py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-xs shadow-xs border border-emerald-800 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
               <span>Confirmar e Enviar Pedido</span>
@@ -1948,7 +1993,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
           <div class="bg-slate-50 dark:bg-slate-900/80 p-3 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
             <div class="relative flex items-center justify-between mb-1">
               <div class="absolute top-3.5 sm:top-4 left-4 right-4 h-1 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 z-0 rounded-full"></div>
-              <div class="absolute top-3.5 sm:top-4 left-4 h-1 bg-gradient-to-r from-indigo-500 to-emerald-500 -translate-y-1/2 z-0 rounded-full transition-all duration-500" style="width: calc(${pctProgresso}% - 0.5rem);"></div>
+              <div class="absolute top-3.5 sm:top-4 left-4 h-1 bg-slate-900 dark:bg-slate-300 -translate-y-1/2 z-0 rounded-full transition-all duration-500" style="width: calc(${pctProgresso}% - 0.5rem);"></div>
               ${stepperHtml}
             </div>
           </div>
