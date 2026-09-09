@@ -411,19 +411,19 @@
       modeloIa: 'qwen/qwen3.8-27b',
       setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'],
       tabelaPrecos: [
-        { setor: 'Oficina', servico: 'Troca de Óleo e Filtro', valor: 180, prazo: '1 a 2 horas' },
-        { setor: 'Oficina', servico: 'Revisão de Freios e Pastilhas', valor: 250, prazo: '1 dia útil' },
-        { setor: 'Oficina', servico: 'Alinhamento e Balanceamento', valor: 120, prazo: '1 a 2 horas' },
-        { setor: 'Pet Shop', servico: 'Banho e Tosa Completa', valor: 85, prazo: '2 a 3 horas' },
-        { setor: 'Pet Shop', servico: 'Consulta Veterinária', valor: 140, prazo: 'Sob agendamento' },
-        { setor: 'Pet Shop', servico: 'Vacinação Polivalente', valor: 95, prazo: 'Imediato' },
-        { setor: 'Informática', servico: 'Formatação e Instalação de Windows/SSD', valor: 150, prazo: '24 horas' },
-        { setor: 'Informática', servico: 'Limpeza Interna e Troca de Pasta Térmica', valor: 120, prazo: '24 horas' },
-        { setor: 'Informática', servico: 'Upgrade de Memória RAM / SSD', valor: 90, prazo: 'Mesmo dia' },
-        { setor: 'Design', servico: 'Criação de Logotipo / Identidade Visual', valor: 350, prazo: '2 a 3 dias úteis' },
-        { setor: 'Design', servico: 'Arte para Banner ou Panfleto', valor: 120, prazo: '24 horas' },
-        { setor: 'Manutenção', servico: 'Visita Técnica / Diagnóstico no Local', valor: 100, prazo: 'Agendamento' },
-        { setor: 'Vendas', servico: 'Pedido Comercial de Produtos em Catálogo', valor: 0, prazo: 'Imediato' }
+        { setor: 'Oficina', servico: 'Troca de Óleo e Filtro', valor: 180, prazo: '1 a 2 horas', tags: ['oleo', 'filtro de oleo', 'lubrificante', 'troca de oleo', 'oleo do carro'] },
+        { setor: 'Oficina', servico: 'Revisão de Freios e Pastilhas', valor: 250, prazo: '1 dia útil', tags: ['freio', 'pastilha', 'disco de freio', 'freios', 'pastilhas'] },
+        { setor: 'Oficina', servico: 'Alinhamento e Balanceamento', valor: 120, prazo: '1 a 2 horas', tags: ['alinhamento', 'balanceamento', 'geometria', 'suspensao'] },
+        { setor: 'Pet Shop', servico: 'Banho e Tosa Completa', valor: 85, prazo: '2 a 3 horas', tags: ['banho', 'tosa', 'pet', 'cachorro', 'gato', 'tosar', 'banho e tosa'] },
+        { setor: 'Pet Shop', servico: 'Consulta Veterinária', valor: 140, prazo: 'Sob agendamento', tags: ['consulta', 'veterinario', 'veterinaria', 'vet', 'medico pet', 'consulta pet'] },
+        { setor: 'Pet Shop', servico: 'Vacinação Polivalente', valor: 95, prazo: 'Imediato', tags: ['vacina', 'vacinacao', 'vacinar', 'polivalente', 'v8', 'v10'] },
+        { setor: 'Informática', servico: 'Formatação e Instalação de Windows/SSD', valor: 150, prazo: '24 horas', tags: ['formatar', 'formatacao', 'windows', 'ssd', 'computador', 'notebook', 'pc', 'reinstalar'] },
+        { setor: 'Informática', servico: 'Limpeza Interna e Troca de Pasta Térmica', valor: 120, prazo: '24 horas', tags: ['limpeza interna', 'pasta termica', 'aquecendo', 'cooler', 'limpar notebook', 'limpar pc', 'limpeza e pasta termica'] },
+        { setor: 'Informática', servico: 'Upgrade de Memória RAM / SSD', valor: 90, prazo: 'Mesmo dia', tags: ['ram', 'memoria ram', 'upgrade de memoria', 'adicionar memoria'] },
+        { setor: 'Design', servico: 'Criação de Logotipo / Identidade Visual', valor: 350, prazo: '2 a 3 dias úteis', tags: ['logo', 'logotipo', 'marca', 'identidade visual', 'criar logo', 'criacao de logotipo'] },
+        { setor: 'Design', servico: 'Arte para Banner ou Panfleto', valor: 120, prazo: '24 horas', tags: ['banner', 'panfleto', 'flyer', 'folheto', 'social media', 'arte', 'cartaz'] },
+        { setor: 'Manutenção', servico: 'Visita Técnica / Diagnóstico no Local', valor: 100, prazo: 'Agendamento', tags: ['visita tecnica', 'diagnostico no local', 'conserto em domicilio', 'reparo em casa', 'visita'] },
+        { setor: 'Vendas', servico: 'Pedido Comercial de Produtos em Catálogo', valor: 0, prazo: 'Imediato', tags: ['comprar peca', 'catalogo de pecas', 'produto', 'catalogo'] }
       ]
     };
 
@@ -1093,6 +1093,66 @@
     // MOTOR DE IA CONVERSACIONAL INTELIGENTE (NLP + GROQ QWEN 3.8 27B)
     // ==============================================================================
 
+    // Utilitário de Normalização Fonética e Acentos
+    function normalizarTexto(str) {
+      return String(str || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    // Buscador Especializado de Orçamentos e Preços de Referência por Tags e Especificidade
+    function obterOrcamentoServico(texto) {
+      if (!texto || !Array.isArray(configuracaoChat.tabelaPrecos)) return null;
+      const norm = normalizarTexto(texto);
+      
+      let melhorItem = null;
+      let melhorPontuacao = 0;
+
+      // 1. Match por tags específicas com pontuação por tamanho do termo (mais específico vence)
+      for (const it of configuracaoChat.tabelaPrecos) {
+        if (Array.isArray(it.tags)) {
+          for (const tag of it.tags) {
+            const tagNorm = normalizarTexto(tag);
+            if (norm.includes(tagNorm)) {
+              const score = tagNorm.length;
+              if (score > melhorPontuacao) {
+                melhorPontuacao = score;
+                melhorItem = it;
+              }
+            }
+          }
+        }
+      }
+
+      if (melhorItem) return melhorItem;
+
+      // 2. Match por nome do serviço ou palavras significativas (evitando stop words)
+      const stopWords = ['troca', 'servico', 'completa', 'instalacao', 'revisao', 'criacao', 'pedido', 'manutencao', 'geral'];
+      for (const it of configuracaoChat.tabelaPrecos) {
+        const sNorm = normalizarTexto(it.servico);
+        if (norm.includes(sNorm)) {
+          const score = sNorm.length + 10;
+          if (score > melhorPontuacao) {
+            melhorPontuacao = score;
+            melhorItem = it;
+          }
+        }
+        const words = sNorm.split(/\s+/).filter(w => w.length > 3 && !stopWords.includes(w));
+        for (const w of words) {
+          if (norm.includes(w)) {
+            const score = w.length;
+            if (score > melhorPontuacao) {
+              melhorPontuacao = score;
+              melhorItem = it;
+            }
+          }
+        }
+      }
+
+      return melhorItem;
+    }
+
     // Detector e Extrator Especializado de Correção de Nome
     function extrairNovoNome(texto) {
       const t = String(texto || '').trim();
@@ -1218,23 +1278,16 @@
       }
 
       // 6. Mapeamento Automático com Tabela de Preços de Referência & Orçamentos
-      if (Array.isArray(configuracaoChat.tabelaPrecos)) {
-        const tLower = texto.toLowerCase();
-        for (const item of configuracaoChat.tabelaPrecos) {
-          const sLower = item.servico.toLowerCase();
-          const palavrasChave = sLower.split(/\s+/).filter(w => w.length > 3);
-          const coincide = palavrasChave.some(p => tLower.includes(p));
-          if (coincide) {
-            if (!extraido.servico && !dadosPedidoEmConstrucao.servico) {
-              extraido.servico = item.servico;
-            }
-            if (!extraido.setor && dadosPedidoEmConstrucao.setor === 'Geral') {
-              extraido.setor = item.setor;
-            }
-            if (!extraido.valor && !dadosPedidoEmConstrucao.valor && item.valor > 0) {
-              extraido.valor = item.valor;
-            }
-          }
+      const orcamentoEncontrado = obterOrcamentoServico(texto);
+      if (orcamentoEncontrado) {
+        if (!extraido.servico && !dadosPedidoEmConstrucao.servico) {
+          extraido.servico = orcamentoEncontrado.servico;
+        }
+        if (!extraido.setor && (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral')) {
+          extraido.setor = orcamentoEncontrado.setor;
+        }
+        if (!extraido.valor && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0) && orcamentoEncontrado.valor > 0) {
+          extraido.valor = orcamentoEncontrado.valor;
         }
       }
 
@@ -1504,15 +1557,83 @@
         return;
       }
 
+      // INTENÇÃO: Preços de Referência, Orçamentos & Valores
+      const pediuPrecoOuOrcamento = /(?:quanto\s+(?:custa|fica|sai|vale|cobra|cobram)|qual\s+(?:o\s+)?(?:pre[çc]o|valor|or[çc]amento)|tabela\s+(?:de\s+)?pre[çc]os?|or[çc]amento|tabela\s+de\s+valores|valores\s+dos\s+servi[çc]os|pre[çc]o|precos)/i.test(textoLower);
+
+      if (pediuPrecoOuOrcamento) {
+        const orcamento = obterOrcamentoServico(texto) || (dadosPedidoEmConstrucao.servico ? obterOrcamentoServico(dadosPedidoEmConstrucao.servico) : null);
+        
+        if (orcamento) {
+          if (!dadosPedidoEmConstrucao.servico) dadosPedidoEmConstrucao.servico = orcamento.servico;
+          if (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = orcamento.setor;
+          if (!dadosPedidoEmConstrucao.valor) dadosPedidoEmConstrucao.valor = orcamento.valor;
+
+          const valorFmt = orcamento.valor > 0 
+            ? Number(orcamento.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            : 'Sob consulta / A combinar';
+
+          adicionarMensagem('bot', `
+            💰 <strong>Orçamento & Preço de Referência:</strong><br/>
+            O serviço <strong>${escapeHtml(orcamento.servico)}</strong> (Setor: ${escapeHtml(orcamento.setor)}) possui valor estimado de:
+            <div class="my-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Valor Estimado:</span>
+                <strong class="text-emerald-600 dark:text-emerald-400 text-base font-extrabold">${valorFmt}</strong>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Prazo Médio:</span>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${orcamento.prazo || '24h a 48h'}</span>
+              </div>
+            </div>
+            🛡️ <em>Inclui garantia legal de 90 dias e pagamento facilitado via PIX, Cartão em até 12x ou Dinheiro.</em><br/><br/>
+            Gostaria de agendar ou solicitar esse serviço agora?
+          `);
+
+          atualizarSugestoes([
+            { texto: '✅ Quero agendar este serviço', valor: `Quero agendar ${orcamento.servico}` },
+            { texto: '💳 Formas de pagamento', valor: 'Quais formas de pagamento vocês aceitam?' },
+            { texto: '📋 Ver outros preços', valor: 'Qual a tabela de preços?' }
+          ]);
+          return;
+        } else {
+          // Consulta geral de preços (mini-catálogo com destaques)
+          const itensDestaque = (configuracaoChat.tabelaPrecos || []).slice(0, 6);
+          adicionarMensagem('bot', `
+            📋 <strong>Tabela de Preços e Serviços em Destaque:</strong><br/>
+            Confira abaixo os valores médios de referência dos nossos principais serviços:
+            <div class="mt-2.5 space-y-1.5 text-xs">
+              ${itensDestaque.map(item => `
+                <div class="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200/80 dark:border-slate-800">
+                  <div>
+                    <strong class="text-slate-800 dark:text-slate-100">${escapeHtml(item.servico)}</strong>
+                    <span class="block text-[10px] text-slate-500 dark:text-slate-400">${escapeHtml(item.setor)} • Prazo: ${item.prazo}</span>
+                  </div>
+                  <strong class="text-emerald-600 dark:text-emerald-400 font-bold ml-2 shrink-0">${item.valor > 0 ? Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'A combinar'}</strong>
+                </div>
+              `).join('')}
+            </div>
+            <p class="mt-2.5 text-xs text-slate-600 dark:text-slate-300">Qual desses serviços você gostaria de solicitar?</p>
+          `);
+
+          atualizarSugestoes(itensDestaque.slice(0, 4).map(i => ({
+            texto: `${i.servico.split(' ')[0]} - R$ ${i.valor}`,
+            valor: `Quero ${i.servico}`
+          })));
+          return;
+        }
+      }
 
       // Coleta em Estágios
       if (etapaColetaAtual === 'inicio' || etapaColetaAtual === 'nome') {
         let nome = entidades.cliente;
         if (!nome) {
           // Se for resposta direta com apenas o nome (ex: "Carlos Eduardo" ou "Sou Maria")
-          const limpo = texto.replace(/^(olá|oi|bom dia|boa tarde|boa noite|sou|meu nome é|me chamo|o meu é)\s*/i, '').trim();
-          if (limpo.length >= 2 && !limpo.includes('pedido')) {
-            nome = limpo;
+          const ehPerguntaOuIntencao = /(?:quanto|qual|como|onde|quando|quem|por\s*que|pre[çc]o|valor|or[çc]amento|pedido|duvida|ajuda|ola|olá|bom\s+dia|boa\s+tarde|boa\s+noite|troca|conserto|reparo|manutencao|limpeza)/i.test(textoLower);
+          if (!ehPerguntaOuIntencao) {
+            const limpo = texto.replace(/^(?:olá|oi|bom dia|boa tarde|boa noite|sou\s+o|sou\s+a|sou|meu nome é|me chamo|o meu é)\s*/i, '').trim();
+            if (limpo.length >= 2 && limpo.length <= 40 && !/^(pedido|quero|gostaria|sim|nao|não|ok|errado|certo|ajuda|cancelar)$/i.test(limpo)) {
+              nome = limpo;
+            }
           }
         }
 
@@ -1521,6 +1642,7 @@
           // Se na mesma mensagem o cliente já passou o telefone
           if (entidades.telefone) dadosPedidoEmConstrucao.telefone = entidades.telefone;
           if (entidades.servico) dadosPedidoEmConstrucao.servico = entidades.servico;
+          if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
 
           etapaColetaAtual = 'telefone';
           if (!dadosPedidoEmConstrucao.telefone) {
@@ -1535,7 +1657,7 @@
             return;
           }
         } else {
-          adicionarMensagem('bot', `Olá! Para iniciarmos seu pedido, por favor, me informe o seu <strong>nome completo</strong>.`);
+          adicionarMensagem('bot', `Olá! Para iniciarmos seu atendimento ou pedido, por favor, me informe o seu <strong>nome completo</strong>.`);
           return;
         }
       }
@@ -1560,9 +1682,10 @@
             <span class="text-xs text-slate-400">Pode detalhar o que precisa (Ex: Troca de óleo, Banho e tosa, Formatação, Criação de Banner, etc.)</span>
           `);
           atualizarSugestoes([
-            { texto: 'Manutenção Geral', icone: '🛠️' },
-            { texto: 'Atendimento de Suporte', icone: '💻' },
-            { texto: 'Orçamento Personalizado', icone: '📋' }
+            { texto: 'Troca de Óleo', icone: '🛢️' },
+            { texto: 'Formatação de PC', icone: '💻' },
+            { texto: 'Banho e Tosa', icone: '🐾' },
+            { texto: 'Criação de Banner', icone: '🎨' }
           ]);
           return;
         } else {
@@ -1573,19 +1696,66 @@
 
       if (etapaColetaAtual === 'servico') {
         dadosPedidoEmConstrucao.servico = texto;
+
+        // Identificar orçamento e preço de referência para o serviço informado
+        const orcamento = obterOrcamentoServico(texto) || (entidades.valor ? { valor: entidades.valor, setor: entidades.setor, prazo: 'A combinar' } : null);
+
+        if (orcamento) {
+          if (orcamento.valor && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) {
+            dadosPedidoEmConstrucao.valor = orcamento.valor;
+          }
+          if (orcamento.setor && (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral')) {
+            dadosPedidoEmConstrucao.setor = orcamento.setor;
+          }
+        }
+
         if (entidades.setor) dadosPedidoEmConstrucao.setor = entidades.setor;
         if (entidades.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidades.data_pedido;
         if (entidades.valor) dadosPedidoEmConstrucao.valor = entidades.valor;
 
-        etapaColetaAtual = 'setor';
-        const setores = configuracaoChat.setoresDisponiveis || ['Geral', 'Oficina', 'Vendas'];
-        
-        adicionarMensagem('bot', `
-          Excelente! Entendi sua solicitação: <strong>"${escapeHtml(texto)}"</strong>. 🎯<br/><br/>
-          A qual <strong>setor ou categoria</strong> esse pedido melhor se encaixa? Clique em uma das opções abaixo ou digite:
-        `);
+        const valorFmt = dadosPedidoEmConstrucao.valor > 0 
+          ? Number(dadosPedidoEmConstrucao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+          : (orcamento?.valor > 0 ? Number(orcamento.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta / A combinar');
 
-        atualizarSugestoes(setores.map(s => ({ texto: s, valor: s, icone: '🏷️' })));
+        const prazoFmt = orcamento?.prazo || '24h a 48h';
+
+        const cardPrecoHtml = `
+          <div class="my-2.5 p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/70 rounded-xl">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Valor de Referência / Estimado:</span>
+                <strong class="text-emerald-600 dark:text-emerald-400 text-base font-extrabold">${valorFmt}</strong>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Prazo Médio:</span>
+                <span class="text-xs font-bold text-slate-700 dark:text-slate-300">${prazoFmt}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        if (dadosPedidoEmConstrucao.setor && dadosPedidoEmConstrucao.setor !== 'Geral') {
+          etapaColetaAtual = 'data';
+          adicionarMensagem('bot', `
+            Excelente! Entendi sua solicitação: <strong>"${escapeHtml(texto)}"</strong> (Setor: <strong>${escapeHtml(dadosPedidoEmConstrucao.setor)}</strong>). 🎯<br/>
+            ${cardPrecoHtml}
+            Para quando você gostaria de agendar ou receber esse pedido? (Ex: <em>Hoje</em>, <em>Amanhã às 14h</em>, <em>Sexta-feira</em>, etc.)
+          `);
+          atualizarSugestoes([
+            { texto: 'Hoje o quanto antes', icone: '⚡' },
+            { texto: 'Amanhã pela manhã', icone: '🌅' },
+            { texto: 'Neste final de semana', icone: '📅' }
+          ]);
+        } else {
+          etapaColetaAtual = 'setor';
+          const setores = configuracaoChat.setoresDisponiveis || ['Geral', 'Oficina', 'Vendas'];
+          adicionarMensagem('bot', `
+            Excelente! Entendi sua solicitação: <strong>"${escapeHtml(texto)}"</strong>. 🎯<br/>
+            ${cardPrecoHtml}
+            A qual <strong>setor ou categoria</strong> esse pedido melhor se encaixa? Clique em uma das opções abaixo ou digite:
+          `);
+          atualizarSugestoes(setores.map(s => ({ texto: s, valor: s, icone: '🏷️' })));
+        }
         return;
       }
 
@@ -1682,6 +1852,10 @@
               <span class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold text-[11px]">${escapeHtml(p.setor || 'Geral')}</span>
             </div>
             <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+              <span class="text-slate-500 dark:text-slate-400">Valor Estimado:</span>
+              <strong class="text-emerald-600 dark:text-emerald-400 font-bold">${p.valor && p.valor > 0 ? Number(p.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta / A combinar'}</strong>
+            </div>
+            <div class="flex justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
               <span class="text-slate-500 dark:text-slate-400">Data / Horário:</span>
               <strong class="text-slate-900 dark:text-white font-bold">${escapeHtml(p.data_pedido || 'Imediato')}</strong>
             </div>
@@ -1716,12 +1890,20 @@
       atualizarSugestoes([
         { texto: 'Confirmar Pedido Agora', icone: '✅' },
         { texto: 'Mudar a Data', icone: '📅' },
-        { texto: 'Mudar o Telefone', icone: '📱' }
+        { texto: 'Mudar o Telefone', icone: '📱' },
+        { texto: 'Alterar Serviço', icone: '🛠️' }
       ]);
     }
 
     function solicitarAlteracaoDados() {
-      adicionarMensagem('bot', 'Qual dado você gostaria de alterar? Pode escrever diretamente (ex: "Meu telefone é 11988887777" ou "Data para sexta às 10h").');
+      adicionarMensagem('bot', 'Qual informação você gostaria de alterar? Você pode clicar em uma das sugestões abaixo ou me dizer diretamente:');
+      atualizarSugestoes([
+        { texto: '👤 Corrigir Nome', valor: 'Corrigir meu nome para ' },
+        { texto: '📱 Alterar WhatsApp', valor: 'Mudar meu telefone para ' },
+        { texto: '🛠️ Alterar Serviço', valor: 'Quero mudar o serviço para ' },
+        { texto: '📅 Alterar Data', valor: 'Mudar a data para ' },
+        { texto: '💰 Consultar Preço', valor: 'Qual o valor deste serviço?' }
+      ]);
     }
 
     // ==============================================================================
@@ -1989,6 +2171,7 @@
               <p><strong>Número do Pedido:</strong> #${idGerado}</p>
               <p><strong>Cliente:</strong> ${escapeHtml(payload.cliente)}</p>
               <p><strong>Serviço:</strong> ${escapeHtml(payload.servico)}</p>
+              <p><strong>Valor Estimado:</strong> <strong class="text-emerald-600 dark:text-emerald-400 font-bold">${payload.valor > 0 ? Number(payload.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta / A combinar'}</strong></p>
               <p><strong>Status:</strong> <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold text-[10px]">Pendente de Atendimento</span></p>
             </div>
 
@@ -2073,7 +2256,12 @@ ONTOLOGIA DO SISTEMA & ESTRUTURA OPERACIONAL
 
 4. TABELA DE PREÇOS DE REFERÊNCIA & ORÇAMENTOS ESTIMADOS:
    ${(configuracaoChat.tabelaPrecos || []).map(p => `- [${p.setor}] ${p.servico}: R$ ${p.valor},00 (Prazo: ${p.prazo})`).join('\n   ')}
-   Quando o cliente perguntar valores ou solicitar orçamento, use esses valores de referência para dar estimativas precisas e preencher o campo "valor" no JSON!
+
+   REGRA MANDATÓRIA DE PREÇOS E VALORES (MÁXIMA PRIORIDADE):
+   - SEMPRE que o cliente mencionar, solicitar ou tiver interesse em qualquer serviço ou produto, você DEVE OBRIGATORIAMENTE CITAR O VALOR ESTIMADO DE REFERÊNCIA (ex: "O valor estimado para Troca de Óleo é R$ 180,00 com prazo de 1 a 2 horas") diretamente na sua "mensagem".
+   - Preencha SEMPRE o campo "dadosAtualizados.valor" com o valor numérico da tabela correspondente (ex: 180).
+   - Se o cliente perguntar "quanto custa?", "qual o valor?", ou solicitar orçamento, responda informando o preço e o prazo do serviço específico ou apresente os valores dos nossos serviços principais.
+   - NUNCA deixe de informar o preço quando o cliente disser qual serviço deseja!
 
 5. CORREÇÃO E ATUALIZAÇÃO DE DADOS (PRIORIDADE MÁXIMA):
    - Se o cliente informar que errou o nome, que o nome foi enviado errado, ou pedir para corrigir/mudar o nome (ex: "mandei meu nome errado", "errei meu nome, é Carlos", "meu nome não é João, é Lucas", "corrija meu nome para Carlos", "na verdade me chamo Pedro", "muda meu nome para Arthur"):
@@ -2252,6 +2440,25 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown de código e sem 
             if (entidadesLocais.telefone && !dadosPedidoEmConstrucao.telefone) dadosPedidoEmConstrucao.telefone = entidadesLocais.telefone;
             if (entidadesLocais.data_pedido && !dadosPedidoEmConstrucao.data_pedido) dadosPedidoEmConstrucao.data_pedido = entidadesLocais.data_pedido;
             if (entidadesLocais.setor && dadosPedidoEmConstrucao.setor === 'Geral') dadosPedidoEmConstrucao.setor = entidadesLocais.setor;
+            if (entidadesLocais.valor && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) dadosPedidoEmConstrucao.valor = entidadesLocais.valor;
+
+            // Garantir que o orçamento e valor de referência sejam extraídos se o serviço foi fornecido
+            if (dadosPedidoEmConstrucao.servico && (!dadosPedidoEmConstrucao.valor || dadosPedidoEmConstrucao.valor === 0)) {
+              const orc = obterOrcamentoServico(dadosPedidoEmConstrucao.servico) || obterOrcamentoServico(textoUsuario);
+              if (orc && orc.valor > 0) {
+                dadosPedidoEmConstrucao.valor = orc.valor;
+                if (!dadosPedidoEmConstrucao.setor || dadosPedidoEmConstrucao.setor === 'Geral') {
+                  dadosPedidoEmConstrucao.setor = orc.setor;
+                }
+              }
+            }
+
+            // Se o modelo não mencionou o preço explicitamente na resposta e temos orçamento para o serviço
+            if (dadosPedidoEmConstrucao.valor > 0 && !respostaObj.mensagem.includes('R$') && !respostaObj.mensagem.includes('reais') && !respostaObj.mensagem.includes('valor')) {
+              const orc = obterOrcamentoServico(dadosPedidoEmConstrucao.servico || textoUsuario);
+              const prazoTexto = orc?.prazo ? ` (Prazo médio: ${orc.prazo})` : '';
+              respostaObj.mensagem += `<br/><br/>💡 <em>Valor estimado de referência: <strong>${Number(dadosPedidoEmConstrucao.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>${prazoTexto}.</em>`;
+            }
 
             if (respostaObj.acao === 'EDITAR_PEDIDO' || novoNomeLocal) {
               salvarSessaoNoStorage();
