@@ -1,6 +1,28 @@
+# Dependências
 node_modules/
+.pnpm-store/
+
+# Variáveis de Ambiente e Segredos (NUNCA versionar)
 .env
 .env.local
+.env.*.local
+*.pem
+*.key
+*.cert
+credentials.json
+secrets/
+
+# Supabase temporários e caches locais
 supabase/.temp/
+.supabase/
+
+# Arquivos do Sistema Operacional
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo

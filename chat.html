@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
   <title>Atendimento &amp; Novos Pedidos &bull; Assistente Virtual IA</title>
   <meta name="description" content="Faça seu pedido ou solicite um orçamento de forma rápida e inteligente com nosso assistente virtual com IA integrado ao sistema de pedidos." />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <!-- NOTA: Tailwind Play CDN e Supabase-JS via CDN sem SRI: para produção, prefira build local + pin + integrity. -->
 
   <!-- Tipografia Google Fonts: Plus Jakarta Sans com suporte a Numerais Tabulares -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -419,7 +421,7 @@
             id="chat-input-texto"
             aria-label="Mensagem para o assistente virtual"
             placeholder="Digite sua mensagem ou descreva o pedido..."
-            autocomplete="off"
+            autocomplete="off" maxlength="2000"
             class="w-full pl-3.5 sm:pl-4 pr-9 sm:pr-10 py-2.5 sm:py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-2xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition shadow-inner"
           />
           <button 
@@ -495,14 +497,31 @@
 
   </div>
 
+  <!-- CONFIGURAÇÃO EXTERNALIZADA -->
+  <script src="config.js"></script>
+
   <!-- JAVASCRIPT DO CHATBOT -->
   <script>
     // ==============================================================================
     // CONFIGURAÇÃO DO SUPABASE & AMBIENTE
     // ==============================================================================
-    const SUPABASE_URL = 'https://xqmzysjzopyuelvhokwm.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_RfIxDPxwUdyzsaXXsa2tIw_XRvfyxAn';
+    const APP_CONFIG = window.__APP_CONFIG__ || {};
+    const SUPABASE_URL = APP_CONFIG.SUPABASE_URL || 'https://xqmzysjzopyuelvhokwm.supabase.co';
+    // Chave publishable: segura SOMENTE com RLS endurecido (sem SELECT/INSERT anon
+    // direto; chatbot usa apenas RPCs criar/consultar/avaliar + Edge Function).
+    const SUPABASE_KEY = APP_CONFIG.SUPABASE_ANON_KEY || 'sb_publishable_RfIxDPxwUdyzsaXXsa2tIw_XRvfyxAn';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+    // Limites anti-abuso no cliente (validação real está na Edge Function e nas RPCs)
+    const LIMITE_TEXTO_MSG = 2000;
+    const LIMITE_ANEXO_BYTES = 5 * 1024 * 1024;
+    const LIMITE_AUDIO_BYTES = 5 * 1024 * 1024;
+    const MODELOS_PERMITIDOS_CHAT = ['qwen/qwen3-32b', 'qwen/qwen3-8b', 'llama-3.3-70b-versatile'];
+    const MODELO_PADRAO_CHAT = 'qwen/qwen3-32b';
+    const SETORES_PERMITIDOS = ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'];
+    let ultimoEnvioTimestamp = 0;
+    let isEnviandoPedido = false;
 
     // ESTADO DA CONVERSA E DADOS DO PEDIDO
     let dadosPedidoEmConstrucao = {
@@ -532,8 +551,8 @@
 
     let configuracaoChat = {
       nomeEmpresa: 'Nossa Empresa',
-      groqApiKey: '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', // Chave Groq ativa como fallback imediato
-      modeloIa: 'qwen/qwen3.8-27b',
+      // NUNCA coloque groqApiKey aqui. A chave fica só nos Secrets da Edge Function.
+      modeloIa: 'qwen/qwen3-32b',
       setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'],
       tabelaPrecos: [
         { setor: 'Oficina', servico: 'Troca de Óleo e Filtro', valor: 180, prazo: '1 a 2 horas', tags: ['oleo', 'filtro de oleo', 'lubrificante', 'troca de oleo', 'oleo do carro'] },
@@ -572,19 +591,21 @@
 
         const configLocal = localStorage.getItem('painel_chat_config');
         if (configLocal) {
-          const parse = JSON.parse(configLocal);
-          configuracaoChat = { ...configuracaoChat, ...parse };
+          try {
+            const parse = JSON.parse(configLocal);
+            // Allowlist: nunca hidrata segredos do storage local
+            if (parse.nomeEmpresa) configuracaoChat.nomeEmpresa = String(parse.nomeEmpresa).slice(0, 80);
+            if (Array.isArray(parse.setoresDisponiveis)) configuracaoChat.setoresDisponiveis = parse.setoresDisponiveis.filter(s => SETORES_PERMITIDOS.includes(s));
+            if (Array.isArray(parse.tabelaPrecos)) configuracaoChat.tabelaPrecos = parse.tabelaPrecos;
+            if (parse.modeloIa && MODELOS_PERMITIDOS_CHAT.includes(parse.modeloIa)) configuracaoChat.modeloIa = parse.modeloIa;
+          } catch { /* storage corrompido: ignora */ }
         }
 
-        // Chave Groq via URL param se fornecida (ou chave customizada)
+        // Parâmetro de URL: permite APENAS modelo da allowlist. NUNCA chave via URL.
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('groq_key')) {
-          configuracaoChat.groqApiKey = urlParams.get('groq_key');
-        } else if (urlParams.has('gemini_key') && !configuracaoChat.groqApiKey) {
-          configuracaoChat.groqApiKey = urlParams.get('gemini_key');
-        }
-        if (urlParams.has('model')) {
-          configuracaoChat.modeloIa = urlParams.get('model');
+        const modeloUrl = urlParams.get('model');
+        if (modeloUrl && MODELOS_PERMITIDOS_CHAT.includes(modeloUrl)) {
+          configuracaoChat.modeloIa = modeloUrl;
         }
 
         if (configuracaoChat.nomeEmpresa && configuracaoChat.nomeEmpresa !== 'Nossa Empresa') {
@@ -592,33 +613,32 @@
           if (tit) tit.textContent = configuracaoChat.nomeEmpresa;
         }
 
-        // Sincronização remota automática com configurações salvas no painel Supabase
+        // Config pública (sem segredos) via tabela dedicada — nunca via pedidos.__sistema_config__
         try {
           const { data: configRemota } = await supabaseClient
-            .from('pedidos')
-            .select('observacoes')
-            .eq('setor', '__sistema_config__')
+            .from('configuracoes_chatbot')
+            .select('valor')
+            .eq('chave', 'public_config')
             .maybeSingle();
 
-          if (configRemota && configRemota.observacoes) {
-            const remParsed = JSON.parse(configRemota.observacoes);
+          if (configRemota && configRemota.valor) {
+            const remParsed = typeof configRemota.valor === 'string' ? JSON.parse(configRemota.valor) : configRemota.valor;
             if (remParsed.nomeEmpresa && remParsed.nomeEmpresa !== 'Nossa Empresa') {
-              configuracaoChat.nomeEmpresa = remParsed.nomeEmpresa;
+              configuracaoChat.nomeEmpresa = String(remParsed.nomeEmpresa).slice(0, 80);
               const tit = document.getElementById('chat-empresa-titulo');
-              if (tit) tit.textContent = remParsed.nomeEmpresa;
+              if (tit) tit.textContent = configuracaoChat.nomeEmpresa;
             }
             if (Array.isArray(remParsed.setoresDisponiveis) && remParsed.setoresDisponiveis.length) {
-              configuracaoChat.setoresDisponiveis = remParsed.setoresDisponiveis;
+              const filtrados = remParsed.setoresDisponiveis.filter(s => SETORES_PERMITIDOS.includes(s));
+              if (filtrados.length) configuracaoChat.setoresDisponiveis = filtrados;
             }
-            if (remParsed.groqApiKey && (!configuracaoChat.groqApiKey || configuracaoChat.groqApiKey.length < 15)) {
-              configuracaoChat.groqApiKey = remParsed.groqApiKey;
-            }
+            // groqApiKey NUNCA vem do banco/frontend.
           }
         } catch (eSync) {
           // Continua normalmente caso offline ou sem permissão
         }
-      } catch (e) {
-        console.warn('Erro ao carregar configurações do chat:', e);
+      } catch {
+        // Silencia erro de carregamento sem vazar internals
       }
     }
 
@@ -756,8 +776,8 @@
           if (banner) banner.classList.remove('hidden');
           return true;
         }
-      } catch (e) {
-        console.warn('Erro ao verificar sessão salva:', e);
+      } catch {
+        // Silencia erro de leitura do storage
       }
       return false;
     }
@@ -765,20 +785,37 @@
     function restaurarSessaoAnterior() {
       try {
         const raw = sessionStorage.getItem(STORAGE_KEY_SESSAO);
-        if (!raw) return;
+        if (!raw || raw.length > 50000) { sessionStorage.removeItem(STORAGE_KEY_SESSAO); return; }
         const sessao = JSON.parse(raw);
+        if (!sessao || typeof sessao !== 'object') return;
 
-        if (sessao.dados) dadosPedidoEmConstrucao = sessao.dados;
-        if (sessao.etapa) etapaColetaAtual = sessao.etapa;
-        if (Array.isArray(sessao.historico)) historicoMensagens = sessao.historico;
-        if (sessao.aguardandoCorrecaoNome !== undefined) aguardandoCorrecaoNome = sessao.aguardandoCorrecaoNome;
+        // Valida schema antes de hidratar (anti XSS persistente via storage editado)
+        if (sessao.dados && typeof sessao.dados === 'object') {
+          dadosPedidoEmConstrucao = {
+            cliente: String(sessao.dados.cliente || '').slice(0, 120),
+            telefone: String(sessao.dados.telefone || '').slice(0, 30),
+            setor: SETORES_PERMITIDOS.includes(sessao.dados.setor) ? sessao.dados.setor : 'Geral',
+            servico: String(sessao.dados.servico || '').slice(0, 200),
+            valor: Number.isFinite(Number(sessao.dados.valor)) ? Math.min(1000000, Math.max(0, Number(sessao.dados.valor))) : 0,
+            data_pedido: String(sessao.dados.data_pedido || '').slice(0, 60),
+            observacoes: String(sessao.dados.observacoes || '').slice(0, 1000)
+          };
+        }
+        if (['inicio','nome','telefone','servico','setor','data','confirmacao'].includes(sessao.etapa)) etapaColetaAtual = sessao.etapa;
+        if (Array.isArray(sessao.historico)) {
+          historicoMensagens = sessao.historico
+            .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+            .slice(-16)
+            .map(m => ({ role: m.role, content: String(m.content).slice(0, 350) }));
+        }
+        if (typeof sessao.aguardandoCorrecaoNome === 'boolean') aguardandoCorrecaoNome = sessao.aguardandoCorrecaoNome;
 
         const banner = document.getElementById('banner-restaurar-sessao');
         if (banner) banner.classList.add('hidden');
 
         const container = document.getElementById('chat-mensagens-container');
         if (container) {
-          container.innerHTML = '';
+          container.textContent = '';
           for (const msg of historicoMensagens) {
             adicionarMensagem(msg.role === 'assistant' ? 'bot' : 'usuario', msg.content, { skipSave: true });
           }
@@ -795,8 +832,9 @@
             { texto: '🔄 Recomeçar do Zero', valor: 'Recomeçar' }
           ]);
         }
-      } catch (e) {
-        console.error('Erro ao restaurar sessão:', e);
+      } catch {
+        // Silencia falha de restauração e reinicia limpo
+        sessionStorage.removeItem(STORAGE_KEY_SESSAO);
       }
     }
 
@@ -815,8 +853,15 @@
       const file = event.target.files?.[0];
       if (!file) return;
 
-      if (!file.type.startsWith('image/')) {
-        alert('Por favor, selecione um arquivo de imagem (JPEG, PNG, WebP).');
+      // Validação estrita: tamanho + tipo (SVG bloqueado = XSS via <script>)
+      if (file.size > LIMITE_ANEXO_BYTES) {
+        alert('Imagem muito grande. Envie uma foto de até 5MB.');
+        event.target.value = '';
+        return;
+      }
+      const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!tiposPermitidos.includes(file.type)) {
+        alert('Por favor, selecione uma foto JPEG, PNG ou WebP (até 5MB).');
         event.target.value = '';
         return;
       }
@@ -856,9 +901,11 @@
 
           const tamanhoKb = Math.round((base64Otimizado.length * 3) / 4 / 1024);
 
+          // Sanitiza nome do arquivo (sem path, sem HTML, limite 80 chars)
+          const nomeLimpo = String(file.name || 'foto.jpg').split(/[/\\]/).pop().slice(0, 80);
           anexoImagemAtual = {
             base64: base64Otimizado,
-            nome: file.name,
+            nome: nomeLimpo,
             tamanhoKb
           };
 
@@ -967,8 +1014,7 @@
           }
         }, 1000);
 
-      } catch (err) {
-        console.error('Erro ao acessar microfone:', err);
+      } catch {
         alert('Não foi possível acessar o microfone. Por favor, autorize a permissão no navegador.');
       }
     }
@@ -1004,7 +1050,14 @@
 
     async function transcreverAudioComGroqWhisper(blob) {
       exibirDigitando(true);
+      // Timeout para não travar o "digitando" para sempre
+      const ctrl = new AbortController();
+      const timerAbort = setTimeout(() => ctrl.abort(), 45000);
       try {
+        if (!blob || blob.size === 0 || blob.size > LIMITE_AUDIO_BYTES) {
+          adicionarMensagem('bot', '🎤 Áudio muito grande (limite 5MB). Tente uma gravação mais curta ou envie por texto.', { htmlSeguro: true });
+          return;
+        }
         const formData = new FormData();
         formData.append('file', blob, 'gravacao.webm');
 
@@ -1013,54 +1066,34 @@
           'Authorization': `Bearer ${SUPABASE_KEY}`
         };
 
-        if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
-          headers['x-groq-key'] = configuracaoChat.groqApiKey;
-        }
-
-        // 1. Envia prioritariamente para a Supabase Edge Function 'chat-ia'
+        // SOMENTE via Edge Function (chave no servidor). Sem fallback direto.
         let textoTranscrito = '';
         try {
           const res = await fetch(`${SUPABASE_URL}/functions/v1/chat-ia`, {
             method: 'POST',
             headers,
-            body: formData
+            body: formData,
+            signal: ctrl.signal
           });
 
           if (res.ok) {
-            const data = await res.json();
-            textoTranscrito = data.text ? data.text.trim() : '';
+            let data = null;
+            try { data = await res.json(); } catch { data = null; }
+            textoTranscrito = data && data.text ? String(data.text).trim().slice(0, LIMITE_TEXTO_MSG) : '';
           }
         } catch (eEdge) {
-          console.warn('Tentativa via Edge Function para áudio falhou:', eEdge);
-        }
-
-        // 2. Fallback caso a Edge Function não esteja publicada e haja chave no storage
-        if (!textoTranscrito && configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
-          formData.append('model', 'whisper-large-v3-turbo');
-          formData.append('language', 'pt');
-          formData.append('response_format', 'json');
-          const resDirect = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${configuracaoChat.groqApiKey}`
-            },
-            body: formData
-          });
-          if (resDirect.ok) {
-            const dataDirect = await resDirect.json();
-            textoTranscrito = dataDirect.text ? dataDirect.text.trim() : '';
-          }
+          // Silencia detalhe técnico do provedor
         }
 
         if (textoTranscrito) {
           processarEnvioMensagem(textoTranscrito);
         } else {
-          adicionarMensagem('bot', '🎤 Não foi possível transcrever o áudio no momento. Você pode tentar falar novamente ou enviar sua mensagem por texto.');
+          adicionarMensagem('bot', '🎤 Não foi possível transcrever o áudio no momento. Você pode tentar falar novamente ou enviar sua mensagem por texto.', { htmlSeguro: true });
         }
       } catch (err) {
-        console.error('Erro na transcrição de voz:', err);
-        adicionarMensagem('bot', '🎤 Tive uma instabilidade ao transcrever seu áudio. Pode enviar por texto, por favor?');
+        adicionarMensagem('bot', '🎤 Tive uma instabilidade ao transcrever seu áudio. Pode enviar por texto, por favor?', { htmlSeguro: true });
       } finally {
+        clearTimeout(timerAbort);
         exibirDigitando(false);
       }
     }
@@ -1069,12 +1102,14 @@
     // RENDERIZAÇÃO DE MENSAGENS E BALÕES
     // ==============================================================================
     // Adiciona mensagem no histórico e na tela
-    function adicionarMensagem(remetente, conteudoHtml, meta = {}) {
+    // SEGURANÇA: conteúdo da IA/usuário é TEXTO por padrão (escapado).
+    // HTML interno (cards gerados por nós) exige { htmlSeguro: true }.
+    function adicionarMensagem(remetente, conteudo, meta = {}) {
       const container = document.getElementById('chat-mensagens-container');
       if (!container) return;
 
       // Salva no histórico de memória multi-turn (texto limpo de tags HTML)
-      const textoPlano = String(conteudoHtml).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const textoPlano = String(conteudo ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       if (textoPlano && !meta.skipSave) {
         historicoMensagens.push({
           role: remetente === 'bot' ? 'assistant' : 'user',
@@ -1091,25 +1126,28 @@
       divMsg.className = `flex gap-2.5 sm:gap-3 animate-msg ${remetente === 'usuario' ? 'justify-end' : 'justify-start'}`;
 
       if (remetente === 'bot') {
+        const corpoBot = meta.htmlSeguro
+          ? String(conteudo ?? '')
+          : escapeHtml(String(conteudo ?? '')).replace(/\n/g, '<br/>');
         divMsg.innerHTML = `
           <div class="w-8 h-8 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 flex items-center justify-center shrink-0 shadow-xs border border-slate-700/50 mt-0.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           </div>
           <div class="max-w-[92%] sm:max-w-[80%] space-y-1">
             <div class="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl rounded-tl-sm p-3 sm:p-4 text-slate-800 dark:text-slate-100 shadow-sm space-y-2">
-              <div class="leading-relaxed">${conteudoHtml}</div>
+              <div class="leading-relaxed">${corpoBot}</div>
             </div>
-            <div class="text-[10px] text-slate-400 dark:text-slate-500 pl-1">${hora} &bull; Assistente IA</div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500 pl-1">${escapeHtml(hora)} &bull; Assistente IA</div>
           </div>
         `;
         emitirSom('msg');
       } else {
         const anexoHtml = meta.anexo && meta.anexo.base64 ? `
           <div class="mb-2 max-w-xs rounded-xl overflow-hidden border border-white/20 shadow-xs">
-            <img src="${meta.anexo.base64}" alt="${escapeHtml(meta.anexo.nome || 'Anexo')}" class="w-full max-h-48 object-cover cursor-pointer hover:opacity-95 transition" onclick="window.open('${meta.anexo.base64}')" />
+            <img src="${meta.anexo.base64}" alt="${escapeHtml(meta.anexo.nome || 'Anexo')}" class="w-full max-h-48 object-cover transition" />
             <div class="px-2 py-1 bg-black/40 text-[10px] text-white/90 truncate flex items-center justify-between backdrop-blur-xs">
               <span class="truncate">📷 ${escapeHtml(meta.anexo.nome || 'Foto')}</span>
-              <span class="text-[9px] text-emerald-300 font-mono ml-1 font-bold">${meta.anexo.tamanhoKb || ''}KB</span>
+              <span class="text-[9px] text-emerald-300 font-mono ml-1 font-bold">${Number(meta.anexo.tamanhoKb) || ''}KB</span>
             </div>
           </div>
         ` : '';
@@ -1118,12 +1156,12 @@
           <div class="max-w-[92%] sm:max-w-[80%] space-y-1 flex flex-col items-end">
             <div class="bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 rounded-2xl rounded-tr-sm p-3 sm:p-4 shadow-xs border border-slate-800 dark:border-slate-200 leading-relaxed break-words font-medium">
               ${anexoHtml}
-              ${conteudoHtml ? `<div>${escapeHtml(conteudoHtml)}</div>` : ''}
+              ${conteudo ? `<div>${escapeHtml(conteudo)}</div>` : ''}
             </div>
-            <div class="text-[10px] text-slate-400 dark:text-slate-500 pr-1">${hora} &bull; Você</div>
+            <div class="text-[10px] text-slate-400 dark:text-slate-500 pr-1">${escapeHtml(hora)} &bull; Você</div>
           </div>
           <div class="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex items-center justify-center shrink-0 shadow-xs mt-0.5 font-bold text-xs">
-            ${meta.iniciais || 'EU'}
+            ${escapeHtml(meta.iniciais || 'EU')}
           </div>
         `;
       }
@@ -1132,18 +1170,13 @@
       rolarParaFim();
     }
 
-    // EFEITO TYPEWRITER STREAMING PARA RESPOSTAS DO BOT (ANIMAÇÃO FLUIDA)
-    function adicionarMensagemComEfeito(conteudoHtml, meta = {}) {
+    // EFEITO TYPEWRITER SEGURO (texto escapado; HTML interno usa adicionarMensagem com htmlSeguro)
+    function adicionarMensagemComEfeito(conteudoTexto, meta = {}) {
       const container = document.getElementById('chat-mensagens-container');
       if (!container) return;
 
-      // Se possuir estrutura HTML rica (cards, botões, tabelas, steps), renderiza direto
-      if (conteudoHtml.includes('<div') || conteudoHtml.includes('<table') || conteudoHtml.includes('<button') || conteudoHtml.includes('<svg')) {
-        adicionarMensagem('bot', conteudoHtml, meta);
-        return;
-      }
-
-      const hora = formatarHoraAtual();
+      const texto = String(conteudoTexto ?? '').replace(/<[^>]+>/g, ' ');
+      const hora = escapeHtml(formatarHoraAtual());
       const divMsg = document.createElement('div');
       divMsg.className = 'flex gap-2.5 sm:gap-3 animate-msg justify-start';
 
@@ -1164,19 +1197,18 @@
       emitirSom('msg');
 
       const area = divMsg.querySelector('.typewriter-area');
-      const textoFormatado = conteudoHtml.replace(/<br\s*\/?>/gi, '\n');
       let idx = 0;
-      const incremento = 3;
+      const incremento = 6;
 
       function digitar() {
-        if (idx < textoFormatado.length) {
-          idx = Math.min(idx + incremento, textoFormatado.length);
-          area.innerHTML = textoFormatado.slice(0, idx).replace(/\n/g, '<br/>');
+        if (idx < texto.length) {
+          idx = Math.min(idx + incremento, texto.length);
+          area.textContent = texto.slice(0, idx);
           rolarParaFim();
           requestAnimationFrame(digitar);
         } else {
           // Salva no histórico de mensagens e sessionStorage ao término da animação
-          const textoPlano = String(conteudoHtml).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          const textoPlano = texto.replace(/\s+/g, ' ').trim();
           if (textoPlano && !meta.skipSave) {
             historicoMensagens.push({ role: 'assistant', content: textoPlano.slice(0, 350) });
             if (historicoMensagens.length > 16) historicoMensagens = historicoMensagens.slice(-16);
@@ -1210,21 +1242,32 @@
 
       if (!chips || chips.length === 0) {
         container.classList.add('hidden');
-        container.innerHTML = '';
+        container.textContent = '';
         return;
       }
 
       container.classList.remove('hidden');
-      container.innerHTML = chips.map(chip => `
-        <button 
-          type="button"
-          onclick="acionarSugestaoChip('${escapeHtml(chip.valor || chip.texto)}')"
-          class="px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition shadow-xs active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer"
-        >
-          ${chip.icone ? `<span>${chip.icone}</span>` : ''}
-          <span>${chip.texto}</span>
-        </button>
-      `).join('');
+      container.textContent = '';
+      // Botões via DOM (sem innerHTML/onclick inline) — imune a break-out via LLM
+      const EMOJI_SEGURO = /^[\p{Emoji}\p{So}\u2190-\u2BFF\uFE0F\s]{0,8}$/u;
+      chips.slice(0, 8).forEach(chip => {
+        const texto = String(chip.texto ?? '').slice(0, 60);
+        const valor = String(chip.valor ?? chip.texto ?? '').slice(0, 200);
+        if (!texto) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'px-3 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition shadow-xs active:scale-95 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer';
+        if (chip.icone && EMOJI_SEGURO.test(String(chip.icone))) {
+          const ic = document.createElement('span');
+          ic.textContent = String(chip.icone);
+          btn.appendChild(ic);
+        }
+        const lb = document.createElement('span');
+        lb.textContent = texto;
+        btn.appendChild(lb);
+        btn.addEventListener('click', () => acionarSugestaoChip(valor));
+        container.appendChild(btn);
+      });
     }
 
     function acionarSugestaoChip(valor) {
@@ -1303,24 +1346,27 @@
     // NOVAS FUNCIONALIDADES: COMPROVANTE DIGITAL, CSAT E ATENDIMENTO HUMANO
     // ==============================================================================
 
-    // Emissão e Download de Comprovante Digital (.txt)
+    // Emissão e Download de Comprovante Digital (.txt) — informativo, sem valor de autenticação
     function baixarComprovanteDigital(id, cliente, servico, valor, data, setor) {
+      const idNum = Number(id) || 0;
       const agora = new Date().toLocaleString('pt-BR');
-      const authCode = 'AUTH-' + id + '-' + Date.now().toString(36).toUpperCase();
+      // Código opaco não-previsível (não é prova criptográfica; validação real é no banco)
+      const rand = (window.crypto?.getRandomValues ? Array.from(window.crypto.getRandomValues(new Uint8Array(4))).map(b => b.toString(16).padStart(2, '0')).join('') : Math.random().toString(16).slice(2, 10)).toUpperCase();
+      const authCode = 'REF-' + idNum + '-' + rand;
       const conteudo = `==================================================
-        COMPROVANTE DIGITAL DE PEDIDO
+        COMPROVANTE DIGITAL DE PEDIDO (cópia do cliente — confira no rastreio)
 ==================================================
-Protocolo:          #${id}
+Protocolo:          #${idNum}
 Data do Registro:   ${agora}
-Cliente:            ${cliente || 'Cliente'}
-Serviço Solicitado: ${servico || 'Não especificado'}
-Setor Operacional:  ${setor || 'Geral'}
-Previsão / Data:    ${data || 'A combinar'}
+Cliente:            ${String(cliente || 'Cliente').slice(0, 120)}
+Serviço Solicitado: ${String(servico || 'Não especificado').slice(0, 200)}
+Setor Operacional:  ${String(setor || 'Geral').slice(0, 60)}
+Previsão / Data:    ${String(data || 'A combinar').slice(0, 60)}
 Valor Estimado:     ${Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
 Status Inicial:     Pendente de Atendimento
 --------------------------------------------------
-Autenticação:       ${authCode}
-Empresa:            ${configuracaoChat.nomeEmpresa || 'Central de Pedidos'}
+Referência:       ${authCode}
+Empresa:            ${String(configuracaoChat.nomeEmpresa || 'Central de Pedidos').slice(0, 80)}
 Atendimento Digital via Assistente Virtual Oficial
 ==================================================`;
 
@@ -1328,36 +1374,44 @@ Atendimento Digital via Assistente Virtual Oficial
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `comprovante-pedido-${id}.txt`;
+      a.download = `comprovante-pedido-${idNum}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
-    // Avaliação de Satisfação do Cliente (CSAT)
+    // Avaliação de Satisfação do Cliente (CSAT) via RPC (sem UPDATE anon direto)
     async function avaliarAtendimento(idPedido, nota) {
-      const el = document.getElementById(`csat-widget-${idPedido}`);
+      const idNum = Number(idPedido);
+      const notaNum = Number(nota);
+      if (!Number.isInteger(idNum) || idNum <= 0 || !Number.isInteger(notaNum) || notaNum < 1 || notaNum > 5) return;
+      const el = document.getElementById(`csat-widget-${idNum}`);
       if (el) {
-        el.innerHTML = `
-          <div class="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs py-1">
-            <span>🌟</span>
-            <span>Muito obrigado pela sua avaliação de ${nota} estrela${nota > 1 ? 's' : ''}! Sua opinião é fundamental para melhorarmos continuamente.</span>
-          </div>
-        `;
+        el.textContent = '';
+        const box = document.createElement('div');
+        box.className = 'flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs py-1';
+        const star = document.createElement('span');
+        star.textContent = '🌟';
+        const txt = document.createElement('span');
+        txt.textContent = `Muito obrigado pela sua avaliação de ${notaNum} estrela${notaNum > 1 ? 's' : ''}! Sua opinião é fundamental para melhorarmos continuamente.`;
+        box.appendChild(star);
+        box.appendChild(txt);
+        el.appendChild(box);
       }
       emitirSom('sucesso');
       try {
-        await supabaseClient.from('pedidos').update({ avaliacao_csat: nota }).eq('id', idPedido);
+        await supabaseClient.rpc('avaliar_pedido_publico', { p_id: idNum, p_nota: notaNum });
       } catch (e) {
-        console.warn('Registro CSAT local salvo.');
+        // Silencia: avaliação é best-effort
       }
     }
 
     // Transbordo / Redirecionamento para Atendente Humano no WhatsApp
     function transbordarParaAtendente(assunto = '') {
-      const texto = encodeURIComponent(`Olá! Estava utilizando o autoatendimento e gostaria de falar diretamente com um atendente humano.${assunto ? ' Assunto: ' + assunto : ''}`);
-      window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
+      const assuntoLimpo = String(assunto || '').slice(0, 120);
+      const texto = encodeURIComponent(`Olá! Estava utilizando o autoatendimento e gostaria de falar diretamente com um atendente humano.${assuntoLimpo ? ' Assunto: ' + assuntoLimpo : ''}`);
+      window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank', 'noopener,noreferrer');
     }
 
     // Inicialização da Conversa
@@ -1376,7 +1430,7 @@ Atendimento Digital via Assistente Virtual Oficial
         <p class="text-xs text-indigo-600 dark:text-indigo-400 font-semibold pt-1">Como posso te ajudar hoje?</p>
       `;
 
-      adicionarMensagem('bot', saudacao);
+      adicionarMensagem('bot', saudacao, { htmlSeguro: true });
       etapaColetaAtual = 'inicio';
 
       atualizarSugestoes([
@@ -1407,14 +1461,18 @@ Atendimento Digital via Assistente Virtual Oficial
       }
     }
 
-    // ENVIO DE MENSAGEM PELO FORMULÁRIO (COM SUPORTE A TEXTO E FOTOS)
+    // ENVIO DE MENSAGEM PELO FORMULÁRIO (COM SUPORTE A TEXTO E FOTOS + ANTI-SPAM)
     function enviarMensagemUsuario(e) {
       if (e) e.preventDefault();
       const input = document.getElementById('chat-input-texto');
-      const texto = input.value.trim();
+      const texto = String(input.value || '').trim().slice(0, LIMITE_TEXTO_MSG);
       const anexo = anexoImagemAtual;
 
       if (!texto && !anexo) return;
+      // Throttle simples: 1 msg / 800ms
+      const agora = Date.now();
+      if (agora - ultimoEnvioTimestamp < 800) return;
+      ultimoEnvioTimestamp = agora;
 
       input.value = '';
       const btnLimpar = document.getElementById('btn-limpar-input');
@@ -1458,32 +1516,40 @@ Atendimento Digital via Assistente Virtual Oficial
 
     // Processamento central da mensagem (com suporte a anexo e streaming de IA)
     async function processarEnvioMensagem(texto, anexo = null) {
-      // Extrai as iniciais do nome se já tiver cliente
+      const textoSeguro = String(texto || '').slice(0, LIMITE_TEXTO_MSG);
+      // Extrai as iniciais do nome se já tiver cliente (sem crash em nome vazio)
       let iniciais = 'EU';
-      if (dadosPedidoEmConstrucao.cliente) {
-        const p = dadosPedidoEmConstrucao.cliente.trim().split(/\s+/);
-        iniciais = p.length > 1 ? (p[0][0] + p[p.length - 1][0]).toUpperCase() : p[0].slice(0, 2).toUpperCase();
-      }
-
-      if (anexo) {
-        if (!dadosPedidoEmConstrucao.observacoes.includes('[Foto Anexa]')) {
-          dadosPedidoEmConstrucao.observacoes = (dadosPedidoEmConstrucao.observacoes ? dadosPedidoEmConstrucao.observacoes + ' ' : '') + `[Foto Anexa: ${anexo.nome}]`;
+      const nomeBase = String(dadosPedidoEmConstrucao.cliente || '').trim();
+      if (nomeBase) {
+        const p = nomeBase.split(/\s+/).filter(Boolean);
+        if (p.length > 1 && p[0][0] && p[p.length - 1][0]) {
+          iniciais = (p[0][0] + p[p.length - 1][0]).toUpperCase();
+        } else if (p[0]) {
+          iniciais = p[0].slice(0, 2).toUpperCase();
         }
       }
 
-      adicionarMensagem('usuario', texto, { iniciais, anexo });
+      if (anexo) {
+        const obsAtual = String(dadosPedidoEmConstrucao.observacoes || '');
+        if (!obsAtual.includes('[Foto Anexa]')) {
+          const nomeAnexo = String(anexo.nome || 'foto').slice(0, 80);
+          dadosPedidoEmConstrucao.observacoes = (obsAtual ? obsAtual + ' ' : '') + `[Foto Anexa: ${nomeAnexo}]`;
+        }
+      }
+
+      adicionarMensagem('usuario', textoSeguro, { iniciais, anexo });
       exibirDigitando(true);
       atualizarSugestoes([]);
 
       // Simulação de processamento inteligente da IA (latência natural de diálogo)
       setTimeout(async () => {
         try {
+          const nomeAnexoSeguro = anexo ? String(anexo.nome || 'foto').slice(0, 80) : '';
           const textoParaIa = anexo 
-            ? (texto ? `${texto} (Enviei uma foto/anexo: ${anexo.nome})` : `Enviei uma imagem em anexo (${anexo.nome}) para análise do meu pedido.`)
-            : texto;
+            ? (textoSeguro ? `${textoSeguro} (Enviei uma foto/anexo: ${nomeAnexoSeguro})` : `Enviei uma imagem em anexo (${nomeAnexoSeguro}) para análise do meu pedido.`)
+            : textoSeguro;
           await processarComIA(textoParaIa);
         } catch (err) {
-          console.error('Erro na resposta da IA:', err);
           adicionarMensagem('bot', 'Desculpe, tive uma instabilidade momentânea ao processar sua resposta. Pode repetir, por favor?');
         } finally {
           exibirDigitando(false);
@@ -1492,11 +1558,13 @@ Atendimento Digital via Assistente Virtual Oficial
     }
 
     // ==============================================================================
-    // PROCESSAMENTO 100% LLM-DRIVEN VIA SUPABASE EDGE FUNCTION COM GUARDRAILS E SIGILO
+    // PROCESSAMENTO LLM VIA SUPABASE EDGE FUNCTION (chave só no servidor)
     // ==============================================================================
     async function processarComIA(textoUsuario) {
       const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/chat-ia`;
-      const requestedModel = configuracaoChat.modeloIa || 'qwen/qwen3.8-27b';
+      const modeloDesejado = String(configuracaoChat.modeloIa || MODELO_PADRAO_CHAT);
+      const requestedModel = MODELOS_PERMITIDOS_CHAT.includes(modeloDesejado) ? modeloDesejado : MODELO_PADRAO_CHAT;
+      const textoLimitado = String(textoUsuario || '').slice(0, LIMITE_TEXTO_MSG);
 
       const promptSistema = `Você é o Assistente Virtual Oficial da Central de Pedidos e Atendimento da empresa "${configuracaoChat.nomeEmpresa}".
 Você possui RACIOCÍNIO ANALÍTICO PROFUNDO, EMPATIA, FLUÊNCIA NATURAL E TOTAL CONHECIMENTO OPERACIONAL.
@@ -1601,7 +1669,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
       const messages = [
         { role: 'system', content: promptSistema },
         ...historicoRecente,
-        { role: 'user', content: textoUsuario }
+        { role: 'user', content: textoLimitado }
       ];
 
       const requestHeaders = {
@@ -1610,15 +1678,13 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
         'Authorization': `Bearer ${SUPABASE_KEY}`
       };
 
-      if (configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
-        requestHeaders['x-groq-key'] = configuracaoChat.groqApiKey;
-      }
-
       let json = null;
       let sucesso = false;
 
-      // 1. Tenta prioritariamente a Supabase Edge Function (Chave protegida no servidor)
+      // SOMENTE via Edge Function (sem fallback direto com chave no browser)
       try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 30000);
         const resEdge = await fetch(edgeFunctionUrl, {
           method: 'POST',
           headers: requestHeaders,
@@ -1627,46 +1693,16 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
             messages,
             max_tokens: 500,
             temperature: 0.1
-          })
+          }),
+          signal: ctrl.signal
         });
+        clearTimeout(t);
 
         if (resEdge.ok) {
-          json = await resEdge.json();
-          sucesso = true;
-        } else {
-          console.warn(`Edge Function chat-ia retornou status HTTP ${resEdge.status}`);
+          try { json = await resEdge.json(); sucesso = true; } catch { sucesso = false; }
         }
       } catch (errEdge) {
-        console.warn('Erro ao conectar com Edge Function chat-ia:', errEdge);
-      }
-
-      // 2. Fallback caso a Edge Function não esteja publicada e haja chave no storage
-      if (!sucesso && configuracaoChat.groqApiKey && configuracaoChat.groqApiKey.startsWith('gsk_')) {
-        const modelosDirect = [requestedModel, 'qwen/qwen3.6-27b'];
-        for (const m of modelosDirect) {
-          try {
-            const resDirect = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${configuracaoChat.groqApiKey}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                model: m,
-                messages,
-                max_tokens: 500,
-                temperature: 0.1
-              })
-            });
-            if (resDirect.ok) {
-              json = await resDirect.json();
-              sucesso = true;
-              break;
-            }
-          } catch (eDirect) {
-            console.warn(`Erro no fallback direto modelo ${m}:`, eDirect);
-          }
-        }
+        // Silencia detalhe técnico
       }
 
       if (sucesso && json) {
@@ -1713,29 +1749,38 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
 
     // Aplicação da resposta inteligente da IA no estado e na interface
     async function aplicarRespostaIA(respostaObj, textoUsuario) {
-      if (!respostaObj) return;
+      if (!respostaObj || typeof respostaObj.mensagem !== 'string') return;
+      // Sanitiza mensagem da IA: remove HTML/JS, limita tamanho
+      respostaObj.mensagem = String(respostaObj.mensagem).replace(/<[^>]+>/g, ' ').slice(0, 1500).trim();
+      if (!respostaObj.mensagem) return;
 
-      // Blindagem de segurança ativa contra geração indevida de código ou páginas web (Defesa em Profundidade)
-      const contemCodigoOuHtmlIndevido = /(?:<!doctype\s+html|<html[\s>]|<script[\s>]|```(?:html|js|javascript|python|css|php))/i.test(respostaObj.mensagem);
+      // Blindagem ampliada contra code/prompt-injection (qualquer tag/evento)
+      const contemCodigoOuHtmlIndevido = /(?:<!doctype|<html|<script|<iframe|<object|<embed|<svg|on\w+\s*=|```|javascript:)/i.test(respostaObj.mensagem + ' ' + JSON.stringify(respostaObj.dadosAtualizados || {}));
       if (contemCodigoOuHtmlIndevido) {
         respostaObj.mensagem = 'Como Assistente Virtual Oficial da nossa Central de Serviços, sou especializado exclusivamente em registrar novos pedidos, consultar o andamento das suas solicitações, fornecer orçamentos e esclarecer dúvidas sobre nossos serviços e atendimento. Não realizo desenvolvimento de código ou criação de páginas web. Como posso te ajudar com nossos serviços hoje?';
         respostaObj.acao = 'RESPONDER_DUVIDA';
         respostaObj.sugestoes = ['🛍️ Fazer Novo Pedido', '💰 Solicitar Orçamento', '🔍 Consultar Pedido'];
       }
 
-      // 1. Atualizar dados do pedido com inteligência analítica
+      // 1. Atualizar dados com validação estrita (a IA não é confiável para validação)
       if (respostaObj.dadosAtualizados) {
         const d = respostaObj.dadosAtualizados;
-        if (d.cliente && d.cliente !== 'Não informado' && d.cliente.trim()) dadosPedidoEmConstrucao.cliente = d.cliente.trim();
-        if (d.telefone && d.telefone !== 'Não informado' && d.telefone.trim()) dadosPedidoEmConstrucao.telefone = d.telefone.trim();
-        if (d.servico && d.servico.trim()) dadosPedidoEmConstrucao.servico = d.servico.trim();
-        if (d.setor && d.setor.trim()) dadosPedidoEmConstrucao.setor = d.setor.trim();
-        if (d.data_pedido && d.data_pedido.trim()) dadosPedidoEmConstrucao.data_pedido = d.data_pedido.trim();
+        const nome = String(d.cliente || '').trim().slice(0, 120);
+        if (nome && nome !== 'Não informado' && nome.length >= 2) dadosPedidoEmConstrucao.cliente = nome;
+        const telDigits = String(d.telefone || '').replace(/\D/g, '').slice(0, 15);
+        if (telDigits.length >= 8) dadosPedidoEmConstrucao.telefone = String(d.telefone).trim().slice(0, 30);
+        const svc = String(d.servico || '').trim().slice(0, 200);
+        if (svc && svc.length >= 2) dadosPedidoEmConstrucao.servico = svc;
+        const setorCand = String(d.setor || '').trim();
+        dadosPedidoEmConstrucao.setor = SETORES_PERMITIDOS.includes(setorCand) ? setorCand : (dadosPedidoEmConstrucao.setor || 'Geral');
+        const dataCand = String(d.data_pedido || '').trim().slice(0, 60);
+        if (dataCand) dadosPedidoEmConstrucao.data_pedido = dataCand;
         if (d.valor !== undefined && d.valor !== null) {
-          const valNum = parseFloat(d.valor);
-          if (!isNaN(valNum) && valNum > 0) dadosPedidoEmConstrucao.valor = valNum;
+          const valNum = Number(d.valor);
+          if (Number.isFinite(valNum) && valNum >= 0 && valNum <= 1000000) dadosPedidoEmConstrucao.valor = valNum;
         }
-        if (d.observacoes && d.observacoes.trim()) dadosPedidoEmConstrucao.observacoes = d.observacoes.trim();
+        const obs = String(d.observacoes || '').trim().slice(0, 1000);
+        if (obs) dadosPedidoEmConstrucao.observacoes = obs;
       }
 
       // Auto-preenchimento de valor de referência caso não preenchido
@@ -1752,17 +1797,18 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
       // Salva sessão localmente
       salvarSessaoNoStorage();
 
-      // 2. Ação: TRANSBORDAR_HUMANO
+      // 2. Ação: TRANSBORDAR_HUMANO (sem onclick inline com dado do usuário)
       if (respostaObj.acao === 'TRANSBORDAR_HUMANO') {
-        const msgFormatada = (respostaObj.mensagem || 'Encaminhando seu atendimento para nossa equipe no WhatsApp.')
-          .replace(/\n/g, '<br/>');
+        const msgFormatada = escapeHtml(respostaObj.mensagem || 'Encaminhando seu atendimento para nossa equipe no WhatsApp.').replace(/\n/g, '<br/>');
+        const assuntoSeguro = String(dadosPedidoEmConstrucao.servico || 'Atendimento Geral').slice(0, 120);
         const cardHumano = `
           <div class="space-y-3">
             <p>${msgFormatada}</p>
             <div class="pt-1">
               <button 
                 type="button" 
-                onclick="transbordarParaAtendente('${escapeHtml(dadosPedidoEmConstrucao.servico || 'Atendimento Geral')}')"
+                data-assunto="${escapeHtml(assuntoSeguro)}"
+                data-acao-transbordo="1"
                 class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
               >
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
@@ -1771,7 +1817,13 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
             </div>
           </div>
         `;
-        adicionarMensagem('bot', cardHumano);
+        adicionarMensagem('bot', cardHumano, { htmlSeguro: true });
+        // Liga o botão sem inline-JS (imune a quebra por aspas)
+        const ultimoCard = document.getElementById('chat-mensagens-container')?.lastElementChild;
+        ultimoCard?.querySelector('[data-acao-transbordo]')?.addEventListener('click', (ev) => {
+          const a = (ev.currentTarget?.getAttribute('data-assunto') || '');
+          transbordarParaAtendente(a);
+        });
         atualizarSugestoes([
           { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
           { texto: '🔍 Consultar Pedido', valor: 'Quero consultar o status de um pedido' }
@@ -1779,26 +1831,19 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
         return;
       }
 
-      // 3. Ação: CONSULTAR_PEDIDO
+      // 3. Ação: CONSULTAR_PEDIDO (exige ID + telefone; sem enumeração por ID sozinho)
       if (respostaObj.acao === 'CONSULTAR_PEDIDO') {
         const idPed = respostaObj.consulta?.idPedido;
         const telPed = respostaObj.consulta?.telefone;
         if (idPed || telPed) {
-          adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
-          await consultarPedidoNoSupabase(idPed || telPed);
+          adicionarMensagemComEfeito(respostaObj.mensagem);
+          await consultarPedidoNoSupabase(idPed && telPed ? `${idPed} ${telPed}` : (idPed || telPed));
         } else {
-          const matchNum = textoUsuario.match(/#?(\d+)/);
-          if (matchNum && matchNum[1] && matchNum[1].length <= 6) {
-            adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
-            await consultarPedidoNoSupabase(matchNum[1]);
-          } else {
-            adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
-            atualizarSugestoes([
-              { texto: 'Informar número #', valor: 'Meu pedido é #' },
-              { texto: 'Informar WhatsApp', valor: 'Meu telefone é ' },
-              { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
-            ]);
-          }
+          adicionarMensagemComEfeito(respostaObj.mensagem);
+          atualizarSugestoes([
+            { texto: 'Informar pedido + WhatsApp', valor: 'Meu pedido é #  e meu telefone com DDD é ' },
+            { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
+          ]);
         }
         return;
       }
@@ -1809,12 +1854,12 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
         return;
       }
 
-      // 5. Exibe a mensagem do assistente com efeito suave de digitação
-      adicionarMensagemComEfeito(respostaObj.mensagem.replace(/\n/g, '<br/>'));
+      // 5. Exibe a mensagem do assistente com efeito suave de digitação (texto puro)
+      adicionarMensagemComEfeito(respostaObj.mensagem);
 
-      // 6. Atualiza chips de sugestão interativos
+      // 6. Atualiza chips de sugestão interativos (limite + texto puro)
       if (Array.isArray(respostaObj.sugestoes) && respostaObj.sugestoes.length) {
-        atualizarSugestoes(respostaObj.sugestoes.map(s => ({ texto: s, valor: s })));
+        atualizarSugestoes(respostaObj.sugestoes.slice(0, 6).map(s => ({ texto: String(s).slice(0, 60), valor: String(s).slice(0, 200) })));
       }
 
       // 7. Se pronto para confirmação (ou dados essenciais preenchidos), exibe o Card de Resumo
@@ -1887,12 +1932,12 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
         </div>
       `;
 
-      adicionarMensagem('bot', cardHtml);
+      adicionarMensagem('bot', cardHtml, { htmlSeguro: true });
       atualizarSugestoes([
-        { texto: 'Confirmar Pedido Agora', icone: '✅' },
-        { texto: 'Mudar a Data', icone: '📅' },
-        { texto: 'Mudar o Telefone', icone: '📱' },
-        { texto: 'Alterar Serviço', icone: '🛠️' }
+        { texto: 'Confirmar Pedido Agora', icone: '✅', valor: 'Pode confirmar meu pedido' },
+        { texto: 'Mudar a Data', icone: '📅', valor: 'Mudar a data para ' },
+        { texto: 'Mudar o Telefone', icone: '📱', valor: 'Mudar meu telefone para ' },
+        { texto: 'Alterar Serviço', icone: '🛠️', valor: 'Quero mudar o serviço para ' }
       ]);
     }
 
@@ -1911,14 +1956,15 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
     // CONSULTA E RASTREAMENTO EM TEMPO REAL DE PEDIDOS NO SUPABASE
     // ==============================================================================
     function renderizarCardStatusPedido(pedido) {
-      const id = pedido.id;
-      const cliente = pedido.cliente || 'Cliente';
-      const servico = pedido.servico || 'Serviço solicitado';
-      const setor = pedido.setor || 'Geral';
-      const dataPedido = pedido.data_pedido || 'A definir';
-      const statusRaw = (pedido.status || 'Pendente').trim();
+      const id = Number(pedido.id) || 0;
+      const cliente = String(pedido.cliente || 'Cliente').slice(0, 120);
+      const servico = String(pedido.servico || 'Serviço solicitado').slice(0, 200);
+      const setor = String(pedido.setor || 'Geral').slice(0, 60);
+      const dataPedido = String(pedido.data_pedido || 'A definir').slice(0, 60);
+      const statusRaw = String(pedido.status || 'Pendente').trim().slice(0, 30);
       const statusLower = statusRaw.toLowerCase();
-      const valor = parseFloat(pedido.valor) || 0;
+      const valorNum = Number(pedido.valor);
+      const valor = Number.isFinite(valorNum) && valorNum >= 0 ? valorNum : 0;
 
       // Determina o estágio no Stepper (1 a 4)
       let estagio = 1;
@@ -2020,7 +2066,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
           <div class="pt-1">
             <a 
               href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá! Gostaria de acompanhar o andamento do meu pedido #${id} (${servico}) registrado na Central de Pedidos.`)}"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-2 shadow-sm"
             >
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
@@ -2034,78 +2080,62 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
     async function consultarPedidoNoSupabase(idOuTelefone) {
       exibirDigitando(true);
       try {
+        const termoLimpo = String(idOuTelefone || '').slice(0, 120).trim();
+        // Exige ID + telefone completo (2 fatores). Sem fallback direto.
+        const matchId = termoLimpo.match(/#?\b(\d{1,10})\b/);
+        const idNum = matchId ? parseInt(matchId[1], 10) : null;
+        const digitos = termoLimpo.replace(/\D/g, '').slice(0, 15);
         let pedido = null;
         let buscaPor = '';
-        const termoLimpo = String(idOuTelefone || '').trim();
-        const matchId = termoLimpo.match(/#?(\d+)/);
-        const idNum = (matchId && matchId[1] && (termoLimpo.length <= 6 || termoLimpo.startsWith('#') || termoLimpo.toLowerCase().includes('pedido'))) ? parseInt(matchId[1], 10) : null;
-        const digitos = termoLimpo.replace(/\D/g, '');
 
-        // 1. Tenta consulta segura e blindada via Stored Procedure RPC (PostgreSQL RLS Hardening)
+        if (!idNum || idNum <= 0 || digitos.length < 10) {
+          adicionarMensagem('bot', `
+            <div class="space-y-2">
+              <p>🔒 Para sua segurança, informe o <strong>número do pedido + telefone completo com DDD</strong> usados no cadastro.</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Exemplo: "Meu pedido é #38 e meu telefone com DDD é 11987654321".</p>
+            </div>
+          `, { htmlSeguro: true });
+          atualizarSugestoes([
+            { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' }
+          ]);
+          return;
+        }
+
         try {
           const { data: rpcData, error: rpcErr } = await supabaseClient.rpc('consultar_pedido_publico', {
             p_id: idNum,
-            p_telefone: digitos.length >= 8 ? digitos : null
+            p_telefone: digitos
           });
           if (!rpcErr && Array.isArray(rpcData) && rpcData.length > 0) {
             pedido = rpcData[0];
-            buscaPor = idNum ? `ID #${idNum}` : `WhatsApp ${termoLimpo}`;
+            buscaPor = `ID #${idNum}`;
           }
         } catch (eRpc) {
-          // Fallback gracioso caso a RPC ainda não tenha sido rodada no SQL Editor
-        }
-
-        // 2. Fallback direto caso a RPC não tenha sido instalada
-        if (!pedido && idNum) {
-          buscaPor = `ID #${idNum}`;
-          const { data, error } = await supabaseClient
-            .from('pedidos')
-            .select('*')
-            .eq('id', idNum)
-            .maybeSingle();
-
-          if (!error && data) {
-            pedido = data;
-          }
-        }
-
-        if (!pedido && digitos.length >= 8) {
-          buscaPor = `WhatsApp ${termoLimpo}`;
-          const { data, error } = await supabaseClient
-            .from('pedidos')
-            .select('*')
-            .ilike('telefone', `%${digitos.slice(-8)}%`)
-            .order('id', { ascending: false })
-            .limit(1);
-
-          if (!error && data && data.length > 0) {
-            pedido = data[0];
-          }
+          // Silencia
         }
 
         if (pedido) {
           emitirSom('msg');
           const cardHtml = renderizarCardStatusPedido(pedido);
-          adicionarMensagem('bot', cardHtml);
+          adicionarMensagem('bot', cardHtml, { htmlSeguro: true });
           atualizarSugestoes([
             { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
             { texto: '🔍 Consultar Outro Pedido', valor: 'Quero consultar outro pedido' },
-            { texto: '💬 Falar no WhatsApp', valor: `Olá, gostaria de falar sobre o pedido #${pedido.id}` }
+            { texto: '💬 Falar no WhatsApp', valor: `Olá, gostaria de falar sobre o pedido #${Number(pedido.id) || ''}` }
           ]);
         } else {
           adicionarMensagem('bot', `
             <div class="space-y-2">
-              <p>🔍 Não localizei nenhum pedido ativo com o identificador informado (<strong>${escapeHtml(buscaPor || idOuTelefone)}</strong>).</p>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Por favor, confira o número do pedido (ex: <em>#38</em>) ou digite seu número de telefone completo com DDD para que eu possa localizar.</p>
+              <p>🔍 Não localizei nenhum pedido ativo com o identificador informado (<strong>${escapeHtml(buscaPor || termoLimpo)}</strong>).</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Por favor, confira o número do pedido (ex: <em>#38</em>) e digite seu número de telefone completo com DDD.</p>
             </div>
-          `);
+          `, { htmlSeguro: true });
           atualizarSugestoes([
             { texto: '🛍️ Fazer Novo Pedido', valor: 'Quero fazer um novo pedido' },
-            { texto: 'Informar meu WhatsApp', valor: 'Meu telefone é ' }
+            { texto: 'Informar meu WhatsApp', valor: 'Meu telefone com DDD é ' }
           ]);
         }
       } catch (err) {
-        console.error('Erro ao consultar pedido:', err);
         adicionarMensagem('bot', `Desculpe, ocorreu uma instabilidade ao consultar o banco de dados. Por favor, tente novamente em instantes.`);
       } finally {
         exibirDigitando(false);
@@ -2116,43 +2146,54 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
     // CRIAÇÃO AUTOMÁTICA DO PEDIDO NA TABELA SUPABASE
     // ==============================================================================
     async function confirmarECriarPedidoNoSupabase() {
+      if (isEnviandoPedido) return;
+      isEnviandoPedido = true;
       exibirDigitando(true);
       atualizarSugestoes([]);
 
       const p = dadosPedidoEmConstrucao;
-      const payload = {
-        cliente: p.cliente || 'Cliente Chatbot',
-        telefone: p.telefone || 'Não informado',
-        setor: p.setor || 'Geral',
-        servico: p.servico || 'Solicitação via Chatbot',
-        valor: parseFloat(p.valor) || 0,
-        data_pedido: p.data_pedido || new Date().toLocaleDateString('pt-BR'),
-        status: 'Pendente',
-        observacoes: (p.observacoes || '') + ' [Criado automaticamente via Chatbot IA]',
-        user_id: null // Cliente público / visitante
-      };
+      const cliente = String(p.cliente || '').trim().slice(0, 120);
+      const telefoneRaw = String(p.telefone || '').trim().slice(0, 30);
+      const servico = String(p.servico || '').trim().slice(0, 200);
+      const setor = SETORES_PERMITIDOS.includes(p.setor) ? p.setor : 'Geral';
+      const valorNum = Number(p.valor);
+      const valor = Number.isFinite(valorNum) && valorNum >= 0 && valorNum <= 1000000 ? valorNum : 0;
+      const data_pedido = String(p.data_pedido || new Date().toLocaleDateString('pt-BR')).slice(0, 60);
+      const observacoes = String(p.observacoes || '').slice(0, 1000);
+
+      if (cliente.length < 2 || servico.length < 2 || telefoneRaw.replace(/\D/g, '').length < 8) {
+        adicionarMensagem('bot', 'Para concluir, preciso do seu nome, telefone com DDD e o serviço desejado. Pode me informar?', { htmlSeguro: false });
+        isEnviandoPedido = false;
+        exibirDigitando(false);
+        return;
+      }
 
       try {
-        const { data, error } = await supabaseClient
-          .from('pedidos')
-          .insert([payload])
-          .select();
+        // Único caminho de escrita: RPC validada no servidor (sem INSERT anon direto)
+        const { data, error } = await supabaseClient.rpc('criar_pedido_publico', {
+          p_cliente: cliente,
+          p_telefone: telefoneRaw,
+          p_servico: servico,
+          p_setor: setor,
+          p_valor: valor,
+          p_data_pedido: data_pedido,
+          p_observacoes: observacoes ? observacoes + ' [via Chatbot]' : '[via Chatbot]'
+        });
 
         if (error) throw error;
+        const idGerado = Array.isArray(data) && data[0]?.id ? Number(data[0].id) : (data?.id ? Number(data.id) : 0);
+        if (!idGerado) throw new Error('Falha ao gerar pedido.');
 
-        const novoPedido = (data && data[0]) ? data[0] : null;
-        const idGerado = novoPedido ? novoPedido.id : Math.floor(1000 + Math.random() * 9000);
-
-        // Notifica janela-mãe (painel-pedidos) se estiver rodando dentro de iframe
+        // Notifica janela-mãe (mesma origem) sem vazar PII completa
         try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({
-              tipo: 'PEDIDO_CRIADO_CHATBOT',
-              pedido: novoPedido || { id: idGerado, ...payload }
-            }, '*');
+          if (window.parent && window.parent !== window && document.referrer) {
+            const origemMae = new URL(document.referrer).origin;
+            if (origemMae === window.location.origin) {
+              window.parent.postMessage({ tipo: 'PEDIDO_CRIADO_CHATBOT', pedido: { id: idGerado, status: 'Pendente' } }, origemMae);
+            }
           }
         } catch (postErr) {
-          console.warn('Erro ao notificar janela pai:', postErr);
+          // Silencia
         }
 
         etapaColetaAtual = 'finalizado';
@@ -2182,21 +2223,21 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
 
             <div class="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800">
               <p><strong>Número do Pedido:</strong> #${idGerado}</p>
-              <p><strong>Cliente:</strong> ${escapeHtml(payload.cliente)}</p>
-              <p><strong>Serviço:</strong> ${escapeHtml(payload.servico)}</p>
-              <p><strong>Valor Estimado:</strong> <strong class="text-emerald-600 dark:text-emerald-400 font-bold">${payload.valor > 0 ? Number(payload.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta / A combinar'}</strong></p>
+              <p><strong>Cliente:</strong> ${escapeHtml(cliente)}</p>
+              <p><strong>Serviço:</strong> ${escapeHtml(servico)}</p>
+              <p><strong>Valor Estimado:</strong> <strong class="text-emerald-600 dark:text-emerald-400 font-bold">${valor > 0 ? Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : 'Sob consulta / A combinar'}</strong></p>
               <p><strong>Status:</strong> <span class="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold text-[10px]">Pendente de Atendimento</span></p>
             </div>
 
             <!-- CSAT AVALIAÇÃO DO ATENDIMENTO -->
             <div id="csat-widget-${idGerado}" class="p-3 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900/60 text-center space-y-1.5">
               <span class="text-xs font-bold text-slate-700 dark:text-slate-200 block">Como foi sua experiência com nosso Assistente Virtual?</span>
-              <div class="flex items-center justify-center gap-2">
-                <button type="button" onclick="avaliarAtendimento(${idGerado}, 1)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="1 estrela - Ruim">⭐</button>
-                <button type="button" onclick="avaliarAtendimento(${idGerado}, 2)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="2 estrelas - Regular">⭐</button>
-                <button type="button" onclick="avaliarAtendimento(${idGerado}, 3)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="3 estrelas - Bom">⭐</button>
-                <button type="button" onclick="avaliarAtendimento(${idGerado}, 4)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="4 estrelas - Muito Bom">⭐</button>
-                <button type="button" onclick="avaliarAtendimento(${idGerado}, 5)" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="5 estrelas - Excelente">⭐</button>
+              <div class="flex items-center justify-center gap-2" data-csat-id="${idGerado}">
+                <button type="button" data-nota="1" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="1 estrela - Ruim">⭐</button>
+                <button type="button" data-nota="2" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="2 estrelas - Regular">⭐</button>
+                <button type="button" data-nota="3" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="3 estrelas - Bom">⭐</button>
+                <button type="button" data-nota="4" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="4 estrelas - Muito Bom">⭐</button>
+                <button type="button" data-nota="5" class="text-2xl hover:scale-125 transition active:scale-95 cursor-pointer" title="5 estrelas - Excelente">⭐</button>
               </div>
               <span class="text-[10px] text-slate-400 block">Clique para avaliar o atendimento</span>
             </div>
@@ -2204,7 +2245,7 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
               <button 
                 type="button" 
-                onclick="baixarComprovanteDigital(${idGerado}, '${escapeHtml(payload.cliente).replace(/'/g, "\\'")}', '${escapeHtml(payload.servico).replace(/'/g, "\\'")}', ${payload.valor}, '${escapeHtml(payload.data_pedido).replace(/'/g, "\\'")}', '${escapeHtml(payload.setor).replace(/'/g, "\\'")}')"
+                data-acao-comprovante="1"
                 class="w-full py-2.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700"
               >
                 <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -2212,8 +2253,8 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
               </button>
 
               <a 
-                href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá! Acabei de registrar meu pedido #${idGerado} (${payload.servico}) com vocês pelo Assistente Virtual.`)}"
-                target="_blank"
+                href="https://api.whatsapp.com/send?text=${encodeURIComponent(`Olá! Acabei de registrar meu pedido #${idGerado} (${servico}) com vocês pelo Assistente Virtual.`)}"
+                target="_blank" rel="noopener noreferrer"
                 class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm"
               >
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
@@ -2221,38 +2262,32 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
               </a>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
-              <button 
-                type="button" 
-                onclick="consultarPedidoNoSupabase('${idGerado}')"
-                class="w-full sm:w-auto flex-1 py-2.5 px-3 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 font-bold rounded-xl text-xs transition cursor-pointer flex items-center justify-center gap-1"
-              >
-                <span>🔍 Rastrear este Pedido</span>
-              </button>
-
-              <button 
-                type="button" 
-                onclick="reiniciarConversa()"
-                class="w-full sm:w-auto py-2.5 px-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs transition cursor-pointer"
-              >
-                <span>Novo Pedido</span>
-              </button>
+            <div class="pt-1">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Anote seu número <strong>#${idGerado}</strong> e o telefone com DDD para rastrear o pedido.</p>
             </div>
           </div>
         `;
 
-        adicionarMensagem('bot', msgSucesso);
+        adicionarMensagem('bot', msgSucesso, { htmlSeguro: true });
+        // Liga CSAT + comprovante sem inline-JS
+        const escopoSucesso = document.getElementById('chat-mensagens-container')?.lastElementChild;
+        escopoSucesso?.querySelector('[data-csat-id]')?.querySelectorAll('button[data-nota]')?.forEach(b => {
+          b.addEventListener('click', () => avaliarAtendimento(idGerado, Number(b.getAttribute('data-nota'))));
+        });
+        escopoSucesso?.querySelector('[data-acao-comprovante]')?.addEventListener('click', () => {
+          baixarComprovanteDigital(idGerado, cliente, servico, valor, data_pedido, setor);
+        });
       } catch (err) {
-        console.error('Erro ao cadastrar pedido no Supabase:', err);
+        const msgErro = err && err.message ? String(err.message).slice(0, 200) : 'Erro de conexão com o banco';
         adicionarMensagem('bot', `
           <div class="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-800 dark:text-rose-300 text-xs">
             <strong>Não foi possível gravar o pedido automaticamente:</strong><br/>
-            ${escapeHtml(err.message || 'Erro de conexão com o banco')}.<br/>
-            Por favor, verifique a conexão ou clique no botão abaixo para tentar novamente.
+            ${escapeHtml(msgErro)}.<br/>
+            Por favor, verifique os dados e tente novamente.
           </div>
-          <button onclick="confirmarECriarPedidoNoSupabase()" class="mt-2 py-2 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl">Tentar Novamente</button>
-        `);
+        `, { htmlSeguro: true });
       } finally {
+        isEnviandoPedido = false;
         exibirDigitando(false);
       }
     }

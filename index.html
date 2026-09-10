@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Central de Pedidos &bull; Painel Operacional</title>
   <meta name="description" content="Painel operacional em tempo real para acompanhamento, gestão e atendimento de pedidos integrado ao Supabase." />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <!-- NOTA PRODUÇÃO: prefira build local do Tailwind + Supabase-JS pinado com SRI em vez de CDN flutuante. -->
 
   <!-- Tipografia Google Fonts: Plus Jakarta Sans com suporte a Numerais Tabulares -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1931,7 +1933,7 @@
 
           <div id="preview-template-whats" class="text-[11px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/80 p-3 rounded-xl border border-slate-200/60 dark:border-slate-700/60 italic leading-relaxed max-h-20 overflow-y-auto"></div>
 
-          <a id="btn-enviar-template-whats" href="#" target="_blank" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs">
+          <a id="btn-enviar-template-whats" href="#" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             <span>Enviar Mensagem Selecionada no WhatsApp</span>
           </a>
@@ -2011,18 +2013,18 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label for="novo-cliente" class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Cliente *</label>
-            <input type="text" id="novo-cliente" aria-label="Nome do cliente" required placeholder="Nome do cliente" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
+            <input type="text" id="novo-cliente" aria-label="Nome do cliente" required maxlength="120" placeholder="Nome do cliente" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
           </div>
           <div>
             <label for="novo-telefone" class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Telefone / WhatsApp</label>
-            <input type="text" id="novo-telefone" aria-label="Telefone ou WhatsApp do cliente" placeholder="(11) 99999-9999" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
+            <input type="text" id="novo-telefone" aria-label="Telefone ou WhatsApp do cliente" maxlength="30" placeholder="(11) 99999-9999" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label for="novo-setor" class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Setor</label>
-            <input type="text" id="novo-setor" aria-label="Setor ou categoria do pedido" list="setores-sugestoes" placeholder="Ex: Pet Shop, Oficina" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
+            <input type="text" id="novo-setor" aria-label="Setor ou categoria do pedido" list="setores-sugestoes" maxlength="60" placeholder="Ex: Pet Shop, Oficina" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
             <datalist id="setores-sugestoes"></datalist>
           </div>
           <div>
@@ -2041,17 +2043,17 @@
 
         <div>
           <label for="novo-servico" class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Serviço / Descrição *</label>
-          <input type="text" id="novo-servico" aria-label="Descrição do serviço ou produto" required placeholder="Ex: Banho e tosa completo" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
+          <input type="text" id="novo-servico" aria-label="Descrição do serviço ou produto" required maxlength="200" placeholder="Ex: Banho e tosa completo" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label for="novo-valor" class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Valor (R$)</label>
-            <input type="number" step="0.01" id="novo-valor" aria-label="Valor em reais" placeholder="0,00" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
+            <input type="number" step="0.01" min="0" max="1000000" id="novo-valor" aria-label="Valor em reais" placeholder="0,00" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
           </div>
           <div>
             <label for="novo-data" class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Data / Horário</label>
-            <input type="text" id="novo-data" aria-label="Data e horário do agendamento" placeholder="Ex: Sexta, 14h" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
+            <input type="text" id="novo-data" aria-label="Data e horário do agendamento" maxlength="60" placeholder="Ex: Sexta, 14h" class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:text-white" />
           </div>
         </div>
 
@@ -2725,28 +2727,11 @@
           <p class="text-[10px] text-slate-400">Exibido no cabeçalho e na saudação inicial do Chatbot.</p>
         </div>
 
-        <!-- Chave da API de IA -->
+        <!-- IA via Edge Function (chave só no servidor) -->
         <div class="space-y-1">
-          <div class="flex items-center justify-between">
-            <label for="cfg-chat-groq-key" class="block font-bold text-slate-700 dark:text-slate-300">Chave da API de Inteligência Artificial</label>
-            <a 
-              href="https://console.groq.com/keys" 
-              target="_blank" 
-              class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-            >
-              <span>Gerenciar Chave de IA</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            </a>
-          </div>
-          <input 
-            type="password" 
-            id="cfg-chat-groq-key" 
-            aria-label="Chave da API de Inteligência Artificial"
-            placeholder="Chave de API..." 
-            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-mono focus:ring-2 focus:ring-indigo-500 outline-none transition"
-          />
           <div class="p-2.5 bg-indigo-50/70 dark:bg-indigo-950/40 rounded-xl border border-indigo-200/80 dark:border-indigo-800 text-[10px] text-indigo-900 dark:text-indigo-300 leading-relaxed">
-            ⚡ <strong>Motor de IA Ativo:</strong> <strong>Inteligência Artificial de Alta Performance</strong> com raciocínio analítico em tempo real e ultra-baixa latência (&lt;1s).
+            ⚡ <strong>Motor de IA Ativo via Edge Function:</strong> chave <code>GROQ_API_KEY</code> configurada apenas nos Secrets do Supabase. Nunca cole a chave neste painel.
+            Gerencie em <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" class="font-bold underline">console.groq.com/keys</a>.
           </div>
         </div>
 
@@ -3127,7 +3112,7 @@
         </div>
       </div>
 
-      <!-- Iframe do Chatbot -->
+      <!-- Iframe do Chatbot (sandbox: mesma origem, sem acesso ao topo) -->
       <div class="relative flex-1 w-full bg-slate-950 overflow-hidden">
         <iframe 
           id="iframe-chatbot-widget" 
@@ -3135,6 +3120,8 @@
           title="Interface do Chatbot IA" 
           class="w-full h-full border-0"
           loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-forms"
+          referrerpolicy="strict-origin-when-cross-origin"
         ></iframe>
       </div>
     </div>
@@ -3178,12 +3165,17 @@
 
   </div><!-- FIM #app-dashboard -->
 
+  <!-- CONFIGURAÇÃO EXTERNALIZADA -->
+  <script src="config.js"></script>
+
   <!-- SCRIPT OPERACIONAL -->
   <script>
-    // CREDENCIAIS DO SUPABASE
-    const SUPABASE_URL = 'https://xqmzysjzopyuelvhokwm.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_RfIxDPxwUdyzsaXXsa2tIw_XRvfyxAn';
+    // CREDENCIAIS DO SUPABASE (CENTRALIZADAS E COM FALLBACK)
+    const APP_CONFIG = window.__APP_CONFIG__ || {};
+    const SUPABASE_URL = APP_CONFIG.SUPABASE_URL || 'https://xqmzysjzopyuelvhokwm.supabase.co';
+    const SUPABASE_KEY = APP_CONFIG.SUPABASE_ANON_KEY || 'sb_publishable_RfIxDPxwUdyzsaXXsa2tIw_XRvfyxAn';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 
     // ESTADO DE AUTENTICAÇÃO E CARGOS (RBAC)
     let usuarioAtual = null;
@@ -3210,8 +3202,8 @@
         if (dadosLocais) {
           registroContasUsuarios = JSON.parse(dadosLocais);
         }
-      } catch (e) {
-        console.warn('Erro ao carregar contas locais:', e);
+      } catch {
+        // Silencia falha de cache local sem vazar detalhes
       }
       if (!Array.isArray(registroContasUsuarios)) {
         registroContasUsuarios = [];
@@ -3237,46 +3229,13 @@
       }
     }
 
-    // SALVAR REGISTRO DE CONTAS NO SUPABASE E LOCALSTORAGE (RESTRITO A ADMINISTRADORES)
+    // SALVAR REGISTRO DE CONTAS (somente local; NÃO sincroniza para pedidos — evita vazar via RLS anon)
     async function salvarRegistroContasSupabase() {
-      localStorage.setItem('sistema_contas_usuarios', JSON.stringify(registroContasUsuarios));
+      try { localStorage.setItem('sistema_contas_usuarios', JSON.stringify(registroContasUsuarios)); } catch {}
       atualizarBadgeTotalClientes();
-
-      // Trava de segurança: apenas administrador autenticado pode gravar no banco
-      if (usuarioCargo !== 'administrador') return;
-
-      try {
-        const jsonContas = JSON.stringify(registroContasUsuarios);
-        const { data: existente } = await supabaseClient
-          .from('pedidos')
-          .select('id')
-          .eq('setor', '__sistema_contas__')
-          .maybeSingle();
-
-        if (existente && existente.id) {
-          await supabaseClient
-            .from('pedidos')
-            .update({
-              observacoes: jsonContas,
-              data_pedido: new Date().toISOString().split('T')[0]
-            })
-            .eq('id', existente.id);
-        } else {
-          await supabaseClient
-            .from('pedidos')
-            .insert([{
-              setor: '__sistema_contas__',
-              cliente: 'Sistema Contas',
-              servico: 'Registro de Usuários e Cargos',
-              valor: 0,
-              status: 'Concluído',
-              observacoes: jsonContas,
-              data_pedido: new Date().toISOString().split('T')[0]
-            }]);
-        }
-      } catch (err) {
-        console.warn('Erro ao persistir contas no Supabase:', err);
-      }
+      // Removido: sync para pedidos.__sistema_contas__ (expunha e-mails/cargos via SELECT anon).
+      // Cargos reais devem estar em auth.users app_metadata. Esta lista local é só cache de exibição.
+      return;
     }
 
     // SINCRONIZAR PERFIL DO USUÁRIO LOGADO NO REGISTRO DE CONTAS
@@ -3313,6 +3272,8 @@
     }
 
     // DETERMINAR E ATUALIZAR CARGO DO USUÁRIO ATUAL
+    // SEGURANÇA: cargo vem de app_metadata (definido pelo admin no Auth), NUNCA de
+    // localStorage nem de user_metadata (ambos editáveis pelo próprio usuário).
     function atualizarEstadoCargo() {
       if (!usuarioAtual) {
         usuarioCargo = 'cliente';
@@ -3320,18 +3281,11 @@
         return;
       }
 
-      const email = (usuarioAtual.email || '').toLowerCase();
-      const conta = registroContasUsuarios.find(c => c.id === usuarioAtual.id || (c.email && c.email.toLowerCase() === email));
-
-      if (conta && conta.role) {
-        usuarioCargo = (conta.role === 'admin' || conta.role === 'administrador') ? 'administrador' : 'cliente';
+      const appRole = usuarioAtual.app_metadata?.role || usuarioAtual.app_metadata?.cargo;
+      if (appRole === 'admin' || appRole === 'administrador') {
+        usuarioCargo = 'administrador';
       } else {
-        const metaRole = usuarioAtual.user_metadata?.role || usuarioAtual.user_metadata?.cargo;
-        if (metaRole === 'admin' || metaRole === 'administrador') {
-          usuarioCargo = 'administrador';
-        } else {
-          usuarioCargo = 'cliente';
-        }
+        usuarioCargo = 'cliente';
       }
 
       aplicarPermissoesCargoNaUI();
@@ -3774,7 +3728,7 @@
           return termoNome && (cli === termoNome || cli.includes(termoNome));
         }).length;
 
-        const iniciais = (c.full_name || 'US').split(/\s+/).filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'US';
+        const iniciais = escapeHtml((c.full_name || 'US').split(/\s+/).filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'US');
 
         return `
           <div class="bg-white dark:bg-slate-850 p-3.5 sm:p-4 rounded-2xl border ${isEuMesmo ? 'border-indigo-400 dark:border-indigo-600 ring-1 ring-indigo-400/30' : 'border-slate-200/70 dark:border-slate-800'} shadow-2xs hover:shadow-md transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -3803,8 +3757,8 @@
 
             <div class="flex items-center gap-1.5 self-end sm:self-center shrink-0 flex-wrap">
               <button 
-                onclick="verPedidosDoCliente('${(c.full_name || '').replace(/'/g, "\\'")}', '${c.id || ''}')"
-                class="px-2.5 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 text-xs font-bold transition cursor-pointer flex items-center gap-1"
+                data-ver-pedidos-id="${escapeHtml(c.id || '')}"
+                class="btn-ver-pedidos px-2.5 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 border border-purple-200 dark:border-purple-800 text-xs font-bold transition cursor-pointer flex items-center gap-1"
                 title="Filtrar pedidos deste cliente no painel"
               >
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -3906,13 +3860,21 @@
 
     // VER PEDIDOS DE UM CLIENTE ESPECÍFICO (ADMIN)
     function verPedidosDoCliente(nomeCliente, clienteId) {
-      filtroClienteAtivoAdmin = { id: clienteId, nome: nomeCliente };
+      const nomeSeguro = String(nomeCliente || '').slice(0, 120);
+      const idSeguro = String(clienteId || '').slice(0, 80);
+      // Se só veio ID (novo padrão seguro), resolve nome pelo cache local
+      let nomeFinal = nomeSeguro;
+      if (!nomeFinal && idSeguro) {
+        const conta = registroContasUsuarios.find(c => String(c.id) === idSeguro);
+        nomeFinal = conta ? String(conta.full_name || conta.email || idSeguro).slice(0, 120) : idSeguro;
+      }
+      filtroClienteAtivoAdmin = { id: idSeguro, nome: nomeFinal };
       fecharModalGestaoContas();
 
       const banner = document.getElementById('banner-filtro-cliente');
       const bannerNome = document.getElementById('banner-nome-cliente');
       if (banner && bannerNome) {
-        bannerNome.textContent = nomeCliente;
+        bannerNome.textContent = nomeFinal;
         banner.classList.remove('hidden');
       }
 
@@ -3922,8 +3884,16 @@
       renderizarAnalyticsSetores(base);
       filtrarEOrdenar();
 
-      mostrarToast(`Visualizando pedidos de "${nomeCliente}" 👁️`);
+      mostrarToast(`Visualizando pedidos de "${String(nomeFinal).slice(0, 60)}"`);
     }
+
+    // Delegação segura para botões "Ver pedidos" (sem onclick inline com nome)
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target?.closest?.('.btn-ver-pedidos');
+      if (!btn) return;
+      const id = btn.getAttribute('data-ver-pedidos-id') || '';
+      if (id) verPedidosDoCliente('', id);
+    });
 
     // LIMPAR FILTRO DE CLIENTE NO MODO ADMIN
     function limparFiltroClienteAdmin() {
@@ -3955,14 +3925,14 @@
       if (id) {
         const c = registroContasUsuarios.find(item => item.id === id);
         if (!c) return;
-        if (titulo) titulo.innerHTML = `<span>✏️</span> Editar Conta: ${c.full_name}`;
+        if (titulo) titulo.textContent = `Editar Conta: ${String(c.full_name || '').slice(0, 120)}`;
         if (inputId) inputId.value = c.id;
         if (inputNome) inputNome.value = c.full_name || '';
         if (inputEmail) inputEmail.value = c.email || '';
         if (inputTelefone) inputTelefone.value = c.phone || c.telefone || '';
         if (selectCargo) selectCargo.value = (c.role === 'admin' || c.role === 'administrador') ? 'admin' : 'cliente';
       } else {
-        if (titulo) titulo.innerHTML = `<span>👤</span> Cadastrar Nova Conta de Cliente`;
+        if (titulo) titulo.textContent = `Cadastrar Nova Conta de Cliente`;
         if (inputId) inputId.value = '';
         if (selectCargo) selectCargo.value = 'cliente';
       }
@@ -4233,7 +4203,7 @@
     }
 
     // MOSTRAR FEEDBACK / ALERTAS NA TELA DE AUTH
-    function mostrarFeedbackAuth(tipo, mensagem, htmlExtra = '') {
+    function mostrarFeedbackAuth(tipo, mensagem, acaoSegura = null) {
       const container = document.getElementById('auth-alert');
       const icon = document.getElementById('auth-alert-icon');
       const msg = document.getElementById('auth-alert-mensagem');
@@ -4255,12 +4225,20 @@
         icon.innerHTML = `<svg class="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
       }
 
-      msg.innerHTML = mensagem;
-      if (htmlExtra) {
-        acao.innerHTML = htmlExtra;
+      // SEGURANÇA: mensagem sempre como texto (sem innerHTML com e-mail). Quebra de linha preservada via CSS.
+      msg.textContent = String(mensagem ?? '');
+      if (acaoSegura && acaoSegura.email) {
+        acao.textContent = '';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mt-1 text-xs font-bold underline cursor-pointer';
+        btn.textContent = 'Reenviar e-mail de confirmação';
+        const emailSeguro = String(acaoSegura.email).slice(0, 120);
+        btn.addEventListener('click', () => reenviarConfirmacaoEmail(emailSeguro));
+        acao.appendChild(btn);
         acao.classList.remove('hidden');
       } else {
-        acao.innerHTML = '';
+        acao.textContent = '';
         acao.classList.add('hidden');
       }
 
@@ -4294,21 +4272,24 @@
         return 'Muitas solicitações seguidas. Aguarde alguns instantes e tente novamente.';
       }
       if (msg.includes('network') || msg.includes('fetch')) {
-        return 'Falha de conexão com os servidores do Supabase. Verifique sua conexão com a internet.';
+        return 'Falha de conexão com os servidores. Verifique sua conexão com a internet.';
       }
-      return msgOriginal;
+      // Não repassa mensagem bruta do provedor (evita leak de internals)
+      return 'Ocorreu um erro no processo de autenticação. Tente novamente.';
     }
 
     // REENVIAR EMAIL DE CONFIRMAÇÃO
     async function reenviarConfirmacaoEmail(email) {
+      const emailSeguro = String(email || '').slice(0, 120);
+      if (!emailSeguro || !emailSeguro.includes('@')) return;
       try {
         mostrarFeedbackAuth('info', 'Enviando novo e-mail de confirmação...');
         const { error } = await supabaseClient.auth.resend({
           type: 'signup',
-          email: email
+          email: emailSeguro
         });
         if (error) throw error;
-        mostrarFeedbackAuth('success', `E-mail de confirmação reenviado para <b>${email}</b>! Verifique sua caixa de entrada e spam.`);
+        mostrarFeedbackAuth('success', `E-mail de confirmação reenviado para ${emailSeguro}! Verifique sua caixa de entrada e spam.`);
       } catch (err) {
         mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
       }
@@ -4344,9 +4325,9 @@
         });
 
         if (error) {
-          let extra = '';
+          let extra = null;
           if (error.message.toLowerCase().includes('email not confirmed')) {
-            extra = `<button onclick="reenviarConfirmacaoEmail('${email}')" class="px-2.5 py-1 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-800 rounded-lg text-[11px] hover:underline cursor-pointer">Reenviar e-mail de confirmação</button>`;
+            extra = { email };
           }
           mostrarFeedbackAuth('error', traduzirErroSupabase(error.message), extra);
           btn.disabled = false;
@@ -4355,11 +4336,10 @@
           return;
         }
 
-        mostrarToast(`Bem-vindo(a) de volta! ✨`);
+        mostrarToast(`Bem-vindo(a) de volta! ✨`, 'success');
         atualizarEstadoAutenticacao(data.user);
       } catch (err) {
-        console.error('Erro de login:', err);
-        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err?.message));
         btn.disabled = false;
         btnText.classList.remove('hidden');
         btnSpinner.classList.add('hidden');
@@ -4439,21 +4419,20 @@
 
         if (data.session) {
           // Sessão criada imediatamente (auto-confirm ativo no Supabase)
-          mostrarToast(`Conta criada com sucesso! Seja bem-vindo(a), ${nome}! 🎉`);
+          mostrarToast(`Conta criada com sucesso! Seja bem-vindo(a)! 🎉`);
           atualizarEstadoAutenticacao(data.user);
         } else {
           // Confirmação de e-mail requerida pelo Supabase
-          mostrarFeedbackAuth('success', `Conta criada com sucesso! ✉️ Enviamos um e-mail de confirmação para <b>${email}</b>.<br/>Por favor, clique no link recebido para ativar seu acesso e depois faça login.`);
+          mostrarFeedbackAuth('success', `Conta criada com sucesso! Enviamos um e-mail de confirmação para ${email}. Por favor, clique no link recebido para ativar seu acesso e depois faça login.`);
           const inputLoginEmail = document.getElementById('login-email');
           if (inputLoginEmail) inputLoginEmail.value = email;
           setTimeout(() => {
             alternarAbaAuth('login');
-            mostrarFeedbackAuth('info', `Conta criada para <b>${email}</b>! Se o seu e-mail já estiver confirmado, digite sua senha para entrar.`);
+            mostrarFeedbackAuth('info', `Conta criada para ${email}! Se o seu e-mail já estiver confirmado, digite sua senha para entrar.`);
           }, 3500);
         }
       } catch (err) {
-        console.error('Erro de cadastro:', err);
-        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err?.message));
         btn.disabled = false;
         btnText.classList.remove('hidden');
         btnSpinner.classList.add('hidden');
@@ -4475,8 +4454,9 @@
       btnSpinner.classList.remove('hidden');
 
       try {
+        const redirectBase = window.location.origin + window.location.pathname;
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.href
+          redirectTo: redirectBase
         });
 
         btn.disabled = false;
@@ -4488,10 +4468,9 @@
           return;
         }
 
-        mostrarFeedbackAuth('success', `Instruções enviadas! Se o e-mail <b>${email}</b> estiver cadastrado, você receberá um link para redefinir sua senha.`);
+        mostrarFeedbackAuth('success', `Instruções enviadas! Se o e-mail ${email} estiver cadastrado, você receberá um link para redefinir sua senha.`);
       } catch (err) {
-        console.error('Erro ao recuperar senha:', err);
-        mostrarFeedbackAuth('error', traduzirErroSupabase(err.message));
+        mostrarFeedbackAuth('error', traduzirErroSupabase(err?.message));
         btn.disabled = false;
         btnText.classList.remove('hidden');
         btnSpinner.classList.add('hidden');
@@ -4517,8 +4496,7 @@
             mostrarFeedbackAuth('error', traduzirErroSupabase(error.message));
           }
         }
-      } catch (err) {
-        console.error('Erro de login com Google:', err);
+      } catch {
         mostrarFeedbackAuth('error', 'Não foi possível iniciar o login com o Google. Verifique sua conexão.');
       }
     }
@@ -4555,9 +4533,8 @@
           return;
         }
 
-        mostrarFeedbackAuth('success', `Link Mágico enviado para <b>${email}</b>! ✨<br/>Abra sua caixa de entrada e clique no link para acessar o painel diretamente.`);
-      } catch (err) {
-        console.error('Erro ao enviar Magic Link:', err);
+        mostrarFeedbackAuth('success', `Link Mágico enviado para ${email}! Abra sua caixa de entrada e clique no link para acessar o painel diretamente.`);
+      } catch {
         animarErroAuth();
         mostrarFeedbackAuth('error', 'Falha ao solicitar link de acesso. Verifique sua conexão.');
         btn.disabled = false;
@@ -4574,10 +4551,9 @@
           canalRealtime = null;
         }
         await supabaseClient.auth.signOut();
-        mostrarToast('Você saiu da sua conta com sucesso 👋');
+        mostrarToast('Você saiu da sua conta com sucesso 👋', 'info');
         atualizarEstadoAutenticacao(null);
-      } catch (err) {
-        console.error('Erro ao deslogar:', err);
+      } catch {
         atualizarEstadoAutenticacao(null);
       }
     }
@@ -4610,9 +4586,17 @@
         }
 
         if (avatarEl) {
+          avatarEl.textContent = '';
           const fotoUrl = meta.avatar_url || meta.picture;
-          if (fotoUrl) {
-            avatarEl.innerHTML = `<img src="${fotoUrl}" alt="Avatar" class="w-full h-full object-cover rounded-full" referrerpolicy="no-referrer" />`;
+          // Allowlist https + mesmo esquema; bloqueia javascript:/data:text/html
+          const urlSegura = (typeof fotoUrl === 'string' && /^https:\/\/[^"'<>\s]+$/i.test(fotoUrl)) ? fotoUrl : null;
+          if (urlSegura) {
+            const img = document.createElement('img');
+            img.src = urlSegura;
+            img.alt = 'Avatar';
+            img.className = 'w-full h-full object-cover rounded-full';
+            img.referrerPolicy = 'no-referrer';
+            avatarEl.appendChild(img);
           } else {
             const partes = nome.trim().split(/\s+/);
             let iniciais = 'US';
@@ -4678,12 +4662,12 @@
     }
 
     // ==============================================================================
-    // CONFIGURAÇÕES E GESTÃO DO CHATBOT PÚBLICO IA
+    // CONFIGURAÇÕES E GESTÃO DO CHATBOT PÚBLICO IA (sem segredos no frontend)
     // ==============================================================================
+    const SETORES_PERMITIDOS_PAINEL = ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'];
     let configuracaoChatGlobal = {
       nomeEmpresa: 'Nossa Empresa',
-      groqApiKey: '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', // Chave Groq ativa como fallback imediato
-      modeloIa: 'qwen/qwen3.8-27b',
+      modeloIa: 'qwen/qwen3-32b',
       setoresDisponiveis: ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral']
     };
 
@@ -4741,10 +4725,12 @@
       }
     }
 
-    // Escuta mensagens do iframe do Chatbot (ex.: quando um cliente conclui um pedido)
+    // Escuta mensagens do iframe do Chatbot (somente mesma origem)
     window.addEventListener('message', (event) => {
+      if (event.origin !== window.location.origin) return;
       if (event && event.data && event.data.tipo === 'PEDIDO_CRIADO_CHATBOT') {
-        const idPed = event.data.pedido ? '#' + event.data.pedido.id : '';
+        const idNum = Number(event.data.pedido?.id) || 0;
+        const idPed = idNum ? '#' + idNum : '';
         mostrarToast(`🤖 Pedido ${idPed} recebido pelo Chatbot IA! Atualizando painel...`);
         if (typeof carregarPedidos === 'function') {
           carregarPedidos();
@@ -4793,13 +4779,11 @@
       if (btnAbrir) btnAbrir.href = url;
 
       const inputEmpresa = document.getElementById('cfg-chat-nome-empresa');
-      const inputGroq = document.getElementById('cfg-chat-groq-key');
       const inputSetores = document.getElementById('cfg-chat-setores');
       const feedback = document.getElementById('cfg-chat-feedback');
 
       if (feedback) feedback.classList.add('hidden');
       if (inputEmpresa) inputEmpresa.value = configuracaoChatGlobal.nomeEmpresa || '';
-      if (inputGroq) inputGroq.value = configuracaoChatGlobal.groqApiKey || '';
       if (inputSetores) inputSetores.value = (configuracaoChatGlobal.setoresDisponiveis || []).join(', ');
 
       const modal = document.getElementById('modal-configuracoes-chatbot');
@@ -4816,34 +4800,36 @@
         const salvo = localStorage.getItem('painel_chat_config');
         if (salvo) {
           const parsed = JSON.parse(salvo);
-          configuracaoChatGlobal = { ...configuracaoChatGlobal, ...parsed };
+          if (parsed.nomeEmpresa) configuracaoChatGlobal.nomeEmpresa = String(parsed.nomeEmpresa).slice(0, 80);
+          if (Array.isArray(parsed.setoresDisponiveis)) {
+            const f = parsed.setoresDisponiveis.filter(s => SETORES_PERMITIDOS_PAINEL.includes(s));
+            if (f.length) configuracaoChatGlobal.setoresDisponiveis = f;
+          }
+          // groqApiKey NUNCA é lido do localStorage/banco.
         }
       } catch (e) {
-        console.warn('Erro ao ler painel_chat_config do localStorage:', e);
+        // storage corrompido: ignora
       }
     }
 
     async function salvarConfiguracoesChatbot(e) {
       if (e) e.preventDefault();
       const inputEmpresa = document.getElementById('cfg-chat-nome-empresa');
-      const inputGroq = document.getElementById('cfg-chat-groq-key');
       const inputSetores = document.getElementById('cfg-chat-setores');
       const feedback = document.getElementById('cfg-chat-feedback');
       const btn = document.getElementById('btn-salvar-cfg-chat');
 
-      const nomeEmpresa = inputEmpresa ? inputEmpresa.value.trim() : 'Nossa Empresa';
-      const groqApiKey = inputGroq ? inputGroq.value.trim() : '';
+      const nomeEmpresa = (inputEmpresa ? inputEmpresa.value.trim() : 'Nossa Empresa').slice(0, 80) || 'Nossa Empresa';
       const setoresTexto = inputSetores ? inputSetores.value.trim() : '';
 
       const setores = setoresTexto 
-        ? setoresTexto.split(',').map(s => s.trim()).filter(Boolean)
+        ? setoresTexto.split(',').map(s => s.trim()).filter(s => SETORES_PERMITIDOS_PAINEL.includes(s))
         : ['Oficina', 'Pet Shop', 'Informática', 'Vendas', 'Manutenção', 'Design', 'Geral'];
 
       configuracaoChatGlobal = {
-        nomeEmpresa: nomeEmpresa || 'Nossa Empresa',
-        groqApiKey,
-        modeloIa: 'qwen/qwen3.8-27b',
-        setoresDisponiveis: setores
+        nomeEmpresa,
+        modeloIa: 'qwen/qwen3-32b',
+        setoresDisponiveis: setores.length ? setores : ['Geral']
       };
 
       try {
@@ -4852,40 +4838,31 @@
           btn.innerHTML = `<span>Salvando...</span>`;
         }
 
-        // Salvar no localStorage (acessível pelo chat.html no mesmo domínio)
+        // Salvar no localStorage (somente config pública, sem segredos)
         localStorage.setItem('painel_chat_config', JSON.stringify(configuracaoChatGlobal));
 
-        // Se for administrador, sincronizar também no Supabase na tabela pedidos (setor especial __sistema_config__)
+        // Sincroniza config PÚBLICA (sem segredos) na tabela dedicada — nunca em pedidos
         if (usuarioCargo === 'administrador') {
           try {
+            const payloadPublico = { nomeEmpresa: configuracaoChatGlobal.nomeEmpresa, setoresDisponiveis: configuracaoChatGlobal.setoresDisponiveis };
             const { data: existente } = await supabaseClient
-              .from('pedidos')
+              .from('configuracoes_chatbot')
               .select('id')
-              .eq('setor', '__sistema_config__')
+              .eq('chave', 'public_config')
               .maybeSingle();
-
-            const configPayload = {
-              setor: '__sistema_config__',
-              cliente: 'Configurações do Chatbot',
-              servico: 'Parametrização do Assistente IA',
-              valor: 0,
-              status: 'Concluído',
-              observacoes: JSON.stringify(configuracaoChatGlobal),
-              data_pedido: new Date().toISOString().split('T')[0]
-            };
 
             if (existente && existente.id) {
               await supabaseClient
-                .from('pedidos')
-                .update(configPayload)
-                .eq('id', existente.id);
+                .from('configuracoes_chatbot')
+                .update({ valor: payloadPublico })
+                .eq('chave', 'public_config');
             } else {
               await supabaseClient
-                .from('pedidos')
-                .insert([configPayload]);
+                .from('configuracoes_chatbot')
+                .insert([{ chave: 'public_config', valor: payloadPublico }]);
             }
           } catch (syncErr) {
-            console.warn('Sincronização remota de config opcional ignorada:', syncErr);
+            // Sincronização opcional: ignora sem vazar detalhe
           }
         }
 
@@ -4955,8 +4932,15 @@
       const avatarPreview = document.getElementById('cfg-avatar-preview');
       if (avatarPreview) {
         const fotoUrl = meta.avatar_url || meta.picture;
-        if (fotoUrl) {
-          avatarPreview.innerHTML = `<img src="${fotoUrl}" alt="Avatar" class="w-full h-full object-cover rounded-full" referrerpolicy="no-referrer" />`;
+        avatarPreview.textContent = '';
+        const urlSegura = (typeof fotoUrl === 'string' && (fotoUrl.startsWith('https://') || fotoUrl.startsWith('http://') || fotoUrl.startsWith('data:image/'))) ? fotoUrl : null;
+        if (urlSegura) {
+          const img = document.createElement('img');
+          img.src = urlSegura;
+          img.alt = 'Avatar do Usuário';
+          img.className = 'w-full h-full object-cover rounded-full';
+          img.referrerPolicy = 'no-referrer';
+          avatarPreview.appendChild(img);
         } else {
           const nomeUsar = nomeCompleto || email.split('@')[0] || 'US';
           const partes = nomeUsar.trim().split(/\s+/);
@@ -5100,9 +5084,8 @@
           feedback.textContent = 'Nome de usuário e perfil atualizados com sucesso!';
         }
 
-        mostrarToast('Perfil atualizado com sucesso! 🎉');
-      } catch (err) {
-        console.error('Erro ao atualizar perfil:', err);
+        mostrarToast('Perfil atualizado com sucesso! 🎉', 'success');
+      } catch {
         if (feedback) {
           feedback.className = 'text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
           feedback.textContent = 'Falha ao salvar alterações. Tente novamente.';
@@ -5171,9 +5154,8 @@
           feedback.textContent = 'Sua senha foi atualizada com sucesso!';
         }
 
-        mostrarToast('Senha atualizada com sucesso! 🔐');
-      } catch (err) {
-        console.error('Erro ao atualizar senha:', err);
+        mostrarToast('Senha atualizada com sucesso! 🔐', 'success');
+      } catch {
         if (feedback) {
           feedback.className = 'text-xs p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800';
           feedback.textContent = 'Erro ao atualizar senha. Tente novamente.';
@@ -5226,8 +5208,8 @@
                 username: '[Perfil Excluído]'
               }
             });
-          } catch (e) {
-            console.warn('Registro de exclusão nos metadados:', e);
+          } catch {
+            // Silencia erro de metadados
           }
         }
 
@@ -5237,13 +5219,13 @@
 
         // Desconectar do Supabase Auth
         await supabaseClient.auth.signOut();
-      } catch (err) {
-        console.error('Erro ao excluir conta:', err);
+      } catch {
+        // Silencia erro de desconexão
       } finally {
         fecharConfirmacaoExclusao();
         fecharModalConfiguracoes();
         atualizarEstadoAutenticacao(null);
-        mostrarToast('Seu perfil foi excluído com sucesso.');
+        mostrarToast('Seu perfil foi excluído com sucesso.', 'info');
       }
     }
 
@@ -5271,8 +5253,11 @@
     let pedidosParaImportarCSV = [];
     let somAtivado = localStorage.getItem('som_notificacao') !== 'false';
     let metaDiaria = parseFloat(localStorage.getItem('meta_diaria')) || 2500;
-    let historicoAtividades = JSON.parse(localStorage.getItem('historico_atividades') || '[]');
+    let historicoAtividades = [];
+    try { historicoAtividades = JSON.parse(localStorage.getItem('historico_atividades') || '[]'); if (!Array.isArray(historicoAtividades)) historicoAtividades = []; } catch { historicoAtividades = []; }
     let segundosDesdeSync = 0;
+    // Kanban drag: sem função fantasma (corrige ReferenceError finalizarArrasto)
+    function finalizarArrasto() { pedidoArrastadoId = null; }
 
     // INICIALIZAÇÃO DE TEMA (DARK / LIGHT)
     function iniciarTema() {
@@ -5533,7 +5518,7 @@
       }
 
       try {
-        let query = supabaseClient.from('pedidos').select('*');
+        let query = supabaseClient.from('pedidos').select('id,cliente,telefone,servico,setor,status,valor,data_pedido,observacoes,user_id,created_at').order('created_at', { ascending: false }).limit(500);
 
         // Se for cliente comum, solicita ao Supabase estritamente os pedidos vinculados ao seu ID
         if (usuarioCargo !== 'administrador' && usuarioAtual && usuarioAtual.id) {
@@ -5544,21 +5529,7 @@
 
         if (error) throw error;
 
-        // Apenas administradores autenticados podem sincronizar o registro de contas de usuários
-        if (usuarioCargo === 'administrador') {
-          const registroContasRemoto = (data || []).find(p => p.setor === '__sistema_contas__');
-          if (registroContasRemoto && registroContasRemoto.observacoes) {
-            try {
-              const contasRemotas = JSON.parse(registroContasRemoto.observacoes);
-              if (Array.isArray(contasRemotas) && contasRemotas.length > 0) {
-                sincronizarContasRemotas(contasRemotas);
-              }
-            } catch (e) {
-              console.warn('Erro ao ler registro de contas remoto:', e);
-            }
-          }
-        }
-
+        // Registro __sistema_* foi descontinuado (vazava via RLS). Ignora silenciosamente.
         // Apenas pedidos reais (ignora registros de sistema __*)
         const novosDados = (data || []).filter(p => !p.setor || !p.setor.startsWith('__'));
         const mudou = JSON.stringify(novosDados) !== JSON.stringify(dadosOriginais);
@@ -5571,19 +5542,15 @@
           atualizarKPIs(pedidosVisiveis);
           renderizarAnalyticsSetores(pedidosVisiveis);
           filtrarEOrdenar();
-          if (emSegundoPlano && mudou) {
-            console.log('⚡ Sincronização em tempo real: novos dados renderizados.');
-          }
         } else {
           segundosDesdeSync = 0;
           const el = document.getElementById('label-ultima-sync');
           if (el) el.textContent = 'Sincronizado agora';
         }
-      } catch (err) {
-        console.error('Erro Supabase:', err);
+      } catch {
         if (!emSegundoPlano) {
           painelErro.classList.remove('hidden');
-          detalheErro.textContent = err.message || JSON.stringify(err);
+          detalheErro.textContent = 'Falha de comunicação ou permissão no banco de dados. Verifique sua conexão e tente novamente.';
         }
       } finally {
         skeletons.classList.add('hidden');
@@ -5591,7 +5558,7 @@
       }
     }
 
-    // SINCRONIZAÇÃO EM TEMPO REAL (SUPABASE REALTIME)
+    // SINCRONIZAÇÃO EM TEMPO REAL (SUPABASE REALTIME COM FILTRO POR USUÁRIO)
     function iniciarRealtime() {
       if (!usuarioAtual) return;
       try {
@@ -5599,10 +5566,13 @@
           supabaseClient.removeChannel(canalRealtime);
           canalRealtime = null;
         }
+        // Admin assina tudo; cliente assina só user_id=eq.<id> (reduz PII + tráfego)
+        const filtroRealtime = usuarioCargo === 'administrador' || !usuarioAtual.id
+          ? { event: '*', schema: 'public', table: 'pedidos' }
+          : { event: '*', schema: 'public', table: 'pedidos', filter: `user_id=eq.${usuarioAtual.id}` };
         canalRealtime = supabaseClient
           .channel('pedidos-realtime-channel')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
-            console.log('⚡ Supabase Realtime Evento:', payload);
+          .on('postgres_changes', filtroRealtime, payload => {
             tocarChime();
             if (payload.eventType === 'INSERT') {
               const cli = getCampo(payload.new, 'cliente', 'nome') || 'Cliente';
@@ -5622,15 +5592,14 @@
             carregarPedidos(true);
           })
           .subscribe(status => {
-            console.log('Status Realtime:', status);
             const badge = document.getElementById('badge-realtime');
             if (badge && status === 'SUBSCRIBED') {
               badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Ao Vivo';
               badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 shrink-0';
             }
           });
-      } catch (e) {
-        console.warn('Realtime subscription not active:', e);
+      } catch {
+        // Silencia falha de conexão realtime em ambientes restritos
       }
     }
 
@@ -5984,12 +5953,11 @@
           .eq('id', id);
 
         if (error) throw error;
-        mostrarToast(`Status alterado para "${novoStatus}"! ✅`);
-      } catch (err) {
-        console.error('Erro ao atualizar status:', err);
+        mostrarToast(`Status alterado para "${novoStatus}"! ✅`, 'success');
+      } catch {
         pedido.status = statusAntigo;
         filtrarEOrdenar();
-        mostrarToast('Erro ao atualizar status no banco de dados.');
+        mostrarToast('Erro ao atualizar status no banco de dados.', 'error');
       }
     }
 
@@ -6077,10 +6045,13 @@
     }
 
     function linkWhatsApp(telefone, cliente, servico) {
-      const numLimpo = String(telefone || '').replace(/\D/g, '');
-      if (numLimpo.length >= 10) {
+      const numLimpo = String(telefone || '').replace(/\D/g, '').slice(0, 15);
+      if (numLimpo.length >= 10 && numLimpo.length <= 15) {
         const ddi = numLimpo.startsWith('55') ? numLimpo : `55${numLimpo}`;
-        const saudacao = encodeURIComponent(`Olá ${cliente}! Gostaria de falar sobre o pedido de ${servico}.`);
+        if (!/^\d{12,15}$/.test(ddi)) return null;
+        const cliSeguro = String(cliente || '').slice(0, 60);
+        const svcSeguro = String(servico || '').slice(0, 80);
+        const saudacao = encodeURIComponent(`Olá ${cliSeguro}! Gostaria de falar sobre o pedido de ${svcSeguro}.`);
         return `https://wa.me/${ddi}?text=${saudacao}`;
       } else if (numLimpo.length > 0) {
         return `tel:${numLimpo}`;
@@ -6581,7 +6552,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
       document.getElementById('modal-det-cliente').textContent = cliente;
       document.getElementById('modal-det-servico').textContent = servico;
-      document.getElementById('modal-det-setor').textContent = setor;
+      const elSetor = document.getElementById('modal-det-setor');
+      if (elSetor) elSetor.textContent = setor;
       document.getElementById('modal-det-data').textContent = formatarData(data);
       document.getElementById('modal-det-valor').textContent = formatarMoeda(valor);
       document.getElementById('pix-valor-display').textContent = formatarMoeda(valor);
@@ -6748,11 +6720,12 @@ const colPendente = document.getElementById('kanban-col-pendente');
       const authCode = `AUT-${String(id).padStart(4, '0')}-${new Date().getTime().toString(36).toUpperCase()}`;
       document.getElementById('recibo-codigo-autenticacao').textContent = authCode;
 
-      // QR Code PIX
+      // QR Code PIX — minimiza PII enviada a terceiro (só chave+valor+id, sem nome do cliente)
       const imgQr = document.getElementById('recibo-qrcode-img');
       if (imgQr) {
-        const payloadPix = `Chave: ${chavePixPadrao} | Valor: R$ ${valor.toFixed(2)} | Pedido #${id} | Cliente: ${cliente}`;
+        const payloadPix = `Chave: ${chavePixPadrao} | Valor: R$ ${Number(valor).toFixed(2)} | Pedido #${Number(id) || 0}`;
         imgQr.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payloadPix)}`;
+        imgQr.referrerPolicy = 'no-referrer';
       }
 
       document.getElementById('modal-recibo-pedido').classList.remove('hidden');
@@ -6766,7 +6739,11 @@ const colPendente = document.getElementById('kanban-col-pendente');
     function imprimirReciboDigital() {
       const conteudo = document.getElementById('area-recibo-conteudo');
       if (!conteudo) return;
-      const janelaPrint = window.open('', '_blank', 'width=450,height=650');
+      // Usa apenas texto (sem re-emitir innerHTML com <mark>/links) para evitar XSS na janela de impressão
+      const janelaPrint = window.open('', '_blank', 'width=450,height=650,noopener,noreferrer');
+      if (!janelaPrint) return;
+      janelaPrint.opener = null;
+      const textoSeguro = conteudo.textContent || '';
       janelaPrint.document.write(`
         <!DOCTYPE html>
         <html>
@@ -6774,22 +6751,16 @@ const colPendente = document.getElementById('kanban-col-pendente');
           <meta charset="UTF-8">
           <title>Recibo Digital</title>
           <style>
-            body { font-family: monospace; padding: 20px; color: #111; font-size: 12px; }
-            .border-b { border-bottom: 1px dashed #999; padding-bottom: 8px; margin-bottom: 8px; }
-            .text-center { text-align: center; }
-            .font-bold { font-weight: bold; }
-            .flex-between { display: flex; justify-content: space-between; margin: 4px 0; }
-            .valor-total { font-size: 16px; font-weight: 900; margin: 10px 0; border-top: 2px solid #000; padding-top: 8px; }
-            img { max-width: 120px; display: block; margin: 8px auto; }
+            body { font-family: monospace; padding: 20px; color: #111; font-size: 12px; white-space: pre-wrap; }
           </style>
         </head>
-        <body>
-          ${conteudo.innerHTML}
-          <script>window.onload = function() { window.print(); }<\/script>
-        </body>
+        <body></body>
         </html>
       `);
       janelaPrint.document.close();
+      janelaPrint.document.body.textContent = textoSeguro;
+      janelaPrint.focus();
+      janelaPrint.print();
     }
 
     function copiarTextoRecibo() {
@@ -6836,9 +6807,10 @@ const colPendente = document.getElementById('kanban-col-pendente');
       if (!oculto && pedidoSelecionado) {
         const chave = document.getElementById('campo-chave-pix').value || chavePixPadrao;
         const valor = extrairNumero(getCampo(pedidoSelecionado, 'valor', 'preco'));
-        const cli = getCampo(pedidoSelecionado, 'cliente', 'nome') || 'Cliente';
-        const payloadPix = `Chave: ${chave} | Valor: R$ ${valor.toFixed(2)} | Pedido #${pedidoSelecionado.id} | Cliente: ${cli}`;
+        const idPix = Number(pedidoSelecionado.id) || 0;
+        const payloadPix = `Chave: ${chave} | Valor: R$ ${Number(valor).toFixed(2)} | Pedido #${idPix}`;
         img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payloadPix)}`;
+        img.referrerPolicy = 'no-referrer';
       }
     }
 
@@ -6970,7 +6942,20 @@ const colPendente = document.getElementById('kanban-col-pendente');
       }
       if (pedidosSelecionados.size === 0) return;
 
-      const ids = Array.from(pedidosSelecionados);
+      // Filtra só IDs que o usuário pode alterar (cliente: só os seus)
+      const idsPermitidos = Array.from(pedidosSelecionados).filter(id => {
+        const ped = dadosOriginais.find(p => Number(p.id) === Number(id));
+        if (!ped) return false;
+        return usuarioCargo === 'administrador' || pedidoPertenceAoUsuario(ped, usuarioAtual);
+      });
+      if (idsPermitidos.length === 0) {
+        mostrarToast('Você não tem permissão para alterar estes pedidos.');
+        return;
+      }
+      if (idsPermitidos.length !== pedidosSelecionados.size) {
+        mostrarToast(`Apenas ${idsPermitidos.length} pedidos autorizados serão atualizados.`);
+      }
+      const ids = idsPermitidos;
       const confirmacao = confirm(`Deseja alterar o status de ${ids.length} pedidos selecionados para "${novoStatus}"?`);
       if (!confirmacao) return;
 
@@ -6991,11 +6976,10 @@ const colPendente = document.getElementById('kanban-col-pendente');
           .in('id', ids);
 
         if (error) throw error;
-        mostrarToast(`${ids.length} pedidos atualizados para "${novoStatus}"! ✨`);
+        mostrarToast(`${ids.length} pedidos atualizados para "${novoStatus}"! ✨`, 'success');
         desmarcarTodosLote();
-      } catch (err) {
-        console.error('Erro ao atualizar em lote:', err);
-        mostrarToast('Erro ao atualizar pedidos no Supabase.');
+      } catch {
+        mostrarToast('Erro ao atualizar pedidos no Supabase.', 'error');
         await carregarPedidos(true);
       }
     }
@@ -7044,15 +7028,15 @@ const colPendente = document.getElementById('kanban-col-pendente');
       if (pedidosParaImprimir.length === 0) return;
 
       const htmlCupons = pedidosParaImprimir.map((p, idx) => {
-        const id = p.id;
-        const cliente = getCampo(p, 'cliente', 'nome') || 'Cliente';
-        const telefone = getCampo(p, 'telefone', 'contato') || '-';
-        const setor = getCampo(p, 'setor', 'categoria') || 'Geral';
-        const status = getCampo(p, 'status') || 'Pendente';
-        const servico = getCampo(p, 'servico', 'serviço') || 'Serviço sob consulta';
+        const id = Number(p.id) || 0;
+        const cliente = escapeHtml(getCampo(p, 'cliente', 'nome') || 'Cliente');
+        const telefone = escapeHtml(getCampo(p, 'telefone', 'contato') || '-');
+        const setor = escapeHtml(getCampo(p, 'setor', 'categoria') || 'Geral');
+        const status = escapeHtml(getCampo(p, 'status') || 'Pendente');
+        const servico = escapeHtml(getCampo(p, 'servico', 'serviço') || 'Serviço sob consulta');
         const valor = formatarMoeda(getCampo(p, 'valor', 'preco'));
-        const data = formatarData(getCampo(p, 'data_pedido', 'data'));
-        const obs = getCampo(p, 'observacoes', 'obs') || '-';
+        const data = escapeHtml(formatarData(getCampo(p, 'data_pedido', 'data')));
+        const obs = escapeHtml(getCampo(p, 'observacoes', 'obs') || '-');
 
         return `
           <div class="cupom">
@@ -7087,7 +7071,9 @@ const colPendente = document.getElementById('kanban-col-pendente');
         `;
       }).join('');
 
-      const win = window.open('', '_blank', 'width=450,height=700');
+      const win = window.open('', '_blank', 'width=450,height=700,noopener,noreferrer');
+      if (!win) return;
+      win.opener = null;
       win.document.write(`
         <!DOCTYPE html>
         <html>
@@ -7123,11 +7109,12 @@ const colPendente = document.getElementById('kanban-col-pendente');
         </head>
         <body>
           ${htmlCupons}
-          <script>window.onload = function() { window.print(); }<\/script>
         </body>
         </html>
       `);
       win.document.close();
+      win.focus();
+      win.print();
     }
 
     // RELATÓRIO EXECUTIVO E FECHAMENTO DO DIA (EXCLUSIVO ADMINISTRADOR)
@@ -7172,9 +7159,9 @@ const colPendente = document.getElementById('kanban-col-pendente');
         const pct = faturamento > 0 ? Math.round((item.valor / faturamento) * 100) : 0;
         return `
           <div class="flex items-center justify-between text-xs py-1.5 border-b border-slate-100 dark:border-slate-800/80">
-            <span class="font-bold text-slate-800 dark:text-slate-200">${s} (${item.qtd})</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${escapeHtml(s)} (${Number(item.qtd) || 0})</span>
             <div class="flex items-center gap-2">
-              <span class="text-[11px] text-slate-400 font-semibold">${pct}%</span>
+              <span class="text-[11px] text-slate-400 font-semibold">${Number(pct) || 0}%</span>
               <span class="font-extrabold text-indigo-600 dark:text-indigo-400">${formatarMoeda(item.valor)}</span>
             </div>
           </div>
@@ -7185,8 +7172,8 @@ const colPendente = document.getElementById('kanban-col-pendente');
       const servicosOrdenados = Object.keys(servicosMap).sort((a, b) => servicosMap[b] - servicosMap[a]).slice(0, 5);
       listaServicosEl.innerHTML = servicosOrdenados.map(srv => `
         <div class="flex items-center justify-between text-xs py-1">
-          <span class="text-slate-700 dark:text-slate-300 truncate max-w-xs">&bull; ${srv}</span>
-          <span class="font-bold text-slate-900 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800">${servicosMap[srv]}x</span>
+          <span class="text-slate-700 dark:text-slate-300 truncate max-w-xs">&bull; ${escapeHtml(srv)}</span>
+          <span class="font-bold text-slate-900 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800">${Number(servicosMap[srv]) || 0}x</span>
         </div>
       `).join('');
 
@@ -7355,20 +7342,23 @@ const colPendente = document.getElementById('kanban-col-pendente');
     // IMPRIMIR COMPROVANTE INDIVIDUAL
     function imprimirComprovanteIndividual() {
       if (!pedidoSelecionado) return;
-      const cliente = getCampo(pedidoSelecionado, 'cliente', 'nome');
-      const servico = getCampo(pedidoSelecionado, 'servico', 'serviço');
+      const cliente = escapeHtml(getCampo(pedidoSelecionado, 'cliente', 'nome'));
+      const servico = escapeHtml(getCampo(pedidoSelecionado, 'servico', 'serviço'));
       const valor = formatarMoeda(getCampo(pedidoSelecionado, 'valor', 'preco'));
-      const data = formatarData(getCampo(pedidoSelecionado, 'data_pedido', 'data'));
-      const setor = getCampo(pedidoSelecionado, 'setor');
-      const status = getCampo(pedidoSelecionado, 'status');
-      const obs = getCampo(pedidoSelecionado, 'observacoes') || 'Nenhuma';
+      const data = escapeHtml(formatarData(getCampo(pedidoSelecionado, 'data_pedido', 'data')));
+      const setor = escapeHtml(getCampo(pedidoSelecionado, 'setor'));
+      const status = escapeHtml(getCampo(pedidoSelecionado, 'status'));
+      const obs = escapeHtml(getCampo(pedidoSelecionado, 'observacoes') || 'Nenhuma');
+      const idSeguro = Number(pedidoSelecionado.id) || 0;
 
-      const win = window.open('', '_blank', 'width=450,height=600');
+      const win = window.open('', '_blank', 'width=450,height=600,noopener,noreferrer');
+      if (!win) return;
+      win.opener = null;
       win.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Comprovante - Pedido #${pedidoSelecionado.id || ''}</title>
+          <title>Comprovante - Pedido #${idSeguro}</title>
           <style>
             body { font-family: monospace, sans-serif; padding: 20px; font-size: 12px; line-height: 1.4; color: #111; }
             .header { text-align: center; border-bottom: 1px dashed #999; padding-bottom: 10px; margin-bottom: 12px; }
@@ -7382,7 +7372,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
             <h2 style="margin:0;">COMPROVANTE DE PEDIDO</h2>
             <p style="margin:4px 0 0 0;">Central de Atendimento Operacional</p>
           </div>
-          <div class="linha"><span>Pedido:</span><span>#${pedidoSelecionado.id || ''}</span></div>
+          <div class="linha"><span>Pedido:</span><span>#${idSeguro}</span></div>
           <div class="linha"><span>Cliente:</span><span>${cliente}</span></div>
           <div class="linha"><span>Setor:</span><span>${setor}</span></div>
           <div class="linha"><span>Data/Horário:</span><span>${data}</span></div>
@@ -7401,13 +7391,14 @@ const colPendente = document.getElementById('kanban-col-pendente');
           </div>
           <div class="footer">
             <p>Obrigado pela preferência!</p>
-            <p>Emitido em: ${new Date().toLocaleString('pt-BR')}</p>
+            <p>Emitido em: ${escapeHtml(new Date().toLocaleString('pt-BR'))}</p>
           </div>
-          <script>window.onload = function() { window.print(); }<\/script>
         </body>
         </html>
       `);
       win.document.close();
+      win.focus();
+      win.print();
     }
 
     // CALCULADORA DE TROCO EM TEMPO REAL (MODAL DETALHES)
@@ -7458,10 +7449,13 @@ const colPendente = document.getElementById('kanban-col-pendente');
           inputCliente.classList.add('bg-slate-100', 'dark:bg-slate-800/80', 'cursor-not-allowed', 'text-slate-500');
         }
         if (alertaCliente) {
-          alertaCliente.innerHTML = `
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-            <span>Este pedido será registrado diretamente na sua conta de Cliente (<b>${nomeCliente}</b>).</span>
-          `;
+          alertaCliente.textContent = '';
+          const dot = document.createElement('span');
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0';
+          const txt = document.createElement('span');
+          txt.textContent = `Este pedido será registrado diretamente na sua conta de Cliente (${nomeCliente}).`;
+          alertaCliente.appendChild(dot);
+          alertaCliente.appendChild(txt);
           alertaCliente.classList.remove('hidden');
         }
       } else {
@@ -7488,6 +7482,11 @@ const colPendente = document.getElementById('kanban-col-pendente');
         p = pedidoSelecionado;
       }
       if (!p) return;
+      // Trava de autorização estrita: cliente só pode editar pedidos pertencentes ao seu perfil
+      if (usuarioCargo !== 'administrador' && !pedidoPertenceAoUsuario(p, usuarioAtual)) {
+        mostrarToast('Acesso negado: Você só pode editar pedidos pertencentes ao seu perfil.', 'error');
+        return;
+      }
       pedidoSelecionado = p;
       fecharModalDetalhes();
 
@@ -7556,14 +7555,31 @@ const colPendente = document.getElementById('kanban-col-pendente');
         }
       }
 
-      const cliente = document.getElementById('novo-cliente').value.trim();
-      const telefone = document.getElementById('novo-telefone').value.trim();
-      const setor = document.getElementById('novo-setor').value.trim() || 'Geral';
+      const cliente = document.getElementById('novo-cliente').value.trim().slice(0, 120);
+      const telefone = document.getElementById('novo-telefone').value.trim().slice(0, 30);
+      const setorRaw = document.getElementById('novo-setor').value.trim().slice(0, 60) || 'Geral';
+      const setor = SETORES_PERMITIDOS_PAINEL.includes(setorRaw) ? setorRaw : 'Geral';
       const status = document.getElementById('novo-status').value;
-      const servico = document.getElementById('novo-servico').value.trim();
-      const valor = parseFloat(document.getElementById('novo-valor').value) || 0;
-      const data_pedido = document.getElementById('novo-data').value.trim();
-      const observacoes = document.getElementById('novo-obs').value.trim();
+      const servico = document.getElementById('novo-servico').value.trim().slice(0, 200);
+      const valorRaw = parseFloat(document.getElementById('novo-valor').value);
+      const valor = Number.isFinite(valorRaw) ? Math.min(1000000, Math.max(0, valorRaw)) : 0;
+      const data_pedido = document.getElementById('novo-data').value.trim().slice(0, 60);
+      const observacoes = document.getElementById('novo-obs').value.trim().slice(0, 4000);
+
+      if (cliente.length < 2 || servico.length < 2) {
+        erroEl.textContent = 'Informe cliente (2+ letras) e serviço (2+ letras).';
+        erroEl.classList.remove('hidden');
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = idEdicao ? 'Atualizar Pedido' : 'Salvar Pedido';
+        return;
+      }
+      if (telefone && telefone.replace(/\D/g, '').length < 8) {
+        erroEl.textContent = 'Telefone inválido (mínimo 8 dígitos).';
+        erroEl.classList.remove('hidden');
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = idEdicao ? 'Atualizar Pedido' : 'Salvar Pedido';
+        return;
+      }
 
       btnSalvar.disabled = true;
       btnSalvar.textContent = 'Salvando...';
@@ -7580,6 +7596,13 @@ const colPendente = document.getElementById('kanban-col-pendente');
         user_id: usuarioAtual ? usuarioAtual.id : null
       };
 
+      if (idEdicao) {
+        const pedidoExistente = dadosOriginais.find(p => Number(p.id) === Number(idEdicao));
+        if (pedidoExistente && pedidoExistente.user_id) {
+          payload.user_id = pedidoExistente.user_id;
+        }
+      }
+
       try {
         if (idEdicao) {
           const { error } = await supabaseClient
@@ -7588,7 +7611,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
             .eq('id', idEdicao);
 
           if (error) throw error;
-          mostrarToast('Pedido atualizado com sucesso! ✨');
+          mostrarToast('Pedido atualizado com sucesso! ✨', 'success');
           registrarAtividade('Pedido Editado', `Pedido #${idEdicao} de ${cliente} modificado`);
         } else {
           const { error } = await supabaseClient
@@ -7596,15 +7619,14 @@ const colPendente = document.getElementById('kanban-col-pendente');
             .insert([payload]);
 
           if (error) throw error;
-          mostrarToast('Pedido cadastrado com sucesso! 🎉');
+          mostrarToast('Pedido cadastrado com sucesso! 🎉', 'success');
           registrarAtividade('Novo Pedido', `Cadastrado pedido para ${cliente} no setor ${setor}`);
         }
 
         fecharModalNovoPedido();
         await carregarPedidos();
-      } catch (err) {
-        console.error('Erro ao salvar:', err);
-        erroEl.textContent = `Erro no Supabase: ${err.message || 'Verifique as permissões de gravação RLS'}`;
+      } catch {
+        erroEl.textContent = 'Não foi possível salvar as alterações do pedido. Verifique os campos e suas permissões.';
         erroEl.classList.remove('hidden');
       } finally {
         btnSalvar.disabled = false;
@@ -7652,12 +7674,11 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
         if (error) throw error;
 
-        mostrarToast(`Pedido #${numId} excluído com sucesso! 🗑️`);
+        mostrarToast(`Pedido #${numId} excluído com sucesso! 🗑️`, 'success');
         registrarAtividade('Exclusão', `Pedido #${numId} (${nomeCliente}) foi excluído`);
         await carregarPedidos(true);
-      } catch (err) {
-        console.error('Erro ao excluir pedido:', err);
-        mostrarToast(`Erro ao excluir: ${err.message || 'Falha de conexão'}`);
+      } catch {
+        mostrarToast('Não foi possível excluir o pedido. Verifique sua conexão e permissões.', 'error');
         await carregarPedidos(false);
       }
     }
@@ -7706,12 +7727,11 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
         if (error) throw error;
 
-        mostrarToast(`${total} pedidos excluídos com sucesso! 🗑️`);
+        mostrarToast(`${total} pedidos excluídos com sucesso! 🗑️`, 'success');
         registrarAtividade('Exclusão em Lote', `${total} pedidos excluídos`);
         await carregarPedidos(true);
-      } catch (err) {
-        console.error('Erro ao excluir em lote:', err);
-        mostrarToast(`Erro ao excluir em lote: ${err.message || 'Falha ao processar'}`);
+      } catch {
+        mostrarToast('Não foi possível excluir os pedidos selecionados.', 'error');
         await carregarPedidos(false);
       }
     }
@@ -7789,12 +7809,41 @@ const colPendente = document.getElementById('kanban-col-pendente');
       mostrarToast('Filtros limpos');
     }
 
-    // TOAST FEEDBACK NOTIFICATIONS
-    function mostrarToast(mensagem) {
+    // TOAST FEEDBACK NOTIFICATIONS SEGURO E POLIDO
+    function mostrarToast(mensagem, tipo = 'info') {
       const container = document.getElementById('toast-container');
+      if (!container) return;
+
       const toast = document.createElement('div');
-      toast.className = 'pointer-events-auto bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 transition-all duration-300 transform translate-y-2 opacity-0';
-      toast.textContent = mensagem;
+
+      let estiloTipo = 'bg-slate-900 text-white dark:bg-slate-800 dark:text-white border-slate-700/60';
+      let icone = '⚡';
+
+      if (tipo === 'success') {
+        estiloTipo = 'bg-emerald-900/95 text-emerald-100 border-emerald-500/50 shadow-emerald-950/30';
+        icone = '✓';
+      } else if (tipo === 'error') {
+        estiloTipo = 'bg-rose-900/95 text-rose-100 border-rose-500/50 shadow-rose-950/30';
+        icone = '✕';
+      } else if (tipo === 'warning') {
+        estiloTipo = 'bg-amber-900/95 text-amber-100 border-amber-500/50 shadow-amber-950/30';
+        icone = '⚠';
+      } else if (tipo === 'info') {
+        estiloTipo = 'bg-slate-900/95 text-slate-100 border-indigo-500/40';
+        icone = 'ℹ';
+      }
+
+      toast.className = `pointer-events-auto ${estiloTipo} border px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 transition-all duration-300 transform translate-y-2 opacity-0 select-none`;
+
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0 font-bold bg-white/20';
+      iconSpan.textContent = icone;
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = mensagem;
+
+      toast.appendChild(iconSpan);
+      toast.appendChild(textSpan);
 
       container.appendChild(toast);
       setTimeout(() => {
@@ -7804,7 +7853,7 @@ const colPendente = document.getElementById('kanban-col-pendente');
       setTimeout(() => {
         toast.classList.add('opacity-0', 'translate-y-2');
         setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      }, 3500);
     }
 
     // MODAL DE IMPORTAÇÃO CSV
@@ -7899,7 +7948,17 @@ const colPendente = document.getElementById('kanban-col-pendente');
           const data_pedido = getCampo(obj, 'data_pedido', 'data') || colunas[6] || 'Hoje';
           const observacoes = getCampo(obj, 'observacoes', 'obs') || colunas[7] || '(Importado via CSV)';
 
-          novos.push({ cliente, telefone, setor, status, servico, valor, data_pedido, observacoes });
+          novos.push({
+            cliente,
+            telefone,
+            setor,
+            status,
+            servico,
+            valor,
+            data_pedido,
+            observacoes,
+            user_id: usuarioAtual ? usuarioAtual.id : null
+          });
         }
 
         if (novos.length === 0) {
@@ -7944,13 +8003,12 @@ const colPendente = document.getElementById('kanban-col-pendente');
 
         if (error) throw error;
 
-        mostrarToast(`${pedidosParaImportarCSV.length} pedidos importados com sucesso! 🚀`);
+        mostrarToast(`${pedidosParaImportarCSV.length} pedidos importados com sucesso! 🚀`, 'success');
         registrarAtividade('Importação CSV', `${pedidosParaImportarCSV.length} novos pedidos importados`);
         fecharModalImportarCSV();
         await carregarPedidos();
-      } catch (err) {
-        console.error('Erro ao importar CSV:', err);
-        erroBox.textContent = `Erro ao cadastrar no Supabase: ${err.message || 'Verifique permissões'}`;
+      } catch {
+        erroBox.textContent = 'Falha ao cadastrar os registros no banco de dados. Verifique o formato do arquivo e suas permissões.';
         erroBox.classList.remove('hidden');
       } finally {
         btn.disabled = false;
@@ -8081,14 +8139,12 @@ const colPendente = document.getElementById('kanban-col-pendente');
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         atualizarEstadoAutenticacao(session?.user || null);
-      } catch (err) {
-        console.warn('Erro ao checar sessão inicial do Supabase:', err);
+      } catch {
         atualizarEstadoAutenticacao(null);
       }
 
       // Escutar mudanças de estado de autenticação (Login, Logout, Renovação)
       supabaseClient.auth.onAuthStateChange((event, session) => {
-        console.log('🔄 Supabase Auth Evento:', event);
         if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
           atualizarEstadoAutenticacao(session?.user || null);
         } else if (event === 'SIGNED_OUT') {

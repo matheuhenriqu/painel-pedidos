@@ -1,46 +1,42 @@
 # Supabase Edge Function: `chat-ia`
 
-Esta Edge Function faz a intermediação segura entre o frontend da Central de Pedidos e o provedor de Inteligência Artificial da Groq (Qwen 3.8 27B e Whisper Large v3 Turbo).
+Esta Edge Function faz a intermediação segura entre o frontend da Central de Pedidos e o provedor de IA da Groq.
 
-**Vantagem de Segurança:**
-A chave `GROQ_API_KEY` fica armazenada com sigilo absoluto nos segredos criptografados do Supabase, **nunca sendo exposta no código-fonte nem enviada ao navegador do cliente**.
+**Segurança:**
+- A chave `GROQ_API_KEY` fica **somente** nos Secrets da Edge Function. Nunca no frontend, nunca no repo.
+- Sem override por header (`x-groq-key` removido). Sem fallback direto `api.groq.com` no frontend.
+- CORS por allowlist (`ALLOWED_ORIGINS`), sem `*`. Validação de modelo/mensagens/tamanho + rate-limit.
+
+> Se esta chave vazou antes (histórico do git), **revogue no painel Groq e gere outra**.
 
 ---
 
-## 1. Como Publicar a Edge Function
-
-No terminal do seu projeto, utilize o Supabase CLI:
+## 1. Publicar
 
 ```bash
-# 1. Faça login no Supabase (se ainda não fez)
 npx supabase login
+npx supabase link --project-ref SEU_PROJECT_REF
 
-# 2. Vincule seu projeto (ID: xqmzysjzopyuelvhokwm)
-npx supabase link --project-ref xqmzysjzopyuelvhokwm
+# Defina os segredos (NUNCA commite valores reais)
+npx supabase secrets set GROQ_API_KEY=SUA_CHAVE_AQUI
+npx supabase secrets set ALLOWED_ORIGINS=https://seu-dominio.com,https://www.seu-dominio.com
 
-# 3. Defina a chave secreta da API do Groq
-npx supabase secrets set GROQ_API_KEY=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
-
-# 4. Faça o deploy da função (sem validação de JWT para permitir autoatendimento público)
+# Deploy COM verificação JWT desabilitada apenas porque o chatbot é público.
+# O controle passa a ser: CORS allowlist + validação + rate-limit na função.
 npx supabase functions deploy chat-ia --no-verify-jwt
 ```
 
----
+## 2. Pelo Dashboard (sem terminal)
 
-## 2. Configuração pelo Supabase Dashboard (Sem Terminal)
+1. Acesse `Edge Functions > chat-ia > Secrets`.
+2. Adicione `GROQ_API_KEY` = sua chave (cole uma vez, não salve em arquivo).
+3. Adicione `ALLOWED_ORIGINS` = seus domínios separados por vírgula.
+4. Publique o código de `index.ts`.
 
-1. Acesse: https://supabase.com/dashboard/project/xqmzysjzopyuelvhokwm/functions
-2. Clique em **Edge Functions** > **Secrets** (ou **Project Settings** > **Vault**).
-3. Adicione um novo segredo:
-   - **Nome:** `GROQ_API_KEY`
-   - **Valor:** `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`
-4. Na aba **Edge Functions**, publique a função `chat-ia` com o código contido em `index.ts`.
+## 3. Rotas
 
----
-
-## 3. Rotas e Recursos Suportados
-
-- **POST /functions/v1/chat-ia** (JSON):
-  - Envia mensagens conversacionais para o modelo `qwen/qwen3.8-27b` com fallback automático para `qwen/qwen3.6-27b`.
-- **POST /functions/v1/chat-ia** (`multipart/form-data`):
-  - Transcreve áudio com o modelo `whisper-large-v3-turbo` em português.
+- `POST /functions/v1/chat-ia` (JSON `{messages, model, max_tokens, temperature}`):
+  - `model` restrito à allowlist no servidor; `max_tokens` clamp 1–600; `temperature` 0–1.
+  - System prompt fixo no servidor; mensagens do cliente limitadas (20 msgs, 2000 chars cada).
+- `POST /functions/v1/chat-ia` (`multipart/form-data` `file`):
+  - Áudio até 5MB, `audio/*`. Também aceita `{"tipo":"transcricao_audio","audioBase64":"..."}` limitado.
